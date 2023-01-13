@@ -34,7 +34,7 @@ jobs:
             CMD_BUILD: >
                 pyinstaller -F -c -n sbte-formatter -i src/icon.icns src/main.py &&
                 cd dist/ &&
-                zip -r9 sbte-formatter sbte-formatter.app/
+                zip -r9 sbte-formatter-macos sbte-formatter.app/
             OUT_FILE_NAME: sbte-formatter-macos.zip
             ASSET_MIME: application/zip
           - os: windows-latest
