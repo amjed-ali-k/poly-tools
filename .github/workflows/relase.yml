@@ -13,13 +13,14 @@ jobs:
     steps:
     - name: Create Release
       id: create_release
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: ncipollo/release-action@v1
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
         title: Release ${{ github.ref }}
-        draft: true
-  
+        draft: false
+        allowUpdates: true
+
   build:
     name: Build packages
     runs-on: ${{ matrix.os }}
@@ -57,23 +58,27 @@ jobs:
 
 
     - name: Upload release
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: ncipollo/release-action@v1
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
         title: Release ${{ github.ref }}
-        draft: true
-        files: ./dist/${{ matrix.OUT_FILE_NAME}}
+        draft: false
+        allowUpdates: true
+        artifacts: ./dist/${{ matrix.OUT_FILE_NAME}}
+        artifactContentType: ${{ matrix.ASSET_MIME}}
 
   finish:
     name: Finish Release
     runs-on: ubuntu-latest
     needs: [build, createrelease]
     steps:
-      - name: Upload release
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          title: Release ${{ github.ref }}
-          draft: false
+    - name: Upload release
+      uses: ncipollo/release-action@v1
+      with:
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        allowUpdates: true
+        # title: Release ${{ github.ref }}
+        draft: false
+        generateReleaseNotes: true
