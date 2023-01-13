@@ -65,6 +65,7 @@ jobs:
         title: Release ${{ github.ref }}
         draft: false
         allowUpdates: true
+        replacesArtifacts: false
         artifacts: ./dist/${{ matrix.OUT_FILE_NAME}}
         artifactContentType: ${{ matrix.ASSET_MIME}}
 
@@ -81,4 +82,5 @@ jobs:
         allowUpdates: true
         # title: Release ${{ github.ref }}
         draft: false
+        replacesArtifacts: false
         generateReleaseNotes: true
