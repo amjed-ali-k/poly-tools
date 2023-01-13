@@ -49,7 +49,6 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        automatic_release_tag: ${{ github.ref }}
         title: Release ${{ github.ref }}
         draft: false
         files: ./dist/${{ matrix.OUT_FILE_NAME}}
