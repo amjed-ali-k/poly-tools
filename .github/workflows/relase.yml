@@ -6,7 +6,20 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-jobs:
+jobs: 
+  createrelease:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        title: Release ${{ github.ref }}
+        draft: true
+  
   build:
     name: Build packages
     runs-on: ${{ matrix.os }}
@@ -26,7 +39,7 @@ jobs:
             CMD_BUILD: pyinstaller -F -w -n sbte-formatter -i src/favicon.ico src/main.py
             OUT_FILE_NAME: sbte-formatter.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
-            
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
@@ -42,8 +55,6 @@ jobs:
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
 
-    - name: Load Release URL File from release job
-      uses: actions/download-artifact@v3
 
     - name: Upload release
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -51,5 +62,18 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
         title: Release ${{ github.ref }}
-        draft: false
+        draft: true
         files: ./dist/${{ matrix.OUT_FILE_NAME}}
+
+  finish:
+    name: Finish Release
+    runs-on: ubuntu-latest
+    needs: [build, createrelease]
+    steps:
+      - name: Upload release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          title: Release ${{ github.ref }}
+          draft: false
