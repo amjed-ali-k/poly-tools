@@ -26,6 +26,7 @@ jobs:
             CMD_BUILD: pyinstaller -F -w -n sbte-formatter -i src/favicon.ico src/main.py
             OUT_FILE_NAME: sbte-formatter.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
+            
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
