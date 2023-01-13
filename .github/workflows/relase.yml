@@ -23,6 +23,8 @@ jobs:
 
   build:
     name: Build packages
+    needs: createrelease
+
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -30,14 +32,14 @@ jobs:
           - os: macos-latest
             TARGET: macos
             CMD_BUILD: >
-                pyinstaller -F -w -n sbte-formatter -i src/icon.icns src/main.py &&
+                pyinstaller -F -c -n sbte-formatter -i src/icon.icns src/main.py &&
                 cd dist/ &&
                 zip -r9 sbte-formatter sbte-formatter.app/
             OUT_FILE_NAME: sbte-formatter-macos.zip
             ASSET_MIME: application/zip
           - os: windows-latest
             TARGET: windows
-            CMD_BUILD: pyinstaller -F -w -n sbte-formatter -i src/favicon.ico src/main.py
+            CMD_BUILD: pyinstaller -F -c -n sbte-formatter -i src/favicon.ico src/main.py
             OUT_FILE_NAME: sbte-formatter.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
 
