@@ -1,3 +1,0 @@
-questionary
-humanize
-pyinstaller

@@ -69,13 +69,17 @@ function App() {
       <Flex
         alignItems="center"
         justifyContent="center"
+        flexDirection="column"
         flexGrow="1"
         height="100vh"
+        css={{
+          userSelect: "none",
+        }}
       >
         <Box>
           <Card w="lg">
             <CardHeader>
-              <Heading size="md">Add file</Heading>
+              <Heading size="md">Process file</Heading>
             </CardHeader>
 
             <CardBody>
@@ -99,7 +103,7 @@ function App() {
                         <Icon inline icon="material-symbols:upload-file" />
                       }
                     >
-                      Upload File
+                      <span style={{ marginTop: 3 }}>Upload File</span>
                     </Button>
                     <Tag
                       mx={3}
@@ -154,11 +158,25 @@ function App() {
               </Stack>
 
               {/* If you add the size prop to `InputGroup`, it'll pass it to all its children. */}
-              <Button my={2} colorScheme="blue" onClick={handleProcess}>
-                Start
+              <Button
+                my={2}
+                colorScheme="blue"
+                rightIcon={<Icon icon="codicon:debug-start" />}
+                onClick={handleProcess}
+              >
+                <span style={{ marginTop: 3 }}>Start</span>
               </Button>
             </CardBody>
           </Card>
+        </Box>
+        <Box p="5" display="flex">
+          Made with
+          <Icon
+            icon="noto-v1:heart-suit"
+            style={{ marginLeft: 4, marginTop: 3, marginRight: 4 }}
+            inline
+          />{" "}
+          Amjed Ali K
         </Box>
       </Flex>
     </>
