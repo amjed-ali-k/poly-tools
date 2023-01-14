@@ -1,7 +1,7 @@
 import "./App.css";
 import { Stack, InputGroup, Input, Button } from "@chakra-ui/react";
 import { useState } from "react";
-import { formatData, parseCsv } from "./core/main";
+import { convertToXlsx, formatData, parseCsv } from "./core/main";
 
 function App() {
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -23,7 +23,7 @@ function App() {
           onClick={() =>
             file &&
             parseCsv(file, (e) => {
-              console.log(formatData(e));
+              convertToXlsx(formatData(e));
             })
           }
         >
