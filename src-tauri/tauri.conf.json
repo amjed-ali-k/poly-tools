@@ -16,6 +16,14 @@
         "writeFile": true,
         "exists": true,
         "scope": ["$HOME/Downloads/*", "$HOME/.your-app-data", "$HOME/*"]
+      },
+      "dialog": {
+        "all": false,
+        "ask": false,
+        "confirm": false,
+        "message": false,
+        "open": false,
+        "save": true
       }
     },
     "bundle": {
