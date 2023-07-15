@@ -67,7 +67,9 @@
     },
     "updater": {
       "active": true,
-      "endpoints": ["https://github.com/amjed-ali-k/sbte-refactor/releases"],
+      "endpoints": [
+        "https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/latest.json"
+      ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU0NUVDMUREN0E2QjIxOEQKUldTTklXdDYzY0ZlVktleVZzSG9zZGtXTnd4dC9hb3BzV0VyWFZYNW1iSWNWOEw4K016N1lPcnQK",
       "windows": {
