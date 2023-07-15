@@ -131,10 +131,7 @@ export const getAllCourses = (data: FormattedType[]): string[] => {
 };
 
 // convert formatted data to xlsx using cell coloring. Also put title "SBTE FORMATTER by Amjed Ali" on Top of the sheet
-export const convertToXlsx = (
-  data: FormattedType[]
-  // filename = "out-sheet.xlsx"
-) => {
+export const convertToXlsx = (data: FormattedType[]) => {
   const wb = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(
     wb,
@@ -148,9 +145,6 @@ export const convertToXlsx = (
   );
 
   return xlsx.write(wb, { type: "buffer", bookType: "xlsx" });
-  // save file in current directory
-  // writeBinaryFile(filename, res, { dir: BaseDirectory.Download });
-  // return filename;
 };
 
 const getHeaderRowObj = (title: string) => {
