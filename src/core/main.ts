@@ -1,6 +1,3 @@
-import { writeBinaryFile, BaseDirectory } from "@tauri-apps/api/fs";
-import { resourceDir } from "@tauri-apps/api/path";
-
 import Papa from "papaparse";
 import * as xlsx from "xlsx-js-style";
 
@@ -13,6 +10,8 @@ enum Grade {
   A = "A",
   S = "S",
 }
+
+export type AllGrades = Grade | "Absent" | "Withheld";
 
 export interface ResultType {
   registerNo: number;
@@ -28,6 +27,7 @@ export interface ResultType {
   result: "P" | "F" | null;
 }
 
+type courseName = string;
 interface FormattedType {
   registerNo: number;
   studentName: string;
@@ -35,7 +35,7 @@ interface FormattedType {
   semester: number;
   examType: "Regular" | "Supplementary";
   grades: {
-    [key: string]: Grade | "Absent" | "Withheld" | null;
+    [key: courseName]: AllGrades | null;
   };
   withheld: "Withheld" | "With held for Malpractice" | null;
 }
@@ -131,10 +131,7 @@ export const getAllCourses = (data: FormattedType[]): string[] => {
 };
 
 // convert formatted data to xlsx using cell coloring. Also put title "SBTE FORMATTER by Amjed Ali" on Top of the sheet
-export const convertToXlsx = (
-  data: FormattedType[],
-  filename = "out-sheet.xlsx"
-) => {
+export const convertToXlsx = (data: FormattedType[]) => {
   const wb = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(
     wb,
@@ -147,10 +144,7 @@ export const convertToXlsx = (
     "Supplementary Result"
   );
 
-  const res = xlsx.write(wb, { type: "buffer", bookType: "xlsx" });
-  // save file in current directory
-  writeBinaryFile(filename, res, { dir: BaseDirectory.Download });
-  return filename;
+  return xlsx.write(wb, { type: "buffer", bookType: "xlsx" });
 };
 
 const getHeaderRowObj = (title: string) => {
@@ -162,6 +156,54 @@ const getHeaderRowObj = (title: string) => {
       alignment: { horizontal: "center", vertical: "center" },
     },
   };
+};
+
+const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
+  const courses = getAllCourses(data);
+  const gradesCount: { [key: string]: { [key: string]: number } } = {};
+  courses.forEach((course) => {
+    gradesCount[course] = {
+      S: 0,
+      A: 0,
+      B: 0,
+      C: 0,
+      D: 0,
+      E: 0,
+      F: 0,
+      Withheld: 0,
+      "With held for Malpractice": 0,
+      Absent: 0,
+    };
+  });
+  data.forEach((item) => {
+    Object.keys(item.grades).forEach((course) => {
+      const val = item.grades[course];
+      val && item.grades && gradesCount[course][val]++;
+    });
+  });
+
+  // convert it into array [{course name, A, B, C, D, E, F, Withheld, With held for Malpractice, Absent}]
+  const gradesCountArr: {
+    Subject: string;
+    S: number;
+    A: number;
+    B: number;
+    C: number;
+    D: number;
+    E: number;
+    F: number;
+    Withheld: number;
+    "With held for Malpractice": number;
+    Absent: number;
+  }[] = [];
+
+  Object.keys(gradesCount).forEach((course) => {
+    gradesCountArr.push({
+      Subject: course,
+      ...gradesCount[course],
+    } as any);
+  });
+  return gradesCountArr;
 };
 
 const createResultWorksheet = (data: FormattedType[]) => {
@@ -302,6 +344,65 @@ const createResultWorksheet = (data: FormattedType[]) => {
     header: [...headerPreDefinedCols, ...courses],
   });
 
+  // store each grade count in each subject at bottom of the sheet
+  const gradeData = calculateGradesCountInEachCourse(data);
+  xlsx.utils.sheet_add_json(ws, gradeData, {
+    // skipHeader: false,
+    origin: {
+      c: 3, // start from 4th column so later it can be merged
+      r: reFormattedData.length + 7,
+    },
+
+    header: [
+      "Subject",
+      "S",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "Withheld",
+      "With held for Malpractice",
+      "Absent",
+    ],
+  });
+
+  Array(gradeData.length + 1)
+    .fill(0)
+    .forEach((_, index) => {
+      const currentRow = reFormattedData.length + 7 + index;
+      // merge first 4 coulums of each stats row, so long subject names can fit
+      ws["!merges"]?.push({
+        s: {
+          r: currentRow,
+          c: 0,
+        },
+        e: {
+          r: currentRow,
+          c: 2,
+        },
+      });
+
+      // Bold each subject name
+      const cell =
+        ws[
+          xlsx.utils.encode_cell({
+            r: currentRow,
+            c: 2,
+          })
+        ];
+      if (cell)
+        cell.s = {
+          ...cell.s,
+          font: {
+            sz: 11,
+            bold: true,
+            alignment: { wrapText: true },
+          },
+        };
+    });
+
   // Add header on top of the sheet
   ws["A3"] = getHeaderRowObj("Reg No");
   ws["B3"] = getHeaderRowObj("Student Name");
@@ -315,6 +416,7 @@ const createResultWorksheet = (data: FormattedType[]) => {
       const cell = ws[xlsx.utils.encode_cell({ r: R, c: C })];
       if (!cell) continue;
       cell.s = {
+        ...cell.s,
         border: {
           top: { style: "thin", color: { auto: 1 } },
           left: { style: "thin", color: { auto: 1 } },
@@ -333,7 +435,8 @@ const createResultWorksheet = (data: FormattedType[]) => {
         cell.s = { ...cell.s, fill: { fgColor: { rgb: "fba7cf" } } };
       }
       // set cell width to minimum text width
-      if (cell.t === "s" && [1, 2, 3, 4].includes(C)) {
+      if (R == 4) console.log(cell);
+      if (cell.t === "s" && [1, 2].includes(C)) {
         if (!ws["!cols"]) ws["!cols"] = [];
         ws["!cols"][C] = { wch: cell.v.length + 5 };
       }

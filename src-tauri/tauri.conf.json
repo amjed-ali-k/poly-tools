@@ -6,8 +6,8 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "sbte-formatter",
-    "version": "1.0.1"
+    "productName": "sbte-tools",
+    "version": "2.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -15,7 +15,15 @@
         "readFile": true,
         "writeFile": true,
         "exists": true,
-        "scope": ["$HOME/Downloads/*", "$HOME/.your-app-data", "$HOME/*"]
+        "scope": ["$HOME/.your-app-data", "$HOME/*"]
+      },
+      "dialog": {
+        "all": false,
+        "ask": false,
+        "confirm": false,
+        "message": false,
+        "open": false,
+        "save": true
       }
     },
     "bundle": {
@@ -58,7 +66,15 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": [
+        "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU0NUVDMUREN0E2QjIxOEQKUldTTklXdDYzY0ZlVktleVZzSG9zZGtXTnd4dC9hb3BzV0VyWFZYNW1iSWNWOEw4K016N1lPcnQK",
+      "windows": {
+        "installMode": "passive"
+      }
     },
     "windows": [
       {
