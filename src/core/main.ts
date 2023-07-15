@@ -28,6 +28,7 @@ export interface ResultType {
   result: "P" | "F" | null;
 }
 
+type courseName = string;
 interface FormattedType {
   registerNo: number;
   studentName: string;
@@ -35,7 +36,7 @@ interface FormattedType {
   semester: number;
   examType: "Regular" | "Supplementary";
   grades: {
-    [key: string]: Grade | "Absent" | "Withheld" | null;
+    [key: courseName]: Grade | "Absent" | "Withheld" | null;
   };
   withheld: "Withheld" | "With held for Malpractice" | null;
 }
@@ -162,6 +163,52 @@ const getHeaderRowObj = (title: string) => {
       alignment: { horizontal: "center", vertical: "center" },
     },
   };
+};
+
+const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
+  const courses = getAllCourses(data);
+  const gradesCount: { [key: string]: { [key: string]: number } } = {};
+  courses.forEach((course) => {
+    gradesCount[course] = {
+      A: 0,
+      B: 0,
+      C: 0,
+      D: 0,
+      E: 0,
+      F: 0,
+      Withheld: 0,
+      "With held for Malpractice": 0,
+      Absent: 0,
+    };
+  });
+  data.forEach((item) => {
+    Object.keys(item.grades).forEach((course) => {
+      const val = item.grades[course];
+      val && item.grades && gradesCount[course][val]++;
+    });
+  });
+
+  // convert it into array [{course name, A, B, C, D, E, F, Withheld, With held for Malpractice, Absent}]
+  const gradesCountArr: {
+    course: string;
+    A: number;
+    B: number;
+    C: number;
+    D: number;
+    E: number;
+    F: number;
+    Withheld: number;
+    "With held for Malpractice": number;
+    Absent: number;
+  }[] = [];
+
+  Object.keys(gradesCount).forEach((course) => {
+    gradesCountArr.push({
+      course,
+      ...gradesCount[course],
+    } as any);
+  });
+  return gradesCountArr;
 };
 
 const createResultWorksheet = (data: FormattedType[]) => {
@@ -300,6 +347,18 @@ const createResultWorksheet = (data: FormattedType[]) => {
       r: 4,
     },
     header: [...headerPreDefinedCols, ...courses],
+  });
+
+  // store  each grade count in each subject at bottom of the sheet
+  const gradeData = calculateGradesCountInEachCourse(data);
+
+  xlsx.utils.sheet_add_json(ws, gradeData, {
+    skipHeader: true,
+    origin: {
+      c: 0,
+      r: reFormattedData.length + 5,
+    },
+    header: ["Subject", "A", "B", "C", "D", "E", "F", "I", "W", "Total"],
   });
 
   // Add header on top of the sheet
