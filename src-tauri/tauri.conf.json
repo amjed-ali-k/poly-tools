@@ -28,8 +28,8 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
+      "category": "Utility",
+      "copyright": "Amjed Ali K (c) 2023",
       "deb": {
         "depends": []
       },
@@ -41,7 +41,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.amjed.sbte-formatter",
+      "identifier": "com.amjed.sbte-tools",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -68,7 +68,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}"
+        "https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/latest.json"
       ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU0NUVDMUREN0E2QjIxOEQKUldTTklXdDYzY0ZlVktleVZzSG9zZGtXTnd4dC9hb3BzV0VyWFZYNW1iSWNWOEw4K016N1lPcnQK",
@@ -81,7 +81,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "SBTE Results formatter",
+        "title": "SBTE Tools",
         "width": 800,
         "visible": false
       },
