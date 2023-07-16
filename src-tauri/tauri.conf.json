@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "sbte-tools",
-    "version": "2.0.0"
+    "version": "./../package.json"
   },
   "tauri": {
     "allowlist": {
