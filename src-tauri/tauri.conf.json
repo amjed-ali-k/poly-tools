@@ -86,11 +86,13 @@
         "visible": false
       },
       {
-        "width": 400,
-        "height": 250,
+        "width": 500,
+        "height": 300,
         "decorations": false,
         "url": "splashscreen.html",
-        "label": "splashscreen"
+        "label": "splashscreen",
+        "alwaysOnTop": true,
+        "center": true
       }
     ]
   }

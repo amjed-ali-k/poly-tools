@@ -6,720 +6,793 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 230px;
-      }
-      .title {
-        text-align: center;
-        font-weight: 700;
-      }
-      .wheel-and-hamster {
-        --dur: 1s;
-        position: relative;
-        width: 12em;
-        height: 12em;
-        font-size: 14px;
+      /*
+! tailwindcss v3.3.3 | MIT License | https://tailwindcss.com
+*/
+
+      /*
+1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
+2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+*/
+
+      *,
+      ::before,
+      ::after {
+        box-sizing: border-box;
+        /* 1 */
+        border-width: 0;
+        /* 2 */
+        border-style: solid;
+        /* 2 */
+        border-color: #e5e7eb;
+        /* 2 */
       }
 
-      .wheel,
-      .hamster,
-      .hamster div,
-      .spoke {
+      ::before,
+      ::after {
+        --tw-content: "";
+      }
+
+      /*
+1. Use a consistent sensible line-height in all browsers.
+2. Prevent adjustments of font size after orientation changes in iOS.
+3. Use a more readable tab size.
+4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
+6. Use the user's configured `sans` font-variation-settings by default.
+*/
+
+      html {
+        line-height: 1.5;
+        /* 1 */
+        -webkit-text-size-adjust: 100%;
+        /* 2 */
+        -moz-tab-size: 4;
+        /* 3 */
+        tab-size: 4;
+        /* 3 */
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+          "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+          "Noto Color Emoji";
+        /* 4 */
+        font-feature-settings: normal;
+        /* 5 */
+        font-variation-settings: normal;
+        /* 6 */
+      }
+
+      /*
+1. Remove the margin in all browsers.
+2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+*/
+
+      body {
+        margin: 0;
+        /* 1 */
+        line-height: inherit;
+        /* 2 */
+      }
+
+      /*
+1. Add the correct height in Firefox.
+2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+3. Ensure horizontal rules are visible by default.
+*/
+
+      hr {
+        height: 0;
+        /* 1 */
+        color: inherit;
+        /* 2 */
+        border-top-width: 1px;
+        /* 3 */
+      }
+
+      /*
+Add the correct text decoration in Chrome, Edge, and Safari.
+*/
+
+      abbr:where([title]) {
+        -webkit-text-decoration: underline dotted;
+        text-decoration: underline dotted;
+      }
+
+      /*
+Remove the default font size and weight for headings.
+*/
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-size: inherit;
+        font-weight: inherit;
+      }
+
+      /*
+Reset links to optimize for opt-in styling instead of opt-out.
+*/
+
+      a {
+        color: inherit;
+        text-decoration: inherit;
+      }
+
+      /*
+Add the correct font weight in Edge and Safari.
+*/
+
+      b,
+      strong {
+        font-weight: bolder;
+      }
+
+      /*
+1. Use the user's configured `mono` font family by default.
+2. Correct the odd `em` font sizing in all browsers.
+*/
+
+      code,
+      kbd,
+      samp,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        /* 1 */
+        font-size: 1em;
+        /* 2 */
+      }
+
+      /*
+Add the correct font size in all browsers.
+*/
+
+      small {
+        font-size: 80%;
+      }
+
+      /*
+Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+*/
+
+      sub,
+      sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+      }
+
+      sub {
+        bottom: -0.25em;
+      }
+
+      sup {
+        top: -0.5em;
+      }
+
+      /*
+1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+3. Remove gaps between table borders by default.
+*/
+
+      table {
+        text-indent: 0;
+        /* 1 */
+        border-color: inherit;
+        /* 2 */
+        border-collapse: collapse;
+        /* 3 */
+      }
+
+      /*
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+3. Remove default padding in all browsers.
+*/
+
+      button,
+      input,
+      optgroup,
+      select,
+      textarea {
+        font-family: inherit;
+        /* 1 */
+        font-feature-settings: inherit;
+        /* 1 */
+        font-variation-settings: inherit;
+        /* 1 */
+        font-size: 100%;
+        /* 1 */
+        font-weight: inherit;
+        /* 1 */
+        line-height: inherit;
+        /* 1 */
+        color: inherit;
+        /* 1 */
+        margin: 0;
+        /* 2 */
+        padding: 0;
+        /* 3 */
+      }
+
+      /*
+Remove the inheritance of text transform in Edge and Firefox.
+*/
+
+      button,
+      select {
+        text-transform: none;
+      }
+
+      /*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Remove default button styles.
+*/
+
+      button,
+      [type="button"],
+      [type="reset"],
+      [type="submit"] {
+        -webkit-appearance: button;
+        /* 1 */
+        background-color: transparent;
+        /* 2 */
+        background-image: none;
+        /* 2 */
+      }
+
+      /*
+Use the modern Firefox focus style for all focusable elements.
+*/
+
+      :-moz-focusring {
+        outline: auto;
+      }
+
+      /*
+Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
+*/
+
+      :-moz-ui-invalid {
+        box-shadow: none;
+      }
+
+      /*
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+
+      progress {
+        vertical-align: baseline;
+      }
+
+      /*
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        height: auto;
+      }
+
+      /*
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+
+      [type="search"] {
+        -webkit-appearance: textfield;
+        /* 1 */
+        outline-offset: -2px;
+        /* 2 */
+      }
+
+      /*
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+
+      ::-webkit-search-decoration {
+        -webkit-appearance: none;
+      }
+
+      /*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to `inherit` in Safari.
+*/
+
+      ::-webkit-file-upload-button {
+        -webkit-appearance: button;
+        /* 1 */
+        font: inherit;
+        /* 2 */
+      }
+
+      /*
+Add the correct display in Chrome and Safari.
+*/
+
+      summary {
+        display: list-item;
+      }
+
+      /*
+Removes the default spacing and border for appropriate elements.
+*/
+
+      blockquote,
+      dl,
+      dd,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      hr,
+      figure,
+      p,
+      pre {
+        margin: 0;
+      }
+
+      fieldset {
+        margin: 0;
+        padding: 0;
+      }
+
+      legend {
+        padding: 0;
+      }
+
+      ol,
+      ul,
+      menu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      /*
+Reset default styling for dialogs.
+*/
+
+      dialog {
+        padding: 0;
+      }
+
+      /*
+Prevent resizing textareas horizontally by default.
+*/
+
+      textarea {
+        resize: vertical;
+      }
+
+      /*
+1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+2. Set the default placeholder color to the user's configured gray 400 color.
+*/
+
+      input::placeholder,
+      textarea::placeholder {
+        opacity: 1;
+        /* 1 */
+        color: #9ca3af;
+        /* 2 */
+      }
+
+      /*
+Set the default cursor for buttons.
+*/
+
+      button,
+      [role="button"] {
+        cursor: pointer;
+      }
+
+      /*
+Make sure disabled buttons don't get the pointer cursor.
+*/
+
+      :disabled {
+        cursor: default;
+      }
+
+      /*
+1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
+2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
+   This can trigger a poorly considered lint error in some tools but is included by design.
+*/
+
+      img,
+      svg,
+      video,
+      canvas,
+      audio,
+      iframe,
+      embed,
+      object {
+        display: block;
+        /* 1 */
+        vertical-align: middle;
+        /* 2 */
+      }
+
+      /*
+Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
+*/
+
+      img,
+      video {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Make elements with the HTML hidden attribute stay hidden by default */
+
+      [hidden] {
+        display: none;
+      }
+
+      *,
+      ::before,
+      ::after {
+        --tw-border-spacing-x: 0;
+        --tw-border-spacing-y: 0;
+        --tw-translate-x: 0;
+        --tw-translate-y: 0;
+        --tw-rotate: 0;
+        --tw-skew-x: 0;
+        --tw-skew-y: 0;
+        --tw-scale-x: 1;
+        --tw-scale-y: 1;
+        --tw-pan-x: ;
+        --tw-pan-y: ;
+        --tw-pinch-zoom: ;
+        --tw-scroll-snap-strictness: proximity;
+        --tw-gradient-from-position: ;
+        --tw-gradient-via-position: ;
+        --tw-gradient-to-position: ;
+        --tw-ordinal: ;
+        --tw-slashed-zero: ;
+        --tw-numeric-figure: ;
+        --tw-numeric-spacing: ;
+        --tw-numeric-fraction: ;
+        --tw-ring-inset: ;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: rgb(59 130 246 / 0.5);
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-ring-shadow: 0 0 #0000;
+        --tw-shadow: 0 0 #0000;
+        --tw-shadow-colored: 0 0 #0000;
+        --tw-blur: ;
+        --tw-brightness: ;
+        --tw-contrast: ;
+        --tw-grayscale: ;
+        --tw-hue-rotate: ;
+        --tw-invert: ;
+        --tw-saturate: ;
+        --tw-sepia: ;
+        --tw-drop-shadow: ;
+        --tw-backdrop-blur: ;
+        --tw-backdrop-brightness: ;
+        --tw-backdrop-contrast: ;
+        --tw-backdrop-grayscale: ;
+        --tw-backdrop-hue-rotate: ;
+        --tw-backdrop-invert: ;
+        --tw-backdrop-opacity: ;
+        --tw-backdrop-saturate: ;
+        --tw-backdrop-sepia: ;
+      }
+
+      ::backdrop {
+        --tw-border-spacing-x: 0;
+        --tw-border-spacing-y: 0;
+        --tw-translate-x: 0;
+        --tw-translate-y: 0;
+        --tw-rotate: 0;
+        --tw-skew-x: 0;
+        --tw-skew-y: 0;
+        --tw-scale-x: 1;
+        --tw-scale-y: 1;
+        --tw-pan-x: ;
+        --tw-pan-y: ;
+        --tw-pinch-zoom: ;
+        --tw-scroll-snap-strictness: proximity;
+        --tw-gradient-from-position: ;
+        --tw-gradient-via-position: ;
+        --tw-gradient-to-position: ;
+        --tw-ordinal: ;
+        --tw-slashed-zero: ;
+        --tw-numeric-figure: ;
+        --tw-numeric-spacing: ;
+        --tw-numeric-fraction: ;
+        --tw-ring-inset: ;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: rgb(59 130 246 / 0.5);
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-ring-shadow: 0 0 #0000;
+        --tw-shadow: 0 0 #0000;
+        --tw-shadow-colored: 0 0 #0000;
+        --tw-blur: ;
+        --tw-brightness: ;
+        --tw-contrast: ;
+        --tw-grayscale: ;
+        --tw-hue-rotate: ;
+        --tw-invert: ;
+        --tw-saturate: ;
+        --tw-sepia: ;
+        --tw-drop-shadow: ;
+        --tw-backdrop-blur: ;
+        --tw-backdrop-brightness: ;
+        --tw-backdrop-contrast: ;
+        --tw-backdrop-grayscale: ;
+        --tw-backdrop-hue-rotate: ;
+        --tw-backdrop-invert: ;
+        --tw-backdrop-opacity: ;
+        --tw-backdrop-saturate: ;
+        --tw-backdrop-sepia: ;
+      }
+
+      .absolute {
         position: absolute;
       }
 
-      .wheel,
-      .spoke {
-        border-radius: 50%;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+      .relative {
+        position: relative;
       }
 
-      .wheel {
-        background: radial-gradient(
-          100% 100% at center,
-          hsla(0, 0%, 60%, 0) 47.8%,
-          hsl(0, 0%, 60%) 48%
-        );
-        z-index: 2;
+      .inset-0 {
+        inset: 0px;
       }
 
-      .hamster {
-        -webkit-animation: hamster var(--dur) ease-in-out infinite;
-        animation: hamster var(--dur) ease-in-out infinite;
-        top: 50%;
-        left: calc(50% - 3.5em);
-        width: 7em;
-        height: 3.75em;
-        -webkit-transform: rotate(4deg) translate(-0.8em, 1.85em);
-        -ms-transform: rotate(4deg) translate(-0.8em, 1.85em);
-        transform: rotate(4deg) translate(-0.8em, 1.85em);
-        -webkit-transform-origin: 50% 0;
-        -ms-transform-origin: 50% 0;
-        transform-origin: 50% 0;
-        z-index: 1;
+      .flex {
+        display: flex;
       }
 
-      .hamster__head {
-        -webkit-animation: hamsterHead var(--dur) ease-in-out infinite;
-        animation: hamsterHead var(--dur) ease-in-out infinite;
-        background: hsl(30, 90%, 55%);
-        border-radius: 70% 30% 0 100% / 40% 25% 25% 60%;
-        -webkit-box-shadow: 0 -0.25em 0 hsl(30, 90%, 80%) inset,
-          0.75em -1.55em 0 hsl(30, 90%, 90%) inset;
-        box-shadow: 0 -0.25em 0 hsl(30, 90%, 80%) inset,
-          0.75em -1.55em 0 hsl(30, 90%, 90%) inset;
-        top: 0;
-        left: -2em;
-        width: 2.75em;
-        height: 2.5em;
-        -webkit-transform-origin: 100% 50%;
-        -ms-transform-origin: 100% 50%;
-        transform-origin: 100% 50%;
+      .h-\[300px\] {
+        height: 300px;
       }
 
-      .hamster__ear {
-        -webkit-animation: hamsterEar var(--dur) ease-in-out infinite;
-        animation: hamsterEar var(--dur) ease-in-out infinite;
-        background: hsl(0, 90%, 85%);
-        border-radius: 50%;
-        -webkit-box-shadow: -0.25em 0 hsl(30, 90%, 55%) inset;
-        box-shadow: -0.25em 0 hsl(30, 90%, 55%) inset;
-        top: -0.25em;
-        right: -0.25em;
-        width: 0.75em;
-        height: 0.75em;
-        -webkit-transform-origin: 50% 75%;
-        -ms-transform-origin: 50% 75%;
-        transform-origin: 50% 75%;
+      .w-\[500px\] {
+        width: 500px;
       }
 
-      .hamster__eye {
-        -webkit-animation: hamsterEye var(--dur) linear infinite;
-        animation: hamsterEye var(--dur) linear infinite;
-        background-color: hsl(0, 0%, 0%);
-        border-radius: 50%;
-        top: 0.375em;
-        left: 1.25em;
-        width: 0.5em;
-        height: 0.5em;
+      .transform {
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+          rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+          skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x))
+          scaleY(var(--tw-scale-y));
       }
 
-      .hamster__nose {
-        background: hsl(0, 90%, 75%);
-        border-radius: 35% 65% 85% 15% / 70% 50% 50% 30%;
-        top: 0.75em;
-        left: 0;
-        width: 0.2em;
-        height: 0.25em;
+      .items-center {
+        align-items: center;
       }
 
-      .hamster__body {
-        -webkit-animation: hamsterBody var(--dur) ease-in-out infinite;
-        animation: hamsterBody var(--dur) ease-in-out infinite;
-        background: hsl(30, 90%, 90%);
-        border-radius: 50% 30% 50% 30% / 15% 60% 40% 40%;
-        -webkit-box-shadow: 0.1em 0.75em 0 hsl(30, 90%, 55%) inset,
-          0.15em -0.5em 0 hsl(30, 90%, 80%) inset;
-        box-shadow: 0.1em 0.75em 0 hsl(30, 90%, 55%) inset,
-          0.15em -0.5em 0 hsl(30, 90%, 80%) inset;
-        top: 0.25em;
-        left: 2em;
-        width: 4.5em;
-        height: 3em;
-        -webkit-transform-origin: 17% 50%;
-        -ms-transform-origin: 17% 50%;
-        transform-origin: 17% 50%;
-        -webkit-transform-style: preserve-3d;
-        transform-style: preserve-3d;
+      .justify-center {
+        justify-content: center;
       }
 
-      .hamster__limb--fr,
-      .hamster__limb--fl {
-        -webkit-clip-path: polygon(
-          0 0,
-          100% 0,
-          70% 80%,
-          60% 100%,
-          0% 100%,
-          40% 80%
-        );
-        clip-path: polygon(0 0, 100% 0, 70% 80%, 60% 100%, 0% 100%, 40% 80%);
-        top: 2em;
-        left: 0.5em;
-        width: 1em;
-        height: 1.5em;
-        -webkit-transform-origin: 50% 0;
-        -ms-transform-origin: 50% 0;
-        transform-origin: 50% 0;
+      .overflow-hidden {
+        overflow: hidden;
       }
 
-      .hamster__limb--fr {
-        -webkit-animation: hamsterFRLimb var(--dur) linear infinite;
-        animation: hamsterFRLimb var(--dur) linear infinite;
-        background: -webkit-gradient(
-          linear,
-          left top,
-          left bottom,
-          color-stop(80%, hsl(30, 90%, 80%)),
-          color-stop(80%, hsl(0, 90%, 75%))
-        );
-        background: linear-gradient(
-          hsl(30, 90%, 80%) 80%,
-          hsl(0, 90%, 75%) 80%
-        );
-        -webkit-transform: rotate(15deg) translateZ(-1px);
-        transform: rotate(15deg) translateZ(-1px);
+      .rounded-2xl {
+        border-radius: 1rem;
       }
 
-      .hamster__limb--fl {
-        -webkit-animation: hamsterFLLimb var(--dur) linear infinite;
-        animation: hamsterFLLimb var(--dur) linear infinite;
-        background: -webkit-gradient(
-          linear,
-          left top,
-          left bottom,
-          color-stop(80%, hsl(30, 90%, 90%)),
-          color-stop(80%, hsl(0, 90%, 85%))
-        );
-        background: linear-gradient(
-          hsl(30, 90%, 90%) 80%,
-          hsl(0, 90%, 85%) 80%
-        );
-        -webkit-transform: rotate(15deg);
-        -ms-transform: rotate(15deg);
-        transform: rotate(15deg);
+      .text-center {
+        text-align: center;
       }
 
-      .hamster__limb--br,
-      .hamster__limb--bl {
-        border-radius: 0.75em 0.75em 0 0;
-        -webkit-clip-path: polygon(
-          0 0,
-          100% 0,
-          100% 30%,
-          70% 90%,
-          70% 100%,
-          30% 100%,
-          40% 90%,
-          0% 30%
-        );
-        clip-path: polygon(
-          0 0,
-          100% 0,
-          100% 30%,
-          70% 90%,
-          70% 100%,
-          30% 100%,
-          40% 90%,
-          0% 30%
-        );
-        top: 1em;
-        left: 2.8em;
-        width: 1.5em;
-        height: 2.5em;
-        -webkit-transform-origin: 50% 30%;
-        -ms-transform-origin: 50% 30%;
-        transform-origin: 50% 30%;
+      .text-3xl {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
       }
 
-      .hamster__limb--br {
-        -webkit-animation: hamsterBRLimb var(--dur) linear infinite;
-        animation: hamsterBRLimb var(--dur) linear infinite;
-        background: -webkit-gradient(
-          linear,
-          left top,
-          left bottom,
-          color-stop(90%, hsl(30, 90%, 80%)),
-          color-stop(90%, hsl(0, 90%, 75%))
-        );
-        background: linear-gradient(
-          hsl(30, 90%, 80%) 90%,
-          hsl(0, 90%, 75%) 90%
-        );
-        -webkit-transform: rotate(-25deg) translateZ(-1px);
-        transform: rotate(-25deg) translateZ(-1px);
+      .font-bold {
+        font-weight: 700;
       }
 
-      .hamster__limb--bl {
-        -webkit-animation: hamsterBLLimb var(--dur) linear infinite;
-        animation: hamsterBLLimb var(--dur) linear infinite;
-        background: -webkit-gradient(
-          linear,
-          left top,
-          left bottom,
-          color-stop(90%, hsl(30, 90%, 90%)),
-          color-stop(90%, hsl(0, 90%, 85%))
-        );
-        background: linear-gradient(
-          hsl(30, 90%, 90%) 90%,
-          hsl(0, 90%, 85%) 90%
-        );
-        -webkit-transform: rotate(-25deg);
-        -ms-transform: rotate(-25deg);
-        transform: rotate(-25deg);
+      .font-extrabold {
+        font-weight: 800;
       }
 
-      .hamster__tail {
-        -webkit-animation: hamsterTail var(--dur) linear infinite;
-        animation: hamsterTail var(--dur) linear infinite;
-        background: hsl(0, 90%, 85%);
-        border-radius: 0.25em 50% 50% 0.25em;
-        -webkit-box-shadow: 0 -0.2em 0 hsl(0, 90%, 75%) inset;
-        box-shadow: 0 -0.2em 0 hsl(0, 90%, 75%) inset;
-        top: 1.5em;
-        right: -0.5em;
-        width: 1em;
-        height: 0.5em;
-        -webkit-transform: rotate(30deg) translateZ(-1px);
-        transform: rotate(30deg) translateZ(-1px);
-        -webkit-transform-origin: 0.25em 0.25em;
-        -ms-transform-origin: 0.25em 0.25em;
-        transform-origin: 0.25em 0.25em;
+      .text-fuchsia-300 {
+        --tw-text-opacity: 1;
+        color: rgb(240 171 252 / var(--tw-text-opacity));
       }
 
-      .spoke {
-        -webkit-animation: spoke var(--dur) linear infinite;
-        animation: spoke var(--dur) linear infinite;
-        background: radial-gradient(
-            100% 100% at center,
-            hsl(0, 0%, 60%) 4.8%,
-            hsla(0, 0%, 60%, 0) 5%
-          ),
-          -webkit-gradient(
-              linear,
-              left top,
-              left bottom,
-              color-stop(46.9%, hsla(0, 0%, 55%, 0)),
-              color-stop(47%, hsl(0, 0%, 65%)),
-              color-stop(53%, hsla(0, 0%, 65%, 0))
-            ) 50% 50% / 99% 99% no-repeat;
-        background: radial-gradient(
-            100% 100% at center,
-            hsl(0, 0%, 60%) 4.8%,
-            hsla(0, 0%, 60%, 0) 5%
-          ),
-          linear-gradient(
-              hsla(0, 0%, 55%, 0) 46.9%,
-              hsl(0, 0%, 65%) 47% 52.9%,
-              hsla(0, 0%, 65%, 0) 53%
-            )
-            50% 50% / 99% 99% no-repeat;
-      }
-
-      /* Animations */
-      @-webkit-keyframes hamster {
-        from,
-        to {
-          -webkit-transform: rotate(4deg) translate(-0.8em, 1.85em);
-          transform: rotate(4deg) translate(-0.8em, 1.85em);
-        }
-
-        50% {
-          -webkit-transform: rotate(0) translate(-0.8em, 1.85em);
-          transform: rotate(0) translate(-0.8em, 1.85em);
-        }
-      }
-      @keyframes hamster {
-        from,
-        to {
-          -webkit-transform: rotate(4deg) translate(-0.8em, 1.85em);
-          transform: rotate(4deg) translate(-0.8em, 1.85em);
-        }
-
-        50% {
-          -webkit-transform: rotate(0) translate(-0.8em, 1.85em);
-          transform: rotate(0) translate(-0.8em, 1.85em);
-        }
-      }
-
-      @-webkit-keyframes hamsterHead {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(8deg);
-          transform: rotate(8deg);
-        }
-      }
-
-      @keyframes hamsterHead {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(8deg);
-          transform: rotate(8deg);
-        }
-      }
-
-      @-webkit-keyframes hamsterEye {
-        from,
-        90%,
-        to {
-          -webkit-transform: scaleY(1);
-          transform: scaleY(1);
-        }
-
-        95% {
-          -webkit-transform: scaleY(0);
-          transform: scaleY(0);
-        }
-      }
-
-      @keyframes hamsterEye {
-        from,
-        90%,
-        to {
-          -webkit-transform: scaleY(1);
-          transform: scaleY(1);
-        }
-
-        95% {
-          -webkit-transform: scaleY(0);
-          transform: scaleY(0);
-        }
-      }
-
-      @-webkit-keyframes hamsterEar {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(12deg);
-          transform: rotate(12deg);
-        }
-      }
-
-      @keyframes hamsterEar {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(12deg);
-          transform: rotate(12deg);
-        }
-      }
-
-      @-webkit-keyframes hamsterBody {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(-2deg);
-          transform: rotate(-2deg);
-        }
-      }
-
-      @keyframes hamsterBody {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(-2deg);
-          transform: rotate(-2deg);
-        }
-      }
-
-      @-webkit-keyframes hamsterFRLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(50deg) translateZ(-1px);
-          transform: rotate(50deg) translateZ(-1px);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(-30deg) translateZ(-1px);
-          transform: rotate(-30deg) translateZ(-1px);
-        }
-      }
-
-      @keyframes hamsterFRLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(50deg) translateZ(-1px);
-          transform: rotate(50deg) translateZ(-1px);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(-30deg) translateZ(-1px);
-          transform: rotate(-30deg) translateZ(-1px);
-        }
-      }
-
-      @-webkit-keyframes hamsterFLLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(-30deg);
-          transform: rotate(-30deg);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(50deg);
-          transform: rotate(50deg);
-        }
-      }
-
-      @keyframes hamsterFLLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(-30deg);
-          transform: rotate(-30deg);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(50deg);
-          transform: rotate(50deg);
-        }
-      }
-
-      @-webkit-keyframes hamsterBRLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(-60deg) translateZ(-1px);
-          transform: rotate(-60deg) translateZ(-1px);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(20deg) translateZ(-1px);
-          transform: rotate(20deg) translateZ(-1px);
-        }
-      }
-
-      @keyframes hamsterBRLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(-60deg) translateZ(-1px);
-          transform: rotate(-60deg) translateZ(-1px);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(20deg) translateZ(-1px);
-          transform: rotate(20deg) translateZ(-1px);
-        }
-      }
-
-      @-webkit-keyframes hamsterBLLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(20deg);
-          transform: rotate(20deg);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(-60deg);
-          transform: rotate(-60deg);
-        }
-      }
-
-      @keyframes hamsterBLLimb {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(20deg);
-          transform: rotate(20deg);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(-60deg);
-          transform: rotate(-60deg);
-        }
-      }
-
-      @-webkit-keyframes hamsterTail {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(30deg) translateZ(-1px);
-          transform: rotate(30deg) translateZ(-1px);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(10deg) translateZ(-1px);
-          transform: rotate(10deg) translateZ(-1px);
-        }
-      }
-
-      @keyframes hamsterTail {
-        from,
-        25%,
-        50%,
-        75%,
-        to {
-          -webkit-transform: rotate(30deg) translateZ(-1px);
-          transform: rotate(30deg) translateZ(-1px);
-        }
-
-        12.5%,
-        37.5%,
-        62.5%,
-        87.5% {
-          -webkit-transform: rotate(10deg) translateZ(-1px);
-          transform: rotate(10deg) translateZ(-1px);
-        }
-      }
-
-      @-webkit-keyframes spoke {
-        from {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        to {
-          -webkit-transform: rotate(-1turn);
-          transform: rotate(-1turn);
-        }
-      }
-
-      @keyframes spoke {
-        from {
-          -webkit-transform: rotate(0);
-          transform: rotate(0);
-        }
-
-        to {
-          -webkit-transform: rotate(-1turn);
-          transform: rotate(-1turn);
-        }
+      .text-white {
+        --tw-text-opacity: 1;
+        color: rgb(255 255 255 / var(--tw-text-opacity));
       }
     </style>
   </head>
-  <body>
-    <div>
-      <div
-        aria-label="Orange and tan hamster running in a metal wheel"
-        role="img"
-        class="wheel-and-hamster"
-      >
-        <div class="wheel"></div>
-        <div class="hamster">
-          <div class="hamster__body">
-            <div class="hamster__head">
-              <div class="hamster__ear"></div>
-              <div class="hamster__eye"></div>
-              <div class="hamster__nose"></div>
-            </div>
-            <div class="hamster__limb hamster__limb--fr"></div>
-            <div class="hamster__limb hamster__limb--fl"></div>
-            <div class="hamster__limb hamster__limb--br"></div>
-            <div class="hamster__limb hamster__limb--bl"></div>
-            <div class="hamster__tail"></div>
-          </div>
-        </div>
-        <div class="spoke"></div>
+  <body
+    class="relative flex h-[300px] w-[500px] items-center justify-center overflow-hidden rounded-2xl"
+  >
+    <svg
+      class="absolute inset-0"
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:svgjs="http://svgjs.dev/svgjs"
+      width="500"
+      height="300"
+      preserveAspectRatio="none"
+      viewBox="0 0 500 300"
+    >
+      <g mask='url("#SvgjsMask1064")' fill="none">
+        <rect
+          width="500"
+          height="300"
+          x="0"
+          y="0"
+          fill='url("#SvgjsRadialGradient1065")'
+        ></rect>
+        <path
+          d="M488.98918835616 161.4730855132375L535.6187752830152 119.4876168603594 493.6333066301371 72.85802993350421 447.0037197032819 114.84349858638232z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float3"
+        ></path>
+        <path
+          d="M265.5027033525289 125.10679911353414L205.5086116659387 141.1821675315947 221.58398008399928 201.1762592181849 281.5780717705895 185.10089080012432z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float2"
+        ></path>
+        <path
+          d="M531.3433964376081 47.5186920631008L455.9625650046479 40.923723865558145 449.36759680710526 116.30455529851837 524.7484282400654 122.89952349606102z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+        <path
+          d="M301.17085857143275 220.82047202442348L275.08324463569494 179.0715626627698 259.42194920977903 246.9080859601613z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float2"
+        ></path>
+        <path
+          d="M491.0283079478118 126.29842969494963L502.32361399396905 68.18911761357775 409.5119928488326 80.30081458502787z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float3"
+        ></path>
+        <path
+          d="M411.9716091911245 136.68419218419353L470.6774855528799 177.79048934990183 511.78378271858816 119.08461298814649 453.07790635683284 77.97831582243819z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+        <path
+          d="M248.32060818338698 132.89860963541543L187.05641483501273 161.46657216445087 215.62437736404817 222.7307655128251 276.8885707124224 194.16280298378967z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float2"
+        ></path>
+        <path
+          d="M401.812955371392 316.49908952809864L481.98701162258266 288.8929480913748 454.3808701858588 208.71889184018414 374.20681393466816 236.32503327690796z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float3"
+        ></path>
+        <path
+          d="M57.35925573203059 66.98144475646374L5.706930202432034 39.517416105127225 29.89522708069407 118.6337702860623z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float3"
+        ></path>
+        <path
+          d="M379.3105143799354 106.99785141599484L367.33957931439045 155.01064953347813 415.3523774318737 166.98158459902305 427.32331249741867 118.96878648153978z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float2"
+        ></path>
+        <path
+          d="M464.8233888333476 219.0478496171355L500.9803056820617 186.49201545721257 468.4244715221388 150.33509860849847 432.2675546734247 182.8909327684214z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+        <path
+          d="M477.3591928278205 259.83611500881545L515.6245351731457 268.6703653788811 509.74323955558157 206.85522667586042z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float3"
+        ></path>
+        <path
+          d="M385.4441828665107 271.7422819963969L460.48395872942524 244.43003719628854 433.17171392931687 169.39026133337396 358.1319380664023 196.70250613348236z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+        <path
+          d="M76.02459778911495 210.13878658838686L62.2256336890885 139.1492704113657 5.035081612093805 223.9377506884133z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+        <path
+          d="M90.31506782458479 151.301889428967L45.59900606575768 143.41724126985977 37.71435790665044 188.13330302868687 82.43041966547756 196.0179511877941z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float3"
+        ></path>
+        <path
+          d="M456.47064422644706 141.86729579323264L462.9903824247764 79.83613042821065 400.9592170597544 73.31639222988133 394.4394788614251 135.34755759490332z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+        <path
+          d="M205.75776016683716 263.71815641986365L200.05620400832544 182.18210465308732 118.52015224154911 187.88366081159904 124.22170840006083 269.41971257837537z"
+          fill="rgba(158, 3, 119, 0.7)"
+          class="triangle-float1"
+        ></path>
+      </g>
+      <defs>
+        <mask id="SvgjsMask1064">
+          <rect width="500" height="300" fill="#ffffff"></rect>
+        </mask>
+        <radialGradient
+          cx="100%"
+          cy="100%"
+          r="583.1"
+          gradientUnits="userSpaceOnUse"
+          id="SvgjsRadialGradient1065"
+        >
+          <stop stop-color="#0e2a47" offset="0"></stop>
+          <stop stop-color="rgba(158, 0, 119, 1)" offset="1"></stop>
+        </radialGradient>
+        <style>
+          @keyframes float1 {
+            0% {
+              transform: translate(0, 0);
+            }
+            50% {
+              transform: translate(-10px, 0);
+            }
+            100% {
+              transform: translate(0, 0);
+            }
+          }
+
+          .triangle-float1 {
+            animation: float1 5s infinite;
+          }
+
+          @keyframes float2 {
+            0% {
+              transform: translate(0, 0);
+            }
+            50% {
+              transform: translate(-5px, -5px);
+            }
+            100% {
+              transform: translate(0, 0);
+            }
+          }
+
+          .triangle-float2 {
+            animation: float2 4s infinite;
+          }
+
+          @keyframes float3 {
+            0% {
+              transform: translate(0, 0);
+            }
+            50% {
+              transform: translate(0, -10px);
+            }
+            100% {
+              transform: translate(0, 0);
+            }
+          }
+
+          .triangle-float3 {
+            animation: float3 6s infinite;
+          }
+        </style>
+      </defs>
+    </svg>
+    <div class="relative text-center text-white">
+      <div class="text-3xl font-extrabold text-white">SBTE Tools</div>
+      <div class="font-bold text-fuchsia-300">
+        Simplify Your Result Evaluation Process
       </div>
-      <div class="title">SBTE Result Formatter</div>
     </div>
   </body>
 </html>
