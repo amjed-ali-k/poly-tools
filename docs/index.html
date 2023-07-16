@@ -796,30 +796,34 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
       >
     </footer>
     <script>
-      var end = Date.now() + 15 * 1000;
-
       // go Buckeyes!
-      var colors = ["#bb0000", "#ffffff"];
 
       function runAnim() {
-        confetti({
-          particleCount: 2,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: colors,
-        });
-        confetti({
-          particleCount: 2,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: colors,
-        });
+        var end = Date.now() + 15 * 1000;
 
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
+        // go Buckeyes!
+        var colors = ["#ffeb3b", "#e91e63"];
+
+        (function frame() {
+          confetti({
+            particleCount: 2,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: colors,
+          });
+          confetti({
+            particleCount: 2,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: colors,
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        })();
       }
 
       // fetch url https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/latest.json and get version number
@@ -831,56 +835,66 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
           .then((data) => {
             const version = data.version;
             console.log(version);
-            const downloadFiles = [
-              `sbte-tools_${version}_amd64.deb`,
-              `sbte-tools_${version}_x64-setup.exe`,
-              `sbte-tools_${version}_amd64.AppImage`,
-              `sbte-tools_${version}_x64.dmg`,
-            ];
-
-            // create a list of anchor elements for each downloadFiles
-            const downloadList = document.getElementById("downloadList");
-            downloadFiles.forEach((file) => {
-              const li = document.createElement("li");
-              li.classList.add(
-                "mx-2",
-                "my-0.5",
-                "text-indigo-800",
-                "hover:font-bold"
-              );
-              li.innerHTML = `<a href="https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/${file}">${file}</a>`;
-              downloadList.appendChild(li);
-            });
-
-            // add download links to buttons
-            const downloadWindows = document.getElementById("downloadWindows");
-            const downloadLinux = document.getElementById("downloadLinux");
-            const downloadMac = document.getElementById("downloadMac");
-            downloadWindows.addEventListener("click", () => {
-              runAnim();
-              window.open(
-                `https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/sbte-tools_${version}_x64_en-US.msi`
-              );
-            });
-            downloadLinux.addEventListener("click", () => {
-              runAnim();
-              window.open(
-                `https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/sbte-tools_${version}_amd64.deb`
-              );
-            });
-
-            downloadMac.addEventListener("click", () => {
-              runAnim();
-              window.open(
-                `https://github.com/amjed-ali-k/sbte-refactor/releases/latest/download/sbte-tools_${version}_x64.dmg`
-              );
-            });
+            fillDataWithVersion(version);
           })
           .catch((err) => console.log(err));
       }
 
+      function fillDataWithVersion(version) {
+        const downloadFiles = [
+          `sbte-tools_${version}_amd64.deb`,
+          `sbte-tools_${version}_x64-setup.exe`,
+          `sbte-tools_${version}_amd64.AppImage`,
+          `sbte-tools_${version}_x64.dmg`,
+        ];
+
+        // create a list of anchor elements for each downloadFiles
+        const downloadList = document.getElementById("downloadList");
+        downloadFiles.forEach((file) => {
+          const li = document.createElement("li");
+          li.classList.add(
+            "mx-2",
+            "my-0.5",
+            "text-indigo-800",
+            "hover:font-bold"
+          );
+          li.innerHTML = `<a href="https://github.com/amjed-ali-k/sbte-refactor/releases/download/app-${version}/${file}">${file}</a>`;
+          downloadList.appendChild(li);
+        });
+
+        // add download links to buttons
+        const downloadWindows = document.getElementById("downloadWindows");
+        const downloadLinux = document.getElementById("downloadLinux");
+        const downloadMac = document.getElementById("downloadMac");
+        downloadWindows.addEventListener("click", () => {
+          runAnim();
+          setTimeout(() => {
+            window.open(
+              `https://github.com/amjed-ali-k/sbte-refactor/releases/download/app-${version}/sbte-tools_${version}_x64_en-US.msi`
+            );
+          }, 2000);
+        });
+        downloadLinux.addEventListener("click", () => {
+          runAnim();
+          setTimeout(() => {
+            window.open(
+              `https://github.com/amjed-ali-k/sbte-refactor/releases/download/app-${version}/sbte-tools_${version}_amd64.deb`
+            );
+          }, 2000);
+        });
+
+        downloadMac.addEventListener("click", () => {
+          runAnim();
+          setTimeout(() => {
+            window.open(
+              `https://github.com/amjed-ali-k/sbte-refactor/releases/download/app-${version}/sbte-tools_${version}_x64.dmg`
+            );
+          }, 2000);
+        });
+      }
+
       window.onload = function () {
-        fillData();
+        fillDataWithVersion("2.0.2");
       };
     </script>
   </body>
