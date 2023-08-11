@@ -19,6 +19,10 @@ export const metadata: Metadata = {
         url: "https://amjed-ali-k.github.io/sbte-refactor/og-image.png",
       },
     ],
+    type: "website",
+    locale: "en_IN",
+    url: "https://sbte-tools.vercel.app/",
+    siteName: "SBTE Tools",
   },
 };
 
