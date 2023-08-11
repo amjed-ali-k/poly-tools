@@ -16,19 +16,22 @@ export default function Home() {
   ) => {
     if (!e.target.files) return;
     setIsError(true);
-    if (!validateFileType(e.target.files[0])) return;
+    if (!validateFileType(e.target.files[0])) {
+      toast.error("Invalid file type.");
+      return;
+    }
     setFile(e.target.files[0]);
 
     const validatedResult = validateCSV(await e.target.files[0].text());
     if (validatedResult !== true) {
-      //  toast({
-      //    title: "Invalid file.",
-      //    description: validatedResult,
-      //    status: "error",
-      //    duration: 9000,
-      //    isClosable: true,
-      //  });
-      toast.error("Invalid file.");
+      toast.error(
+        "Invalid file. " +
+          validatedResult +
+          ". Kindly send me this file so that I can fix this issue. Email: amjedmgm@gmail.com",
+        {
+          duration: 30000,
+        }
+      );
       return;
     }
     setIsError(false);
@@ -37,26 +40,10 @@ export default function Home() {
 
   const handleProcess = async () => {
     if (!file || data.length === 0) {
-      // toast({
-      //   title: "No files selected.",
-      //   description: `Select a file to process and retry.`,
-      //   status: "warning",
-      //   duration: 9000,
-      //   isClosable: true,
-      // });
       toast.error("No files selected.");
       return;
     }
-
     writeFile(convertToXlsx(formatData(data)), "result.xlsx");
-
-    // toast({
-    //   title: "File processed.",
-    //   description: `${filePath} saved`,
-    //   status: "success",
-    //   duration: 9000,
-    //   isClosable: true,
-    // });
     toast.success("File processed.");
   };
 
