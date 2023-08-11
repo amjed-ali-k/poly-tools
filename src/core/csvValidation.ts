@@ -47,11 +47,16 @@ export const validateCSV = (data: string): string | true => {
       return `Invalid line ${i - 1} attendance`;
     // line[7] = should be either empty or "Withheld" | "With held for Malpractice"
     if (
-      line[7] !== "" &&
-      line[7] !== "Withheld" &&
-      line[7] !== "With held for Malpractice"
-    )
+      [
+        "",
+        "Withheld",
+        "With held for Malpractice",
+        '"Withheld"',
+        '"With held for Malpractice"',
+      ].includes(line[7]) === false
+    ) {
       return `Invalid line ${i - 1} withheld`;
+    }
     // line[8] = should be a number if line[7] is empty
     if (line[7] === "" && isNaN(Number(line[8])))
       return `Invalid line ${i - 1} internal mark`;

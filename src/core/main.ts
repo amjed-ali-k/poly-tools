@@ -11,7 +11,7 @@ enum Grade {
   S = "S",
 }
 
-export type AllGrades = Grade | "Absent" | "Withheld";
+export type AllGrades = Grade | "Absent" | "Withheld" | "Malpractice";
 
 export interface ResultType {
   registerNo: number;
@@ -21,7 +21,11 @@ export interface ResultType {
   course: string;
   examType: "Regular" | "Supplementary";
   attendance: "Present" | "Absent";
-  withheld: "Withheld" | "With held for Malpractice" | null;
+  withheld:
+    | "Withheld"
+    | "With held for Malpractice"
+    | '"With held for Malpractice"'
+    | null;
   iMark: number | null;
   grade: Grade | null;
   result: "P" | "F" | null;
@@ -37,7 +41,7 @@ interface FormattedType {
   grades: {
     [key: courseName]: AllGrades | null;
   };
-  withheld: "Withheld" | "With held for Malpractice" | null;
+  // withheld: "Withheld" | "With held for Malpractice" | null;
 }
 
 export const parseCsv = (
@@ -103,17 +107,37 @@ export const formatData = (data: ResultType[]): FormattedType[] => {
             : item.attendance === "Absent"
             ? "Absent"
             : item.withheld === "With held for Malpractice"
-            ? Grade.F
+            ? "Malpractice"
+            : item.withheld === '"With held for Malpractice"'
+            ? "Malpractice"
             : item.withheld === "Withheld"
             ? "Withheld"
             : null,
         },
-        withheld: item.withheld,
+        // withheld:
+        //   item.withheld === "With held for Malpractice"
+        //     ? "With held for Malpractice"
+        //     : item.withheld === '"With held for Malpractice"'
+        //     ? "With held for Malpractice"
+        //     : item.withheld === "Withheld"
+        //     ? "Withheld"
+        //     : null,
       });
     } else {
-      formattedData[index].grades[item.course] = item.grade;
+      formattedData[index].grades[item.course] = item.grade
+        ? item.grade
+        : item.attendance === "Absent"
+        ? "Absent"
+        : item.withheld === "With held for Malpractice"
+        ? "Malpractice"
+        : item.withheld === '"With held for Malpractice"'
+        ? "Malpractice"
+        : item.withheld === "Withheld"
+        ? "Withheld"
+        : null;
     }
   });
+
   return formattedData;
 };
 
@@ -171,7 +195,7 @@ const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
       E: 0,
       F: 0,
       Withheld: 0,
-      "With held for Malpractice": 0,
+      Malpractice: 0,
       Absent: 0,
     };
   });
@@ -193,7 +217,7 @@ const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
     E: number;
     F: number;
     Withheld: number;
-    "With held for Malpractice": number;
+    Malpractice: number;
     Absent: number;
   }[] = [];
 
@@ -349,7 +373,7 @@ const createResultWorksheet = (data: FormattedType[]) => {
   xlsx.utils.sheet_add_json(ws, gradeData, {
     // skipHeader: false,
     origin: {
-      c: 3, // start from 4th column so later it can be merged
+      c: 2, // start from 4th column so later it can be merged
       r: reFormattedData.length + 7,
     },
 
@@ -363,7 +387,7 @@ const createResultWorksheet = (data: FormattedType[]) => {
       "E",
       "F",
       "Withheld",
-      "With held for Malpractice",
+      "Malpractice",
       "Absent",
     ],
   });
@@ -434,8 +458,11 @@ const createResultWorksheet = (data: FormattedType[]) => {
       if (cell.t === "s" && cell.v === "Withheld") {
         cell.s = { ...cell.s, fill: { fgColor: { rgb: "fba7cf" } } };
       }
+      if (cell.t === "s" && cell.v === "Malpractice") {
+        cell.s = { ...cell.s, fill: { fgColor: { rgb: "d7fc00" } } };
+      }
       // set cell width to minimum text width
-      if (R == 4) console.log(cell);
+      // if (R == 4) console.log(cell);
       if (cell.t === "s" && [1, 2].includes(C)) {
         if (!ws["!cols"]) ws["!cols"] = [];
         ws["!cols"][C] = { wch: cell.v.length + 5 };
