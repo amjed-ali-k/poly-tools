@@ -306,11 +306,12 @@ const createResultWorksheet = (data: FormattedType[]) => {
   };
 
   courses.forEach((course, index) => {
+    const _c = course.split("-");
     ws[
       xlsx.utils.encode_cell({ r: 3, c: index + headerPreDefinedCols.length })
     ] = {
       t: "s",
-      v: course.split("-")[1],
+      v: _c[_c.length - 1],
       s: { font: { sz: 10, bold: true, alignment: { wrapText: true } } },
     };
   });
