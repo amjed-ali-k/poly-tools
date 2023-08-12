@@ -93,7 +93,6 @@ export const parseCsv = (
 
 export const formatData = (data: ResultType[]): FormattedType[] => {
   const formattedData: FormattedType[] = [];
-  console.log(data[10]);
   data.forEach((item) => {
     const index = formattedData.findIndex(
       (i) => i.registerNo === item.registerNo
@@ -439,39 +438,107 @@ const createResultWorksheet = (data: FormattedType[]) => {
   ws["E3"] = getHeaderRowObj("Subjects");
 
   const range = xlsx.utils.decode_range(ws["!ref"] || "A1:A1");
-  for (let R = 4; R <= range.e.r; ++R) {
-    for (let C = 0; C <= range.e.c; ++C) {
-      const cell = ws[xlsx.utils.encode_cell({ r: R, c: C })];
-      if (!cell) continue;
-      cell.s = {
-        ...cell.s,
-        border: {
-          top: { style: "thin", color: { auto: 1 } },
-          left: { style: "thin", color: { auto: 1 } },
-          bottom: { style: "thin", color: { auto: 1 } },
-          right: { style: "thin", color: { auto: 1 } },
-        },
-        fill: { fgColor: { rgb: "f7f7f6" } },
+
+  const gradesPos = {
+    gradesStartCol: headerPreDefinedCols.length,
+    gradesEndCol: headerPreDefinedCols.length + courseLength,
+    gradesStartRow: 4,
+    gradesEndRow: reFormattedData.length + 3,
+  };
+
+  iterateThroughCells(ws, 4, range.e.r, 0, range.e.c, (C, R, _cell) => {
+    // if cell includes in grades range
+    let cell = _cell;
+    if (
+      C >= gradesPos.gradesStartCol &&
+      C <= gradesPos.gradesEndCol &&
+      R >= gradesPos.gradesStartRow &&
+      R <= gradesPos.gradesEndRow
+    ) {
+      // if cell undefined
+      if (!cell) {
+        // create a cell in worksheet
+        xlsx.utils.sheet_add_aoa(ws, [[""]], {
+          origin: {
+            c: C,
+            r: R,
+          },
+        });
+        // get the newly created cell
+        cell = ws[xlsx.utils.encode_cell({ r: R, c: C })] as xlsx.CellObject;
+      }
+      const stl: {
+        alignment?: { horizontal: string };
+        fill?: { fgColor: { rgb: string } };
+      } = {
+        alignment: { horizontal: "center" },
       };
+
       if (cell.t === "s" && cell.v === "Absent") {
-        cell.s = { ...cell.s, fill: { fgColor: { rgb: "ff9797" } } };
+        stl.fill = { fgColor: { rgb: "ff79e7" } };
       }
       if (cell.t === "s" && cell.v === "F") {
-        cell.s = { ...cell.s, fill: { fgColor: { rgb: "ff9797" } } };
+        stl.fill = { fgColor: { rgb: "ff9797" } };
       }
       if (cell.t === "s" && cell.v === "Withheld") {
-        cell.s = { ...cell.s, fill: { fgColor: { rgb: "fba7cf" } } };
+        stl.fill = { fgColor: { rgb: "fba7cf" } };
       }
       if (cell.t === "s" && cell.v === "Malpractice") {
-        cell.s = { ...cell.s, fill: { fgColor: { rgb: "d7fc00" } } };
+        stl.fill = { fgColor: { rgb: "d7fc00" } };
       }
-      // set cell width to minimum text width
-      // if (R == 4) console.log(cell);
-      if (cell.t === "s" && [1, 2].includes(C)) {
-        if (!ws["!cols"]) ws["!cols"] = [];
-        ws["!cols"][C] = { wch: cell.v.length + 5 };
-      }
+      cell.s = { ...cell.s, ...stl };
+    }
+
+    if (!cell) return;
+
+    cell.s = {
+      ...cell.s,
+      border: {
+        top: { style: "thin", color: { rgb: "242424" } },
+        left: { style: "thin", color: { rgb: "242424" } },
+        bottom: { style: "thin", color: { rgb: "242424" } },
+        right: { style: "thin", color: { rgb: "242424" } },
+      },
+    };
+
+    if (!cell.s?.fill?.fgColor) {
+      cell.s.fill = { fgColor: { rgb: "f7f7f6" } };
+    }
+    if (!cell.s?.font?.color) {
+      cell.s.font = {
+        ...cell.s.font,
+        color: {
+          rgb: "00000",
+        },
+      };
+    }
+
+    // set cell width to minimum text width for first 2 columns
+    if (cell.t === "s" && [1, 2].includes(C)) {
+      if (!ws["!cols"]) ws["!cols"] = [];
+      if (cell.v)
+        ws["!cols"][C] = {
+          wch: cell.v.toString().length + 5,
+        };
+    }
+  });
+
+  return ws;
+};
+
+const iterateThroughCells = (
+  ws: xlsx.WorkSheet,
+  startRow: number,
+  endRow: number,
+  startColumn: number,
+  endColumn: number,
+  func: (C: number, R: number, e?: xlsx.CellObject) => void
+) => {
+  for (let R = startRow; R <= endRow; ++R) {
+    for (let C = startColumn; C <= endColumn; ++C) {
+      const cell: xlsx.CellObject | undefined =
+        ws[xlsx.utils.encode_cell({ r: R, c: C })];
+      func(C, R, cell);
     }
   }
-  return ws;
 };
