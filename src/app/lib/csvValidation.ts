@@ -63,13 +63,18 @@ export const validateCSV = (data: string): string | true => {
     // line[9] = should be grades if line[7] is empty
     if (
       line[7] === "" &&
-      !["F", "E", "D", "C", "B", "A", "S", "Absent", "Withheld"].includes(
+      !["F", "E", "D", "C", "B", "A", "S", "Absent", "Withheld", ""].includes(
         line[9]
       )
     )
       return `Invalid line ${i - 1} grade`;
     // line[10] = should be either Pass or Fail
-    if (line[7] === "" && line[10] !== "P" && line[10] !== "F")
+    if (
+      line[7] === "" &&
+      line[10] !== "P" &&
+      line[10] !== "F" &&
+      line[10] !== ""
+    )
       return `Invalid line ${i - 1} result`;
   }
   return true;

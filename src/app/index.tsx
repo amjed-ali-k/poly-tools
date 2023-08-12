@@ -21,8 +21,10 @@ export default function Home() {
       return;
     }
     setFile(e.target.files[0]);
+    console.log(file);
 
     const validatedResult = validateCSV(await e.target.files[0].text());
+    console.log(validatedResult);
     if (validatedResult !== true) {
       toast.error(
         "Invalid file. " +
