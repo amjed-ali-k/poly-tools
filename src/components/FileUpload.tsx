@@ -6,7 +6,11 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { writeFile } from "xlsx-js-style";
-import { validateFileType, validateCSV } from "@/app/lib/csvValidation";
+import {
+  validateFileType,
+  validateCSV,
+  preProcessCSV,
+} from "@/app/lib/csvValidation";
 import {
   ResultType,
   parseCsv,
@@ -27,18 +31,15 @@ function FileUpload() {
       toast.error("Invalid file type.");
       return;
     }
+
     setFile(e.target.files[0]);
 
     const validatedResult = validateCSV(await e.target.files[0].text());
-    console.log(validatedResult);
     if (validatedResult !== true) {
+      toast.error(validatedResult);
       toast.error(
-        "Invalid file. " +
-          validatedResult +
-          ". Kindly send me this file so that I can fix this issue. Email: amjedmgm@gmail.com",
-        {
-          duration: 30000,
-        }
+        "Kindly send me this file so that I can fix this issue. Email: amjedmgm@gmail.com",
+        { duration: 15e3 }
       );
       return;
     }

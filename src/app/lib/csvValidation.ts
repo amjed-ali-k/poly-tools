@@ -14,23 +14,28 @@ export const sampleInput = `"Register No";"Student Name";Branch;Semester;Course;
 2201041312,"JUNAID .M","Electronics Engineering",1,"1002-Mathematics I",Regular,Present,,30,B,P`;
 
 export const validateCSV = (data: string): string | true => {
-  const lines = data.split("\n");
+  const lines = data.split("\n").map((line) => line.replace("\r", ""));
   const header = lines[0].split(";");
-  if (header.length !== 11) return "Invalid header length";
+
+  if (header.length < 11) return "Invalid header length";
   if (
-    header[0] !== `"Register No"` ||
-    header[1] !== `"Student Name"` ||
-    header[2] !== `Branch` ||
-    header[3] !== `Semester` ||
-    header[4] !== `Course` ||
-    header[5] !== `"Exam Type"` ||
-    header[6] !== `Attendance` ||
-    header[7] !== `Withheld` ||
-    header[8] !== `IMark` ||
-    header[9] !== `Grade` ||
-    header[10] !== `Result`
+    !(
+      header[0].includes(`Register No`) &&
+      header[1].includes(`Student Name`) &&
+      header[2].includes(`Branch`) &&
+      header[3].includes(`Semester`) &&
+      header[4].includes(`Course`) &&
+      header[5].includes(`Exam Type`) &&
+      header[6].includes(`Attendance`) &&
+      header[7].includes(`Withheld`) &&
+      header[8].includes(`IMark`) &&
+      header[9].includes(`Grade`) &&
+      header[10].includes(`Result`)
+    )
   )
     return "Invalid header";
+
+  if (lines.length < 3) return "File is empty";
 
   for (let i = 1; i < lines.length - 1; i++) {
     const line = lines[i].split(",");
@@ -78,4 +83,19 @@ export const validateCSV = (data: string): string | true => {
       return `Invalid line ${i - 1} result`;
   }
   return true;
+};
+
+export const preProcessCSV = async (data: File): Promise<File> => {
+  // read data as csv
+
+  const _data = await data.text();
+  const lines = _data.split("\n");
+
+  // remove /r from end of all lines if present
+  const _lines = lines
+    .map((line) => line.replace("\r", ""))
+    .filter((line) => line !== "");
+
+  // retrun as file
+  return new File(_lines, data.name, { type: data.type });
 };

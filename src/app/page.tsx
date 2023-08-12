@@ -6,7 +6,7 @@ export default function Home() {
     window.open("https://github.com/amjed-ali-k/sbte-refactor", "_blank");
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center justify-between p-9 sm:p-24 relative">
+      <main className="flex bg-black min-h-screen flex-col items-center justify-between p-9 sm:p-24 relative">
         <div className="absolute top-6 right-6">
           <Link
             type="button"

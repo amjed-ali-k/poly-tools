@@ -50,6 +50,7 @@ export const parseCsv = (
   onError: (e: string) => void = (e) => console.log(e)
 ) => {
   const reader = new FileReader();
+
   reader.onload = (event) => {
     if (!event.target) return;
     const file = event.target.result;
@@ -61,20 +62,22 @@ export const parseCsv = (
       return;
     }
 
-    allLines[0] = allLines[0].replaceAll(";", ",");
+    allLines[0] =
+      "registerNo,studentName,branch,semester,course,examType,attendance,withheld,iMark,grade,result";
 
     // Parse the csv data
     Papa.parse<ResultType>(allLines.join("\n"), {
       header: true,
       skipEmptyLines: true,
       dynamicTyping: true,
-      transformHeader(header) {
+      transformHeader(header, i) {
         // change header to camelCase
         header = header
           .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
             return index === 0 ? word.toLowerCase() : word.toUpperCase();
           })
           .replace(/\s+/g, "");
+
         return header;
       },
       complete(results) {
@@ -90,6 +93,7 @@ export const parseCsv = (
 
 export const formatData = (data: ResultType[]): FormattedType[] => {
   const formattedData: FormattedType[] = [];
+  console.log(data[10]);
   data.forEach((item) => {
     const index = formattedData.findIndex(
       (i) => i.registerNo === item.registerNo
