@@ -22,7 +22,9 @@ function FileUpload() {
   const handleUpload: React.ChangeEventHandler<HTMLInputElement> = async (
     e
   ) => {
+    setFile(undefined);
     if (!e.target.files) return;
+    if (e.target.files.length === 0) return;
     setIsError(true);
     if (!validateFileType(e.target.files[0])) {
       toast.error("Invalid file type.");
