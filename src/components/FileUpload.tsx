@@ -6,17 +6,14 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { writeFile } from "xlsx-js-style";
-import {
-  validateFileType,
-  validateCSV,
-  preProcessCSV,
-} from "@/app/lib/csvValidation";
+import { validateFileType, validateCSV } from "@/app/lib/csvValidation";
 import {
   ResultType,
   parseCsv,
   convertToXlsx,
   formatData,
 } from "@/app/lib/main";
+import axios from "axios";
 
 function FileUpload() {
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -52,7 +49,24 @@ function FileUpload() {
       toast.error("No files selected.");
       return;
     }
-    writeFile(convertToXlsx(formatData(data)), "result.xlsx");
+    const formatedData = formatData(data);
+    writeFile(convertToXlsx(formatedData), "result.xlsx");
+
+    const totalRegular = formatedData.filter(
+      (item) => item.examType === "Regular"
+    ).length;
+    const totalStudents = formatedData.length;
+    const totalSupplimentry = totalStudents - totalRegular;
+
+    axios
+      .put("/api/count/", {
+        totalStudents,
+        totalSupplimentry,
+        totalRegular,
+        fileName: file.name,
+      })
+      .catch((err) => {});
+
     toast.success("File processed.");
   };
   return (

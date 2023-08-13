@@ -11,6 +11,7 @@
   "dependencies": {
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
+    "deta": "^1.2.0",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.13",
     "flowbite": "^1.8.1",
@@ -23,7 +24,8 @@
     "react-hot-toast": "^2.4.1",
     "tailwindcss": "3.3.3",
     "typescript": "5.1.6",
-    "xlsx-js-style": "^1.2.0"
+    "xlsx-js-style": "^1.2.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/node": "20.4.9",
