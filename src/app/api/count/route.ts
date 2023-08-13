@@ -34,12 +34,12 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  statsDb.put({
+  await statsDb.put({
     key: new Date().toISOString(),
     ...body.data,
   });
 
-  statsAll.update(
+  await statsAll.update(
     {
       successOperations: statsAll.util.increment(1),
       totalStudents: statsAll.util.increment(body.data.totalStudents),
