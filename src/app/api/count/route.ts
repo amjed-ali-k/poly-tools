@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Deta } from "deta";
-// e.g a webhook to `your-website.com/api/revalidate?tag=collection&secret=<token>`
-
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -37,6 +35,7 @@ export async function PUT(request: NextRequest) {
   await statsDb.put({
     key: new Date().toISOString(),
     ...body.data,
+    ip: request.ip,
   });
 
   await statsAll.update(
