@@ -89,6 +89,10 @@ function FileUpload() {
         setError("phone");
         return;
       }
+      axios.interceptors.request.use((config) => {
+        config.headers["phone"] = formData.phone;
+        return config;
+      });
     }
     clearError("phone");
 
@@ -138,7 +142,7 @@ function FileUpload() {
         />
       </div>
       <div className="flex max-w-md flex-col gap-4 my-4" id="checkbox">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Checkbox
             defaultChecked
             checked={formData.isImark}
@@ -150,7 +154,7 @@ function FileUpload() {
           <Label htmlFor="imark" className="text-white">
             Include Internal mark{" "}
           </Label>
-        </div>
+        </div> */}
         <div className="flex items-center gap-2">
           <Checkbox
             defaultChecked={false}
