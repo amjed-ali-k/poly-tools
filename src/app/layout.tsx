@@ -9,6 +9,15 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "SBTE Tools",
+  keywords: [
+    "SBTE",
+    "SBTE Tools",
+    "SBTE Result",
+    "SBTE Result Evaluation",
+    "Diploma results sort",
+    "SBTE Result sort",
+    "Diploma exam results",
+  ],
   description:
     "SBTE Tools is a simple app exclusively for lecturers, aimed at streamlining the time-consuming and tedious task of evaluating student results downloaded from SBTE",
   creator: "Amjed Ali K (@amjed-ali-k)",
@@ -25,6 +34,8 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: "https://sbte-tools.vercel.app/",
     siteName: "SBTE Tools",
+    emails: ["amjedmgm@gmail.com"],
+    countryName: "India",
   },
 };
 
