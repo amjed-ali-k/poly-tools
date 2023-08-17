@@ -1,188 +1,31 @@
-import Papa from "papaparse";
 import * as xlsx from "xlsx-js-style";
-
-enum Grade {
-  F = "F",
-  E = "E",
-  D = "D",
-  C = "C",
-  B = "B",
-  A = "A",
-  S = "S",
-}
-
-export type AllGrades = Grade | "Absent" | "Withheld" | "Malpractice";
-
-export interface ResultType {
-  registerNo: number;
-  studentName: string;
-  branch: string;
-  semester: number;
-  course: string;
-  examType: "Regular" | "Supplementary";
-  attendance: "Present" | "Absent";
-  withheld:
-    | "Withheld"
-    | "With held for Malpractice"
-    | '"With held for Malpractice"'
-    | null;
-  iMark: number | null;
-  grade: Grade | null;
-  result: "P" | "F" | null;
-}
-
-type courseName = string;
-interface FormattedType {
-  registerNo: number;
-  studentName: string;
-  branch: string;
-  semester: number;
-  examType: "Regular" | "Supplementary";
-  grades: {
-    [key: courseName]: AllGrades | null;
-  };
-  // withheld: "Withheld" | "With held for Malpractice" | null;
-}
-
-export const parseCsv = (
-  inputFile: File,
-  onSuccess: (e: ResultType[]) => void = (e) => console.log(e),
-  onError: (e: string) => void = (e) => console.log(e)
-) => {
-  const reader = new FileReader();
-
-  reader.onload = (event) => {
-    if (!event.target) return;
-    const file = event.target.result;
-    if (typeof file !== "string") return;
-    let allLines = file.split(/\r\n|\n/);
-    // Reading line by line
-    if (allLines.length < 2) {
-      onError("File is empty");
-      return;
-    }
-
-    allLines[0] =
-      "registerNo,studentName,branch,semester,course,examType,attendance,withheld,iMark,grade,result";
-
-    // Parse the csv data
-    Papa.parse<ResultType>(allLines.join("\n"), {
-      header: true,
-      skipEmptyLines: true,
-      dynamicTyping: true,
-      transformHeader(header, i) {
-        // change header to camelCase
-        header = header
-          .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-            return index === 0 ? word.toLowerCase() : word.toUpperCase();
-          })
-          .replace(/\s+/g, "");
-
-        return header;
-      },
-      complete(results) {
-        onSuccess(results.data);
-      },
-    });
-  };
-  reader.onerror = (error) => {
-    onError("Error reading file");
-  };
-  reader.readAsText(inputFile);
-};
-
-export const formatData = (data: ResultType[]): FormattedType[] => {
-  const formattedData: FormattedType[] = [];
-  data.forEach((item) => {
-    const index = formattedData.findIndex(
-      (i) => i.registerNo === item.registerNo
-    );
-    if (index === -1) {
-      formattedData.push({
-        registerNo: item.registerNo,
-        studentName: item.studentName,
-        branch: item.branch,
-        semester: item.semester,
-        examType: item.examType,
-        grades: {
-          [item.course]: item.grade
-            ? item.grade
-            : item.attendance === "Absent"
-            ? "Absent"
-            : item.withheld === "With held for Malpractice"
-            ? "Malpractice"
-            : item.withheld === '"With held for Malpractice"'
-            ? "Malpractice"
-            : item.withheld === "Withheld"
-            ? "Withheld"
-            : null,
-        },
-        // withheld:
-        //   item.withheld === "With held for Malpractice"
-        //     ? "With held for Malpractice"
-        //     : item.withheld === '"With held for Malpractice"'
-        //     ? "With held for Malpractice"
-        //     : item.withheld === "Withheld"
-        //     ? "Withheld"
-        //     : null,
-      });
-    } else {
-      formattedData[index].grades[item.course] = item.grade
-        ? item.grade
-        : item.attendance === "Absent"
-        ? "Absent"
-        : item.withheld === "With held for Malpractice"
-        ? "Malpractice"
-        : item.withheld === '"With held for Malpractice"'
-        ? "Malpractice"
-        : item.withheld === "Withheld"
-        ? "Withheld"
-        : null;
-    }
-  });
-
-  return formattedData;
-};
-
-// function to get All courses from FormattedType[]
-export const getAllCourses = (data: FormattedType[]): string[] => {
-  const courses: string[] = [];
-  data.forEach((item) => {
-    Object.keys(item.grades).forEach((course) => {
-      if (!courses.includes(course)) {
-        courses.push(course);
-      }
-    });
-  });
-  return courses;
-};
-
+import { FormattedType, ResultType } from "./resultSorter/types";
+import { getAllCourses } from "./resultSorter/formatData";
+import Color from "colorjs.io";
 // convert formatted data to xlsx using cell coloring. Also put title "SBTE FORMATTER by Amjed Ali" on Top of the sheet
-export const convertToXlsx = (data: FormattedType[]): xlsx.WorkBook => {
+export const convertToXlsx = (
+  data: FormattedType[],
+  isCgpa = false
+): xlsx.WorkBook => {
   const wb = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(
     wb,
-    createResultWorksheet(data.filter((e) => e.examType === "Regular")),
+    createResultWorksheet(
+      data.filter((e) => e.examType === "Regular"),
+      isCgpa
+    ),
     "Regular Result"
   );
   xlsx.utils.book_append_sheet(
     wb,
-    createResultWorksheet(data.filter((e) => e.examType === "Supplementary")),
+    createResultWorksheet(
+      data.filter((e) => e.examType === "Supplementary"),
+      isCgpa
+    ),
     "Supplementary Result"
   );
 
   return wb;
-};
-
-const getHeaderRowObj = (title: string) => {
-  return {
-    t: "s",
-    v: title,
-    s: {
-      font: { sz: 10, bold: true, color: { rgb: "000000" } },
-      alignment: { horizontal: "center", vertical: "center" },
-    },
-  };
 };
 
 const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
@@ -232,11 +75,17 @@ const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
   });
   return gradesCountArr;
 };
-
-const createResultWorksheet = (data: FormattedType[]) => {
+type TreformatedData = {
+  registerNo: number;
+  studentName: string;
+  branch: string;
+  semester: number;
+  cgpa?: string;
+};
+const createResultWorksheet = (data: FormattedType[], isCgpa = false) => {
   const courses = getAllCourses(data);
-  // sort according to Student name
-  const courseLength = courses.length || 5;
+
+  const courseLength = courses.length || 7;
 
   const headerPreDefinedCols = [
     "registerNo",
@@ -244,81 +93,17 @@ const createResultWorksheet = (data: FormattedType[]) => {
     "branch",
     "semester",
   ];
+
   const ws = xlsx.utils.aoa_to_sheet<string>([
     ["SBTE Result Formatter"],
-    ["By Amjed Ali (https://github.com/amjed-ali-k"],
+    ["By Amjed Ali (https://sbte-tools.vercel.app)"],
   ]);
 
-  // Add stickey row on top of the sheet with headers
-  ws["!rows"] = [{ hpx: 30 }, { hpx: 20 }];
-  ws["!freeze"] = {
-    xSplit: "A",
-    ySplit: 4,
-    topLeftCell: "A2",
-    activePane: "bottomLeft",
-  };
-  // Merge top row
-  ws["!merges"] = [
-    {
-      s: { r: 0, c: 0 },
-      e: { r: 0, c: headerPreDefinedCols.length + courseLength },
-    },
-    {
-      s: { r: 1, c: 0 },
-      e: { r: 1, c: headerPreDefinedCols.length + courseLength },
-    },
-    {
-      s: { r: 2, c: headerPreDefinedCols.length },
-      e: { r: 2, c: headerPreDefinedCols.length + courseLength - 1 },
-    },
-  ];
+  // Intialize Merges and Rows
+  ws["!merges"] = [];
+  ws["!rows"] = [];
 
-  ws["A1"] = {
-    t: "s",
-    v: "SBTE RESULT FORMATTER",
-    s: {
-      font: {
-        sz: 20,
-        bold: true,
-        color: {
-          rgb: "ffffff",
-        },
-      },
-      fill: { fgColor: { rgb: "2a6099" } },
-      alignment: { horizontal: "center", vertical: "bottom" },
-    },
-  };
-
-  ws["A2"] = {
-    t: "s",
-    v: "By Amjed Ali K (https://github.com/amjed-ali-k)",
-    s: {
-      font: {
-        sz: 8,
-        bold: true,
-        color: {
-          rgb: "ffffff",
-        },
-      },
-      fill: { fgColor: { rgb: "2a6099" } },
-      alignment: { horizontal: "center", vertical: "top" },
-    },
-  };
-
-  courses.forEach((course, index) => {
-    const _c = course.split("-");
-    ws[
-      xlsx.utils.encode_cell({ r: 3, c: index + headerPreDefinedCols.length })
-    ] = {
-      t: "s",
-      v: _c[_c.length - 1],
-      s: { font: { sz: 10, bold: true, alignment: { wrapText: true } } },
-    };
-  });
-
-  ws["!rows"][2] = { hpx: 20 };
-  ws["!rows"][3] = { hpx: 20 };
-
+  // Empty data template
   if (!data || data.length === 0) {
     // TODO: Fix this message is not showing
     ws["!merges"].push({
@@ -330,113 +115,60 @@ const createResultWorksheet = (data: FormattedType[]) => {
     return ws;
   }
 
+  // Create New JS Object to add into sheet
   const reFormattedData = data
     .map((item) => {
-      return {
+      const _obj: TreformatedData = {
+        branch: item.branch,
         registerNo: item.registerNo,
         studentName: item.studentName,
-        branch: item.branch,
         semester: item.semester,
         ...item.grades,
       };
+      let obj: TreformatedData = _obj;
+
+      if (item.cgpa && isCgpa) {
+        obj = { ..._obj, cgpa: item.cgpa };
+      }
+      return obj;
     })
     .sort((a, b) => {
-      if (a.studentName < b.studentName) {
+      if (a.registerNo < b.registerNo) {
         return -1;
       }
-      if (a.studentName > b.studentName) {
+      if (a.registerNo > b.registerNo) {
         return 1;
       }
       return 0;
     });
 
-  ws["!merges"].push(
-    ...Array(headerPreDefinedCols.length)
-      .fill(0)
-      .map((_, i) => ({
-        s: { r: 2, c: i },
-        e: { r: 3, c: i },
-      }))
-  );
-  ws["!merges"].push({
-    s: { r: 0, c: 0 },
-    e: { r: 0, c: headerPreDefinedCols.length + courseLength },
-  });
-
+  // JS Object to Sheet
+  const hdrs = [...headerPreDefinedCols, ...courses];
   xlsx.utils.sheet_add_json(ws, reFormattedData, {
     skipHeader: true,
     origin: {
       c: 0,
       r: 4,
     },
-    header: [...headerPreDefinedCols, ...courses],
+    header: isCgpa ? [...hdrs, "cgpa"] : hdrs,
   });
 
-  // store each grade count in each subject at bottom of the sheet
-  const gradeData = calculateGradesCountInEachCourse(data);
-  xlsx.utils.sheet_add_json(ws, gradeData, {
-    // skipHeader: false,
-    origin: {
-      c: 2, // start from 4th column so later it can be merged
-      r: reFormattedData.length + 7,
-    },
-
-    header: [
-      "Subject",
-      "S",
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "Withheld",
-      "Malpractice",
-      "Absent",
-    ],
+  // Course name modifier
+  courses.forEach((course, index) => {
+    const _c = course.split("-");
+    ws[
+      xlsx.utils.encode_cell({ r: 3, c: index + headerPreDefinedCols.length })
+    ] = {
+      t: "s",
+      v: _c[_c.length - 1],
+      s: {
+        font: { sz: 10, bold: true, alignment: { wrapText: true } },
+        border: fullBorder,
+      },
+    };
   });
 
-  Array(gradeData.length + 1)
-    .fill(0)
-    .forEach((_, index) => {
-      const currentRow = reFormattedData.length + 7 + index;
-      // merge first 4 coulums of each stats row, so long subject names can fit
-      ws["!merges"]?.push({
-        s: {
-          r: currentRow,
-          c: 0,
-        },
-        e: {
-          r: currentRow,
-          c: 2,
-        },
-      });
-
-      // Bold each subject name
-      const cell =
-        ws[
-          xlsx.utils.encode_cell({
-            r: currentRow,
-            c: 2,
-          })
-        ];
-      if (cell)
-        cell.s = {
-          ...cell.s,
-          font: {
-            sz: 11,
-            bold: true,
-            alignment: { wrapText: true },
-          },
-        };
-    });
-
-  // Add header on top of the sheet
-  ws["A3"] = getHeaderRowObj("Reg No");
-  ws["B3"] = getHeaderRowObj("Student Name");
-  ws["C3"] = getHeaderRowObj("Branch");
-  ws["D3"] = getHeaderRowObj("Sem");
-  ws["E3"] = getHeaderRowObj("Subjects");
+  addGradeDetailsToSheet(ws, data, reFormattedData);
 
   const range = xlsx.utils.decode_range(ws["!ref"] || "A1:A1");
 
@@ -492,14 +224,10 @@ const createResultWorksheet = (data: FormattedType[]) => {
 
     if (!cell) return;
 
+    // border all active cells
     cell.s = {
       ...cell.s,
-      border: {
-        top: { style: "thin", color: { rgb: "242424" } },
-        left: { style: "thin", color: { rgb: "242424" } },
-        bottom: { style: "thin", color: { rgb: "242424" } },
-        right: { style: "thin", color: { rgb: "242424" } },
-      },
+      border: fullBorder,
     };
 
     if (!cell.s?.fill?.fgColor) {
@@ -524,6 +252,14 @@ const createResultWorksheet = (data: FormattedType[]) => {
     }
   });
 
+  sheetStyles(
+    ws,
+    headerPreDefinedCols.length,
+    courseLength,
+    reFormattedData.length,
+    isCgpa
+  );
+
   return ws;
 };
 
@@ -543,3 +279,247 @@ const iterateThroughCells = (
     }
   }
 };
+
+const addGradeDetailsToSheet = (
+  ws: xlsx.WorkSheet,
+  data: FormattedType[],
+  reFormattedData: TreformatedData[]
+) => {
+  // store each grade count in each subject at bottom of the sheet
+  const gradeData = calculateGradesCountInEachCourse(data);
+  const header = [
+    "Subject",
+    "",
+    "",
+    "S",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "Withheld",
+    "Malpractice",
+    "Absent",
+  ];
+  xlsx.utils.sheet_add_json(ws, gradeData, {
+    // skipHeader: false,
+    origin: {
+      c: 0,
+      r: reFormattedData.length + 7,
+    },
+    header,
+  });
+
+  Array(gradeData.length + 1)
+    .fill(0)
+    .forEach((_, index) => {
+      const currentRow = reFormattedData.length + 7 + index;
+      // merge first 4 coulums of each stats row, so long subject names can fit
+      ws["!merges"] = [...(ws["!merges"] as [])];
+      ws["!merges"].push({
+        s: {
+          r: currentRow,
+          c: 0,
+        },
+        e: {
+          r: currentRow,
+          c: 2,
+        },
+      });
+
+      // Bold each subject name
+      const cell =
+        ws[
+          xlsx.utils.encode_cell({
+            r: currentRow,
+            c: 0,
+          })
+        ];
+      if (cell)
+        cell.s = {
+          ...cell.s,
+          font: {
+            sz: 11,
+            bold: true,
+            alignment: { wrapText: true },
+          },
+        };
+    });
+
+  // Style title row
+  header.forEach((e, i) => {
+    const cell =
+      ws[
+        xlsx.utils.encode_cell({
+          r: reFormattedData.length + 7,
+          c: i,
+        })
+      ];
+    if (cell) {
+      cell.s = {
+        ...cell.s,
+        font: {
+          sz: 11,
+          bold: true,
+          alignment: { wrapText: true },
+          color: { rgb: "ffffff" },
+        },
+        fill: { fgColor: { rgb: "342a06" } },
+        alignment: { horizontal: "center", vertical: "center" },
+      };
+    }
+  });
+};
+
+const sheetStyles = (
+  ws: xlsx.WorkSheet,
+  firstColLength: number,
+  courseLength: number,
+  dataLength: number,
+  isCgpa = false
+) => {
+  // Add Large row on top of the sheet
+  ws["!rows"] = [...(ws["!rows"] as [])];
+  ws["!rows"][0] = { hpx: 35 };
+  ws["!rows"][1] = { hpx: 20 };
+
+  ws["!merges"] = [...(ws["!merges"] as [])];
+  // Merge Student detail headers (Name, RegNo, Branch, Sem, etc..)
+  ws["!merges"].push(
+    ...Array(firstColLength)
+      .fill(0)
+      .map((_, i) => ({
+        s: { r: 2, c: i },
+        e: { r: 3, c: i },
+      }))
+  );
+
+  // Merge top row and Subject Columns
+  ws["!merges"] = [
+    ...ws["!merges"],
+    {
+      s: { r: 0, c: 0 },
+      e: { r: 0, c: firstColLength + courseLength },
+    },
+    {
+      s: { r: 1, c: 0 },
+      e: { r: 1, c: firstColLength + courseLength },
+    },
+    {
+      s: { r: 2, c: firstColLength },
+      e: { r: 2, c: firstColLength + courseLength - 1 },
+    },
+  ];
+
+  // Add Top Title
+  ws["A1"] = {
+    t: "s",
+    v: "SBTE Tools",
+    s: {
+      font: {
+        sz: 20,
+        bold: true,
+        color: {
+          rgb: "ffffff",
+        },
+      },
+      fill: { fgColor: { rgb: "8d1d75" } },
+      alignment: { horizontal: "center", vertical: "bottom" },
+    },
+  };
+
+  ws["A2"] = {
+    t: "s",
+    v: "By Amjed Ali K (https://github.com/amjed-ali-k)",
+    s: {
+      font: {
+        sz: 8,
+        bold: true,
+        color: {
+          rgb: "ffffff",
+        },
+      },
+      fill: { fgColor: { rgb: "a6318c" } },
+      alignment: { horizontal: "center", vertical: "top" },
+    },
+  };
+
+  // Add header on top of the sheet
+  ws["A3"] = getHeaderRowObj("Reg No");
+  ws["B3"] = getHeaderRowObj("Student Name");
+  ws["C3"] = getHeaderRowObj("Branch");
+  ws["D3"] = getHeaderRowObj("Sem");
+  ws["E3"] = getHeaderRowObj("Subjects");
+
+  if (isCgpa) {
+    ws[
+      xlsx.utils.encode_cell({
+        r: 2,
+        c: firstColLength + courseLength,
+      })
+    ] = getHeaderRowObj("CGPA");
+    ws["!merges"].push({
+      s: { r: 2, c: firstColLength + courseLength },
+      e: { r: 3, c: firstColLength + courseLength },
+    });
+  }
+
+  ws["!freeze"] = {
+    xSplit: "A",
+    ySplit: 3,
+    topLeftCell: "A1",
+    activePane: "bottomLeft",
+  };
+
+  iterateThroughCells(
+    ws,
+    4,
+    4 + dataLength,
+    firstColLength + courseLength,
+    firstColLength + courseLength,
+    (C, R, e) => {
+      if (!e) return;
+      console.log(e);
+      console.log(
+        redgreen(parseFloat(e.v as string) / 10)
+          .toString({ format: "hex" })
+          .replace("#", "")
+      );
+      e.s = {
+        ...e.s,
+        fill: {
+          fgColor: {
+            rgb: redgreen(parseFloat(e.v as string) / 10)
+              .toString({ format: "hex" })
+              .replace("#", ""),
+          },
+        },
+      };
+    }
+  );
+};
+
+const fullBorder = {
+  top: { style: "thin", color: { rgb: "242424" } },
+  left: { style: "thin", color: { rgb: "242424" } },
+  bottom: { style: "thin", color: { rgb: "242424" } },
+  right: { style: "thin", color: { rgb: "242424" } },
+};
+
+const getHeaderRowObj = (title: string) => {
+  return {
+    t: "s",
+    v: title,
+    s: {
+      font: { sz: 10, bold: true, color: { rgb: "000000" } },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: fullBorder,
+    },
+  };
+};
+let color = new Color("#ff6d6d");
+let redgreen = color.range("#57d003", {
+  space: "srgb", // interpolation space
+  hue: "shorter",
+});

@@ -9,19 +9,15 @@ import {
   TextInput,
 } from "flowbite-react";
 import { useState } from "react";
-
 import toast from "react-hot-toast";
-
 import { writeFile } from "xlsx-js-style";
-import { validateFileType, validateCSV } from "@/app/lib/csvValidation";
-import {
-  ResultType,
-  parseCsv,
-  convertToXlsx,
-  formatData,
-} from "@/app/lib/main";
 import axios from "axios";
 import { HiPhone } from "react-icons/hi2";
+
+import { validateFileType, validateCSV } from "@/app/lib/csvValidation";
+import { convertToXlsx } from "@/app/lib/main";
+import { ResultType } from "@/app/lib/resultSorter/types";
+import { formatData, parseCsv } from "@/app/lib/resultSorter/formatData";
 
 function FileUpload() {
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -95,8 +91,9 @@ function FileUpload() {
       }
     }
     clearError("phone");
-    const formatedData = formatData(data);
-    writeFile(convertToXlsx(formatedData), "result.xlsx");
+
+    const formatedData = await formatData(data, formData.isCgpa);
+    writeFile(convertToXlsx(formatedData, formData.isCgpa), "result.xlsx");
 
     const totalRegular = formatedData.filter(
       (item) => item.examType === "Regular"
