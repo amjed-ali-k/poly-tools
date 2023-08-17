@@ -46,7 +46,7 @@ export default function Home() {
             href="https://github.com/amjed-ali-k"
             target="_blank"
             className="text-center"
-            rel="noreferrer"
+            rel="noreferrer noopener"
           >
             Made by <strong>Amjed Ali K</strong>
           </a>
