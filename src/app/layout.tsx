@@ -56,7 +56,7 @@ export default function RootLayout({
           gtag('config', 'G-3DZN7M50RE');
         `}
       </Script>
-      <body className={inter.className}>
+      <body className={inter.className + " dark "}>
         <div>
           <Toaster />
         </div>

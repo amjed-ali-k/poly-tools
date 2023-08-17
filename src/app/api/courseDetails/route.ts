@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const coursesDb = deta.Base("coursesDB");
 
-type CourseType = {
+export type CourseType = {
   category: string | null;
   code: string;
   credits: number | null;
