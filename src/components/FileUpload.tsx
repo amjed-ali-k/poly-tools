@@ -7,6 +7,7 @@ import {
   Checkbox,
   Badge,
   TextInput,
+  Radio,
 } from "flowbite-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -16,7 +17,7 @@ import { HiPhone } from "react-icons/hi2";
 
 import { validateFileType, validateCSV } from "@/app/lib/csvValidation";
 import { convertToXlsx } from "@/app/lib/main";
-import { ResultType } from "@/app/lib/resultSorter/types";
+import { OptionsType, ResultType } from "@/app/lib/resultSorter/types";
 import { formatData, parseCsv } from "@/app/lib/resultSorter/formatData";
 
 function FileUpload() {
@@ -35,14 +36,11 @@ function FileUpload() {
     setErrors({ ...errors, [label]: false });
   };
 
-  const [formData, setFormData] = useState<{
-    isImark: boolean;
-    isCgpa: boolean;
-    phone?: string;
-  }>({
+  const [formData, setFormData] = useState<OptionsType>({
     isImark: true,
     isCgpa: false,
     phone: undefined,
+    sortType: "registerNo",
   });
   const handleUpload: React.ChangeEventHandler<HTMLInputElement> = async (
     e
@@ -97,7 +95,7 @@ function FileUpload() {
     clearError("phone");
 
     const formatedData = await formatData(data, formData.isCgpa);
-    writeFile(convertToXlsx(formatedData, formData.isCgpa), "result.xlsx");
+    writeFile(convertToXlsx(formatedData, formData), "result.xlsx");
 
     const totalRegular = formatedData.filter(
       (item) => item.examType === "Regular"
@@ -141,10 +139,11 @@ function FileUpload() {
           id="file"
         />
       </div>
+
       <div className="flex max-w-md flex-col gap-4 my-4" id="checkbox">
         {/* <div className="flex items-center gap-2">
           <Checkbox
-            defaultChecked
+          
             checked={formData.isImark}
             onChange={(e) =>
               setFormData({ ...formData, isImark: e.target.checked })
@@ -157,7 +156,6 @@ function FileUpload() {
         </div> */}
         <div className="flex items-center gap-2">
           <Checkbox
-            defaultChecked={false}
             checked={formData.isCgpa}
             onChange={(e) =>
               setFormData({ ...formData, isCgpa: e.target.checked })
@@ -165,7 +163,7 @@ function FileUpload() {
             id="cgpa"
           />
           <Label htmlFor="cgpa" className="text-white">
-            Include CGPA of each student{" "}
+            Include SGPA of each student{" "}
             <span className=" ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
               Phone required
             </span>
@@ -185,16 +183,54 @@ function FileUpload() {
               placeholder="9XXXX XXXXXX"
               required={formData.isCgpa}
               type="tel"
-              value={formData.phone}
+              value={formData.phone || ""}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
-              min={10}
-              max={10}
             />
           </div>
         )}
       </div>
+
+      <fieldset className="flex flex-row max-w-md  gap-4 my-4" id="sortby">
+        <legend className="mb-2 font-bold text-sm">Sort by</legend>
+        <div className="flex items-center gap-2">
+          <Radio
+            checked={formData.sortType === "registerNo"}
+            id="sb-roll-no"
+            name="sortBy"
+            value="registerNo"
+            onChange={(e) =>
+              setFormData({ ...formData, sortType: "registerNo" })
+            }
+          />
+          <Label htmlFor="sb-roll-no">Reg number</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Radio
+            checked={formData.sortType === "studentName"}
+            id="sb-name"
+            name="sortBy"
+            value="studentName"
+            onChange={(e) =>
+              setFormData({ ...formData, sortType: "studentName" })
+            }
+          />
+          <Label htmlFor="sb-name">Name</Label>
+        </div>
+        {formData.isCgpa && (
+          <div className="flex items-center gap-2">
+            <Radio
+              checked={formData.sortType === "cgpa"}
+              id="sb-cgpa"
+              name="sortBy"
+              value="cgpa"
+              onChange={(e) => setFormData({ ...formData, sortType: "cgpa" })}
+            />
+            <Label htmlFor="sb-cgpa">SGPA</Label>
+          </div>
+        )}
+      </fieldset>
 
       <div className="my-3">
         <Button

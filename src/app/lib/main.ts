@@ -1,18 +1,18 @@
 import * as xlsx from "xlsx-js-style";
-import { FormattedType, ResultType } from "./resultSorter/types";
+import { FormattedType, OptionsType, ResultType } from "./resultSorter/types";
 import { getAllCourses } from "./resultSorter/formatData";
 import Color from "colorjs.io";
 // convert formatted data to xlsx using cell coloring. Also put title "SBTE FORMATTER by Amjed Ali" on Top of the sheet
 export const convertToXlsx = (
   data: FormattedType[],
-  isCgpa = false
+  options: OptionsType
 ): xlsx.WorkBook => {
   const wb = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(
     wb,
     createResultWorksheet(
       data.filter((e) => e.examType === "Regular"),
-      isCgpa
+      options
     ),
     "Regular Result"
   );
@@ -20,7 +20,7 @@ export const convertToXlsx = (
     wb,
     createResultWorksheet(
       data.filter((e) => e.examType === "Supplementary"),
-      isCgpa
+      options
     ),
     "Supplementary Result"
   );
@@ -82,7 +82,9 @@ type TreformatedData = {
   semester: number;
   cgpa?: string;
 };
-const createResultWorksheet = (data: FormattedType[], isCgpa = false) => {
+const createResultWorksheet = (data: FormattedType[], options: OptionsType) => {
+  const { isCgpa, sortType } = options;
+
   const courses = getAllCourses(data);
 
   const courseLength = courses.length || 7;
@@ -94,10 +96,7 @@ const createResultWorksheet = (data: FormattedType[], isCgpa = false) => {
     "semester",
   ];
 
-  const ws = xlsx.utils.aoa_to_sheet<string>([
-    ["SBTE Result Formatter"],
-    ["By Amjed Ali (https://sbte-tools.vercel.app)"],
-  ]);
+  const ws = xlsx.utils.aoa_to_sheet<string>([[""], [""]]);
 
   // Intialize Merges and Rows
   ws["!merges"] = [];
@@ -133,10 +132,10 @@ const createResultWorksheet = (data: FormattedType[], isCgpa = false) => {
       return obj;
     })
     .sort((a, b) => {
-      if (a.registerNo < b.registerNo) {
+      if ((a[sortType] || 1) < (b[sortType] || 1)) {
         return -1;
       }
-      if (a.registerNo > b.registerNo) {
+      if ((a[sortType] || 1) > (b[sortType] || 1)) {
         return 1;
       }
       return 0;
@@ -431,7 +430,7 @@ const sheetStyles = (
 
   ws["A2"] = {
     t: "s",
-    v: "By Amjed Ali K (https://github.com/amjed-ali-k)",
+    v: "By Amjed Ali K (https://sbte-tools.vercel.app)",
     s: {
       font: {
         sz: 8,
@@ -458,7 +457,7 @@ const sheetStyles = (
         r: 2,
         c: firstColLength + courseLength,
       })
-    ] = getHeaderRowObj("CGPA");
+    ] = getHeaderRowObj("SGPA");
     ws["!merges"].push({
       s: { r: 2, c: firstColLength + courseLength },
       e: { r: 3, c: firstColLength + courseLength },
@@ -472,32 +471,29 @@ const sheetStyles = (
     activePane: "bottomLeft",
   };
 
-  iterateThroughCells(
-    ws,
-    4,
-    4 + dataLength,
-    firstColLength + courseLength,
-    firstColLength + courseLength,
-    (C, R, e) => {
-      if (!e) return;
-      console.log(e);
-      console.log(
-        redgreen(parseFloat(e.v as string) / 10)
-          .toString({ format: "hex" })
-          .replace("#", "")
+  {
+    isCgpa &&
+      iterateThroughCells(
+        ws,
+        4,
+        4 + dataLength,
+        firstColLength + courseLength,
+        firstColLength + courseLength,
+        (C, R, e) => {
+          if (!e) return;
+          e.s = {
+            ...e.s,
+            fill: {
+              fgColor: {
+                rgb: redgreen(parseFloat(e.v as string) / 10)
+                  .toString({ format: "hex" })
+                  .replace("#", ""),
+              },
+            },
+          };
+        }
       );
-      e.s = {
-        ...e.s,
-        fill: {
-          fgColor: {
-            rgb: redgreen(parseFloat(e.v as string) / 10)
-              .toString({ format: "hex" })
-              .replace("#", ""),
-          },
-        },
-      };
-    }
-  );
+  }
 };
 
 const fullBorder = {

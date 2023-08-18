@@ -41,3 +41,10 @@ export interface FormattedType {
   cgpa?: string;
   // withheld: "Withheld" | "With held for Malpractice" | null;
 }
+
+export interface OptionsType {
+  isImark: boolean;
+  isCgpa: boolean;
+  phone?: string;
+  sortType: "registerNo" | "studentName" | "cgpa";
+}
