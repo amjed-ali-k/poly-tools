@@ -99,6 +99,9 @@ model User {
 
   courses Course[]
 
+  createdExamResults ExamResult[]
+  createdBatches     Batch[]
+
   @@index([collegeId])
 }
 
@@ -140,6 +143,9 @@ model Student {
 
   examResults ExamResult[]
 
+  batch   Batch  @relation(fields: [batchId], references: [id])
+  batchId String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -148,6 +154,7 @@ model Student {
 
   @@index([collegeId])
   @@index([branchId])
+  @@index([batchId])
 }
 
 model College {
@@ -163,6 +170,8 @@ model College {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   courses   Course[]
+
+  batches Batch[]
 }
 
 model Branch {
@@ -176,11 +185,31 @@ model Branch {
   students Student[]
 
   subjects Subject[]
+  courses  Course[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  courses   Course[]
+  batches Batch[]
 }
+
+model Subject {
+  code        String @id
+  name        String
+  gradePoints Int
+
+  revision Int
+  category String
+  branches Branch[]
+
+  marks Mark[]
+
+  semester       Int
+  totalMarks     Int
+  type           SubjectType
+  evaluationMode EvaluationMode
+
+  courses Course[]
+}
+
+//  EXAM RESULT ANALYSIS PURPOSES
 
 enum ExamType {
   REGULAR
@@ -206,7 +235,11 @@ model ExamResult {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+  createdById String?
+
   @@index([studentRegNo])
+  @@index([createdById])
 }
 
 model Mark {
@@ -243,23 +276,46 @@ enum EvaluationMode {
   EXTERNAL
 }
 
-model Subject {
-  code        String @id
-  name        String
-  gradePoints Int
+// ATTENDANCE PURPOSES
 
-  revision Int
-  category String
-  branches Branch[]
+enum CourseStatus {
+  ACTIVE
+  COMPLETED
+}
 
-  marks Mark[]
+enum BatchStatus {
+  ACTIVE
+  PASSEDOUT
+}
 
-  semester       Int
-  totalMarks     Int
-  type           SubjectType
-  evaluationMode EvaluationMode
+model Batch {
+  id String @id @default(uuid())
+
+  college   College @relation(fields: [collegeId], references: [id])
+  collegeId String
+
+  branch   Branch @relation(fields: [branchId], references: [id])
+  branchId String
+
+  students Student[]
 
   courses Course[]
+
+  name String
+
+  status BatchStatus @default(ACTIVE)
+
+  passoutYear Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+  createdById String?
+
+  @@index([collegeId])
+  @@index([branchId])
+  @@index([createdById])
 }
 
 model Course {
@@ -271,11 +327,16 @@ model Course {
   branch   Branch @relation(fields: [branchId], references: [id])
   branchId String
 
+  batch   Batch  @relation(fields: [batchId], references: [id])
+  batchId String
+
   users    User[]
   students Student[]
 
   subject     Subject @relation(fields: [subjectCode], references: [code])
   subjectCode String
+
+  status CourseStatus @default(ACTIVE)
 
   semester Int
   year     Int
@@ -288,6 +349,7 @@ model Course {
   @@index([collegeId])
   @@index([branchId])
   @@index([subjectCode])
+  @@index([batchId])
 }
 
 model Period {

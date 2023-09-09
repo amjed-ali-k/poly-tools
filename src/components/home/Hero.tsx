@@ -16,7 +16,7 @@ export async function Hero() {
             <div className="absolute right-1/2 top-1/2 -z-10 hidden h-56 w-56 -translate-y-[40%] rounded-full bg-[#3178c6]/20 blur-3xl dark:block" />
             <SBTEToolsLogo className="h-28 w-28 rounded-3xl sm:h-44 sm:w-44 sm:rounded-[2rem]" />
             <h1 className="bg-gradient-to-r from-[#3178c6] to-black bg-clip-text text-6xl font-extrabold text-transparent dark:to-white sm:text-8xl sm:leading-[5.5rem]">
-              Sbte
+              Poly
               <br />
               Tools
             </h1>
@@ -24,7 +24,7 @@ export async function Hero() {
 
           <p className="max-w-[55ch] bg-transparent px-8 text-center font-medium leading-8 text-black/60 dark:text-white/50 lg:px-0 lg:text-left">
             <Balancer>
-              SBTE Tools is a simple app exclusively for polytechnic lecturers,
+              Poly Tools is a simple app exclusively for polytechnic lecturers,
               aimed at streamlining the time-consuming and tedious tasks.
             </Balancer>
           </p>

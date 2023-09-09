@@ -30,14 +30,14 @@ function Navigation() {
               href="/"
             >
               <SBTEToolsLogo className="h-8 w-8 rounded-md bg-[#3178C6] p-[2px]" />
-              <span className="font-bold leading-3">
-                Sbte
+              <span className="font-bold leading-[15px]">
+                Poly
                 <br />
                 Tools
               </span>
             </a>
 
-            <Link href="/explore" className="ml-4">
+            <Link href="/dashboard/result-formatter" className="ml-4">
               <div
                 className={clsx(
                   "hover:text-foreground text-foreground/80 transition-colors",
@@ -46,10 +46,9 @@ function Navigation() {
                   }
                 )}
               >
-                Explore
+                Result Formatter
               </div>
             </Link>
-
             <Link href="/tracks" className="ml-4">
               <div
                 className={clsx(
@@ -59,7 +58,19 @@ function Navigation() {
                   }
                 )}
               >
-                Tracks
+                Attendance marker
+              </div>
+            </Link>
+            <Link href="/tracks" className="ml-4">
+              <div
+                className={clsx(
+                  "hover:text-foreground text-foreground/80 transition-colors",
+                  {
+                    "!text-foreground": pathname === "/tracks",
+                  }
+                )}
+              >
+                Courses
               </div>
             </Link>
           </div>

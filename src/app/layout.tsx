@@ -14,18 +14,21 @@ export const metadata: Metadata = {
     "SBTE",
     "SBTE Tools",
     "SBTE Result",
+    "Poly tools",
+    "Polytechnic Tools",
+    "Student Attendance Marker",
     "SBTE Result Evaluation",
     "Diploma results sort",
     "SBTE Result sort",
     "Diploma exam results",
   ],
   description:
-    "SBTE Tools is a simple app exclusively for lecturers, aimed at streamlining the time-consuming and tedious task of evaluating student results downloaded from SBTE",
+    "Poly Tools, i.e., Polytechnic Tools, is a collections of online tools exclusively for lecturers, aimed at streamlining the time-consuming and tedious tasks",
   creator: "Amjed Ali K (@amjed-ali-k)",
   openGraph: {
-    title: "SBTE Tools - Simplify Your Result Evaluation Process",
+    title: "Poly Tools - Simplify your laborious tasks",
     description:
-      "SBTE Tools is a simple app exclusively for lecturers, aimed at streamlining the time-consuming and tedious task of evaluating student results downloaded from SBTE",
+      "Poly Tools, i.e., Polytechnic Tools, is a collections of online tools exclusively for lecturers, aimed at streamlining the time-consuming and tedious tasks",
     images: [
       {
         url: "https://amjed-ali-k.github.io/sbte-refactor/og-image.png",
@@ -34,7 +37,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://sbte-tools.vercel.app/",
-    siteName: "SBTE Tools",
+    siteName: "Poly Tools",
     emails: ["amjedmgm@gmail.com"],
     countryName: "India",
   },
