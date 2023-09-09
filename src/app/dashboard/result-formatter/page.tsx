@@ -1,5 +1,5 @@
 import React from "react";
-import ResultUploadFomr from "./_components/form";
+import ResultUploadForm from "./_components/form";
 
 async function page() {
   return (
@@ -18,7 +18,7 @@ async function page() {
         </p>
       </div>
       <div className="container">
-        <ResultUploadFomr />
+        <ResultUploadForm />
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ function Navigation() {
               href="/"
             >
               <SBTEToolsLogo className="h-8 w-8 rounded-md bg-[#3178C6] p-[2px]" />
-              <span className="font-bold leading-[15px]">
+              <span className="font-bold leading-[14px]">
                 Poly
                 <br />
                 Tools

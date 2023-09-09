@@ -46,7 +46,7 @@ const fomrSchema = z.object({
   upload: z.boolean(),
 });
 
-function ResultUploadFomr() {
+function ResultUploadForm() {
   const form = useForm<z.infer<typeof fomrSchema>>({
     resolver: zodResolver(fomrSchema),
     defaultValues: {
@@ -172,4 +172,4 @@ function ResultUploadFomr() {
   );
 }
 
-export default ResultUploadFomr;
+export default ResultUploadForm;
