@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Architecture",
+    "code": "AR"
+  },
+  {
+    "name": "Automation and Robotics",
+    "code": "RA"
+  },
+  {
+    "name": "Automobile Engineering",
+    "code": "AU"
+  },
+  {
+    "name": "Biomedical Engineering",
+    "code": "BM"
+  },
+  {
+    "name": "Chemical Engineering",
+    "code": "CH"
+  },
+  {
+    "name": "Civil Engineering",
+    "code": "CE"
+  },
+  {
+    "name": "Cloud Computing and Big Data",
+    "code": "CC"
+  },
+  {
+    "name": "Commercial Practice",
+    "code": "CP"
+  },
+  {
+    "name": "Communication & Computer Networking",
+    "code": "CN"
+  },
+  {
+    "name": "Computer Application & Business Management",
+    "code": "CB"
+  },
+  {
+    "name": "Computer Engineering",
+    "code": "CT"
+  },
+  {
+    "name": "Computer Hardware Engineering",
+    "code": "CM"
+  },
+  {
+    "name": "Cyber Forensics and Information Security",
+    "code": "CF"
+  },
+  {
+    "name": "Electrical & Electronics Engineering",
+    "code": "EE"
+  },
+  {
+    "name": "Electronics and Communication",
+    "code": "EC"
+  },
+  {
+    "name": "Electronics Engineering",
+    "code": "EL"
+  },
+  {
+    "name": "Information Technology",
+    "code": "IF"
+  },
+  {
+    "name": "Instrumentation  Engineering",
+    "code": "IE"
+  },
+  {
+    "name": "Manufacturing Technology",
+    "code": "MT"
+  },
+  {
+    "name": "Mechanical Engineering",
+    "code": "ME"
+  },
+  {
+    "name": "Polymer Technology",
+    "code": "PL"
+  },
+  {
+    "name": "Printing Technology",
+    "code": "PT"
+  },
+  {
+    "name": "Renewable Energy",
+    "code": "RE"
+  },
+  {
+    "name": "Robotic Process Automation",
+    "code": "RP"
+  },
+  {
+    "name": "Textile Technology",
+    "code": "TT"
+  },
+  {
+    "name": "Tool & Die Engineering",
+    "code": "TD"
+  },
+  {
+    "name": "Wood and Paper Technology",
+    "code": "WP"
+  }
+]

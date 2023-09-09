@@ -191,9 +191,9 @@ model Branch {
 }
 
 model Subject {
-  code        String @id
-  name        String
-  gradePoints Int
+  code    String @id
+  name    String
+  credits Int?
 
   revision Int
   category String
@@ -202,7 +202,7 @@ model Subject {
   marks Mark[]
 
   semester       Int
-  totalMarks     Int
+  totalMarks     Int?
   type           SubjectType
   evaluationMode EvaluationMode
 

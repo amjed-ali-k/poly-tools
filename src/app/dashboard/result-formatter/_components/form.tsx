@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -25,19 +25,22 @@ import {
 } from "@/components/ui/select";
 import Dropzone from "react-dropzone";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ResultType } from "@/app/lib/resultSorter/types";
+import { validateCSV, validateFileType } from "@/app/lib/csvValidation";
+import { formatData, parseCsv } from "@/app/lib/resultSorter/formatData";
+import { writeFile } from "xlsx-js-style";
+import { convertToXlsx } from "@/app/lib/main";
+import { useToast } from "@/components/ui/use-toast";
+import { Ban, FileSpreadsheet, UploadCloud } from "lucide-react";
 
-enum allowedMonths {
-  April,
-  November,
-}
+const allowedMonths = ["April", "November"];
 
 const fomrSchema = z.object({
-  file: z.string().nonempty(),
   month: z
     .string()
     .nonempty()
     .refine((val) => {
-      return allowedMonths[val as keyof typeof allowedMonths];
+      return allowedMonths.includes(val);
     }),
   year: z
     .string()
@@ -47,6 +50,10 @@ const fomrSchema = z.object({
 });
 
 function ResultUploadForm() {
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [verifiedData, setData] = useState<ResultType[]>([]);
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof fomrSchema>>({
     resolver: zodResolver(fomrSchema),
     defaultValues: {
@@ -56,48 +63,126 @@ function ResultUploadForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof fomrSchema>) {
-    console.log(data);
-  }
+  const verifyAndFormatFile = async (e: File) => {
+    setFile(undefined);
+
+    if (!validateFileType(e)) {
+      toast({
+        title: "Invalid file type.",
+        variant: "destructive",
+        description:
+          "File you uploaded is not a CSV file. Please upload a CSV file.",
+      });
+      console.log(
+        "File you uploaded is not a CSV file. Please upload a CSV file."
+      );
+      return;
+    }
+
+    setFile(e);
+
+    const validatedResult = validateCSV(await e.text());
+    if (validatedResult !== true) {
+      toast({
+        title: "Invalid file type.",
+        variant: "destructive",
+        description:
+          "It seems you uploaded modified file. Please upload the original file.",
+      });
+      console.log(
+        "It seems you uploaded modified file. Please upload the original file."
+      );
+      return;
+    }
+
+    parseCsv(e, setData);
+  };
+
+  const handleProcess = async (data: z.infer<typeof fomrSchema>) => {
+    if (!file || verifiedData.length === 0) {
+      toast({
+        title: "No files selected",
+        variant: "destructive",
+      });
+      console.log("No files selected");
+      return;
+    }
+
+    const formatedData = await formatData(verifiedData, true);
+    writeFile(
+      convertToXlsx(formatedData, {
+        isCgpa: true,
+        isImark: true,
+        sortType: "registerNo",
+      }),
+      `SBTE Exam result (${data.month}-${data.year}).xlsx`
+    );
+
+    toast({
+      title: "File processed successfully.",
+      description:
+        "File is downloaded to your device. Open it with Excel or Google Sheets.",
+    });
+  };
 
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
-            {({ getRootProps, getInputProps }) => (
-              <label
-                htmlFor="dropzone-file"
+        <form onSubmit={form.handleSubmit(handleProcess)} className="space-y-8">
+          <Dropzone
+            multiple={false}
+            accept={{
+              "text/csv": [".csv"],
+            }}
+            onDrop={(acceptedFiles) => {
+              verifyAndFormatFile(acceptedFiles[0]);
+            }}
+          >
+            {({ getRootProps, getInputProps, acceptedFiles, isDragReject }) => (
+              <div
                 {...getRootProps()}
                 className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-slate-900 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
               >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-10 h-10 mb-3 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    ></path>
-                  </svg>
-                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold">Click to upload</span> or
-                    drag and drop
-                  </p>
-                  <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                    CSV files only.
-                    <br /> Results won&apos;t be accurate if you upload modified
-                    files.
-                  </p>
-                </div>
-                <input id="dropzone-file" {...getInputProps()} />
-              </label>
+                {acceptedFiles.length > 0 ? (
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <FileSpreadsheet className="w-10 h-10 mb-1 text-gray-400" />
+                    <p className="mb-2 text-sm text-gray-500 font-bold dark:text-gray-400">
+                      {acceptedFiles[0].name}
+                    </p>
+                    <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+                      <span className=" ">Click to upload another file</span> or
+                      drag and drop
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    {isDragReject ? (
+                      <>
+                        <Ban className="w-10 h-10 mb-3 text-red-500 dark:text-red-400" />
+                        <p className="mb-2 text-sm text-red-500 dark:text-red-400">
+                          <span className="font-semibold">
+                            File format not supported
+                          </span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-10 h-10 mb-3 text-gray-400" />
+                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold">Click to upload</span>{" "}
+                          or drag and drop
+                        </p>
+                      </>
+                    )}
+                    <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      CSV files only.
+                      <br /> Results won&apos;t be accurate if you upload
+                      modified files.
+                    </p>
+                  </div>
+                )}
+                <input {...getInputProps()} />
+              </div>
             )}
           </Dropzone>
           <section className="grid grid-cols-2 gap-4">
@@ -135,9 +220,7 @@ function ResultUploadForm() {
                   <FormControl>
                     <Input placeholder="Year" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    This is your public display name.
-                  </FormDescription>
+                  <FormDescription>Year of exam</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -165,7 +248,9 @@ function ResultUploadForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button role="button" type="submit">
+            Submit
+          </Button>
         </form>
       </Form>
     </div>

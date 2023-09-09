@@ -1,0 +1,430 @@
+[
+  {
+    "code": "T01",
+    "name": "Central Polytechnic College, Thiruvananthapuram"
+  },
+  {
+    "code": "T02",
+    "name": "Women's Polytechnic College, Thiruvananthapuram"
+  },
+  {
+    "code": "T03",
+    "name": "Government Polytechnic College, Neyyattinkara"
+  },
+  {
+    "code": "T04",
+    "name": "Government Polytechnic College, Nedumangad"
+  },
+  {
+    "code": "T05",
+    "name": "Government Polytechnic College, Attingal"
+  },
+  {
+    "code": "T06",
+    "name": "MGM Polytechnic College, Kilimanoor, Thiruvananthapuram"
+  },
+  {
+    "code": "T07",
+    "name": "Rajadhani Institute of Engineering and Technology, Nagaroor, Thiruvananthapuram"
+  },
+  {
+    "code": "T08",
+    "name": "PA Aziz College of Engineering and Technology, Karakulam, Thiruvananthapuram"
+  },
+  {
+    "code": "T09",
+    "name": "Muslim Association College of Engineering, Venjarrammoodu, Thiruvananthapuram"
+  },
+  {
+    "code": "T10",
+    "name": "Musaliar College of Engineering, Chirayinkeezh, Thiruvananthapuram"
+  },
+  {
+    "code": "Q01",
+    "name": "Government Polytechnic College, Punalur"
+  },
+  {
+    "code": "Q02",
+    "name": "Sree Narayana Polytechnic College, Kottiyam"
+  },
+  {
+    "code": "Q03",
+    "name": "Government Polytechnic College, Ezhukone"
+  },
+  {
+    "code": "Q04",
+    "name": "Younus College of Polytechnic, Thalachira, Kollam"
+  },
+  {
+    "code": "Q05",
+    "name": "Model Polytechnic College, Karunagappally, Kollam"
+  },
+  {
+    "code": "Q06",
+    "name": "AKM Polytechnic College, Kannanalloor, Kollam"
+  },
+  {
+    "code": "Q07",
+    "name": "College Of Engineering, Pathanapuram, Kollam"
+  },
+  {
+    "code": "Q08",
+    "name": "UKF College of Engineering and Technology, Puthenkulam, Parippally, Kollam"
+  },
+  {
+    "code": "P01",
+    "name": "Government Polytechnic College, Vennikulam"
+  },
+  {
+    "code": "P02",
+    "name": "Government Polytechnic College, Adoor"
+  },
+  {
+    "code": "P03",
+    "name": "N.S.S. Polytechnic College, Pandalam"
+  },
+  {
+    "code": "P04",
+    "name": "Government Polytechnic College, Vechoochira"
+  },
+  {
+    "code": "P05",
+    "name": "College of Engineering, Aranmula, Pathanamthitta"
+  },
+  {
+    "code": "P06",
+    "name": "Sree Narayana Institute of Technology, Adoor"
+  },
+  {
+    "code": "A01",
+    "name": "Government Polytechnic College, Cherthala"
+  },
+  {
+    "code": "A02",
+    "name": "Carmel Polytechnic College, Alappuzha"
+  },
+  {
+    "code": "A03",
+    "name": "Women's Polytechnic College, Kayamkulam"
+  },
+  {
+    "code": "A04",
+    "name": "KELTRAC, Aroor, Alappuzha"
+  },
+  {
+    "code": "A05",
+    "name": "College of Engineering & Management, Punnapra, Alappuzha"
+  },
+  {
+    "code": "A06",
+    "name": "KVM College of Engineering & Information Technology, Kokkothamangalam, Cherthala"
+  },
+  {
+    "code": "K01",
+    "name": "Government Polytechnic College, Kottayam"
+  },
+  {
+    "code": "K02",
+    "name": "Government Polytechnic College, Pala"
+  },
+  {
+    "code": "K03",
+    "name": "Government Polytechnic College, Kaduthuruthy"
+  },
+  {
+    "code": "K04",
+    "name": "Gregorian Institute of Technology, Kangazha, Kottayam"
+  },
+  {
+    "code": "K05",
+    "name": "TOMS College of Engineering, Mattakkara, Kottayam"
+  },
+  {
+    "code": "K06",
+    "name": "Model Polytechnic College, Mattakkara, Kottayam"
+  },
+  {
+    "code": "K07",
+    "name": "College of Engineering, Poonjar, Kottayam"
+  },
+  {
+    "code": "K08",
+    "name": "Mangalam College of Engineering, Ettumanoor, Kottayam"
+  },
+  {
+    "code": "I01",
+    "name": "Government Polytechnic College, Muttom"
+  },
+  {
+    "code": "I02",
+    "name": "Government Polytechnic College, Kumily"
+  },
+  {
+    "code": "I03",
+    "name": "Government Polytechnic College, Nedumkandam"
+  },
+  {
+    "code": "I04",
+    "name": "Government Polytechnic College, Purappuzha, Thodupuzha"
+  },
+  {
+    "code": "I05",
+    "name": "Al"
+  },
+  {
+    "code": "I06",
+    "name": "Model Polytechnic College, Painavu, Idukki"
+  },
+  {
+    "code": "E01",
+    "name": "Government Polytechnic College, Kalamassery"
+  },
+  {
+    "code": "E02",
+    "name": "Women's Polytechnic College, Ernakulam"
+  },
+  {
+    "code": "E03",
+    "name": "Government Polytechnic College, Kothamangalam"
+  },
+  {
+    "code": "E04",
+    "name": "Government Polytechnic College, Perumbavoor"
+  },
+  {
+    "code": "E05",
+    "name": "Kuttukaran Polytechnic College, North Paravur, Ernakulam"
+  },
+  {
+    "code": "E06",
+    "name": "Indira Gandhi Institute of Polytechnic & Engineering, Nellikuzhy, Kothamangalam"
+  },
+  {
+    "code": "E07",
+    "name": "SCMS College of Polytechnic, Perumbavoor, Ernakulam"
+  },
+  {
+    "code": "E08",
+    "name": "MGM Polytechnic College, Pampakuda, Ernakulam"
+  },
+  {
+    "code": "E09",
+    "name": "SNM Polytechnic, Maliankara, Ernakulam"
+  },
+  {
+    "code": "E10",
+    "name": "Indira Gandhi Polytechnic College, Asamannoor, Ernakulam"
+  },
+  {
+    "code": "E11",
+    "name": "Jai Bharath College of Management & Engineering Technology, Perumbavoor"
+  },
+  {
+    "code": "E12",
+    "name": "SNGIST Group of Institutions, N Parur, Ernakulam"
+  },
+  {
+    "code": "E13",
+    "name": "Ilahia Polytechnic College, Muvattupuzha, Ernakulam"
+  },
+  {
+    "code": "E14",
+    "name": "Mar Baselios Institute of Technology and Science,  Kothamangalam, Ernakulam"
+  },
+  {
+    "code": "R01",
+    "name": "Maharaja's Technological Institute, Thrissur"
+  },
+  {
+    "code": "R02",
+    "name": "Sree Rama Government Polytechnic College, Thriprayar"
+  },
+  {
+    "code": "R03",
+    "name": "Thiagarajar Polytechnic College, Alagappanagar"
+  },
+  {
+    "code": "R04",
+    "name": "Government Polytechnic College, Koratty"
+  },
+  {
+    "code": "R05",
+    "name": "Government Polytechnic College, Kunnamkulam"
+  },
+  {
+    "code": "R06",
+    "name": "Govt. Women's Polytechnic College, Thrissur"
+  },
+  {
+    "code": "R07",
+    "name": "Government Polytechnic College, Chelakkara"
+  },
+  {
+    "code": "R08",
+    "name": "Nirmala Institute of Technology, Kunnapilly, Thrissur"
+  },
+  {
+    "code": "R09",
+    "name": "Holy Grace Polytechnic College, Mala, Thrissur"
+  },
+  {
+    "code": "R10",
+    "name": "MET's School of Engineering, Mala, Thrissur"
+  },
+  {
+    "code": "R11",
+    "name": "K Karunakaran Memorial Model Polytechnic College, Mala, Kallettumkara, Thrissur"
+  },
+  {
+    "code": "R12",
+    "name": "ICCS College of Engineering & Management, Mupliyam, Thrissur"
+  },
+  {
+    "code": "G01",
+    "name": "Government Polytechnic College, Palakkad"
+  },
+  {
+    "code": "G02",
+    "name": "IPT & GPTC, Shoranur"
+  },
+  {
+    "code": "G03",
+    "name": "St. Mary's Polytechnic College, Vadakkencherry"
+  },
+  {
+    "code": "G04",
+    "name": "Malabar Polytechnic Campus, Cherupulassery, Palakkad"
+  },
+  {
+    "code": "G05",
+    "name": "Aries Polytechnic College, Attappady, Palakkad"
+  },
+  {
+    "code": "G06",
+    "name": "Model Residential Polytechnic College, Kuzhalmanam, Palakkad"
+  },
+  {
+    "code": "M01",
+    "name": "Government Polytechnic College, Perinthalmanna"
+  },
+  {
+    "code": "M02",
+    "name": "AKNM Government Polytechnic College, Thirurangadi"
+  },
+  {
+    "code": "M03",
+    "name": "S.S.M. Polytechnic College, Tirur"
+  },
+  {
+    "code": "M04",
+    "name": "Women's Polytechnic College, Kottakkal"
+  },
+  {
+    "code": "M05",
+    "name": "Ma'din Polytechnic College, Melmuri"
+  },
+  {
+    "code": "M06",
+    "name": "KMCT Polytechnic College, Kuttipuram, Malappuram"
+  },
+  {
+    "code": "M07",
+    "name": "Orphanage Polytechnic College, Edavanna"
+  },
+  {
+    "code": "M08",
+    "name": "Government Polytechnic College, Manjeri"
+  },
+  {
+    "code": "M09",
+    "name": "Malabar Polytechnic College, Maravattam, Kottakkal"
+  },
+  {
+    "code": "M10",
+    "name": "Majlis Polytechnic College, Puramannur, Malappuram"
+  },
+  {
+    "code": "Z01",
+    "name": "Kerala Government Polytechnic College, Kozhikode"
+  },
+  {
+    "code": "Z02",
+    "name": "Women's Polytechnic College, Kozhikode"
+  },
+  {
+    "code": "Z03",
+    "name": "AWH Polytechnic College, Kozhikode"
+  },
+  {
+    "code": "Z04",
+    "name": "KMCT Polytechnic College, Manassery"
+  },
+  {
+    "code": "Z05",
+    "name": "JDT Islam Polytechnic College, Kozhikode"
+  },
+  {
+    "code": "Z06",
+    "name": "M DIT Polytechnic College, Uliyeri"
+  },
+  {
+    "code": "Z07",
+    "name": "Model Polytechnic College, Vadakara, Kozhikode"
+  },
+  {
+    "code": "Z08",
+    "name": "College of Engineering, Vatakara, Kozhikode"
+  },
+  {
+    "code": "C01",
+    "name": "Government Polytechnic College, Kannur"
+  },
+  {
+    "code": "C02",
+    "name": "Government Polytechnic College, Mattannur"
+  },
+  {
+    "code": "C03",
+    "name": "Residential Women's Polytechnic College, Payyannur"
+  },
+  {
+    "code": "C04",
+    "name": "MGM Silver Jubilee Polytechnic College, Pilathara, Kannur"
+  },
+  {
+    "code": "C05",
+    "name": "E K Nayanar Memorial Model Polytechnic College, Kallyassery, Kannur"
+  },
+  {
+    "code": "C06",
+    "name": "Government Polytechnic College, Naduvil, Kannur"
+  },
+  {
+    "code": "W01",
+    "name": "Government Polytechnic College, Meenangadi"
+  },
+  {
+    "code": "W02",
+    "name": "Government Polytechnic College, Meppadi"
+  },
+  {
+    "code": "W03",
+    "name": "Government Polytechnic College "
+  },
+  {
+    "code": "S01",
+    "name": "Government Polytechnic College, Kasaragod"
+  },
+  {
+    "code": "S02",
+    "name": "Swamy Nithyananda Polytechnic College, Kanhangad"
+  },
+  {
+    "code": "S03",
+    "name": "EKNM Government Polytechnic College, Thrikkaripur"
+  },
+  {
+    "code": "SIT",
+    "name": "SITTTR, Kalamassery"
+  }
+]
