@@ -1,9 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
-import { Toaster } from "react-hot-toast";
+// import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "@/components/ui/toaster";
+import Navigation from "@/components/Navigation";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -46,7 +48,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Script src="https://www.googletagmanager.com/gtag/js?id=G-3DZN7M50RE" />
+      {/* <Script src="https://www.googletagmanager.com/gtag/js?id=G-3DZN7M50RE" />
       <Script id="google-analytics">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -55,12 +57,13 @@ export default function RootLayout({
  
           gtag('config', 'G-3DZN7M50RE');
         `}
-      </Script>
+      </Script> */}
       <body className={inter.className + " dark "}>
-        <div>
+        <Providers>
+          <Navigation />
+          <main>{children}</main>
           <Toaster />
-        </div>
-        {children}
+        </Providers>
         <Analytics />
       </body>
     </html>

@@ -1,0 +1,325 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum RoleTypes {
+  USER
+  ADMIN
+  MODERATOR
+  CREATOR
+}
+
+enum UserStatus {
+  BANNED
+  ACTIVE // can post, comment, vote, etc
+}
+
+// Necessary for Next auth
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Role {
+  id   String    @id @default(uuid())
+  user User[]
+  role RoleTypes @unique
+}
+
+/// This is a table that contains all the user links they can add to profile
+model UserLink {
+  id   String @id @default(uuid())
+  user User[]
+  url  String @db.VarChar(256)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id String @id @default(uuid())
+
+  name          String
+  email         String?   @unique
+  emailVerified DateTime?
+  phone         String?   @unique
+  image         String?
+  roles         Role[]
+
+  /// this is the bio that shows up on the profile page
+  bio String @default("") @db.VarChar(256)
+
+  /// this is the twitter URL that shows up on the profile page
+  userLinks UserLink[]
+
+  status UserStatus @default(ACTIVE)
+
+  accounts Account[]
+  sessions Session[]
+
+  college   College? @relation(fields: [collegeId], references: [id])
+  collegeId String?
+
+  branches Branch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wallet Wallet?
+
+  courses Course[]
+
+  @@index([collegeId])
+}
+
+model Wallet {
+  id String @id @default(uuid())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum StudentStatus {
+  DISCONTINUED
+  PASSOUT
+  ACTIVE
+}
+
+model Student {
+  id String @id @default(uuid())
+
+  registerNo  String? @unique
+  name        String
+  email       String? @unique
+  phone       String? @unique
+  admissionNo String?
+
+  college   College @relation(fields: [collegeId], references: [id])
+  collegeId String
+
+  branch   Branch @relation(fields: [branchId], references: [id])
+  branchId String
+
+  image  String?
+  status StudentStatus @default(ACTIVE)
+
+  cgpa Int?
+
+  examResults ExamResult[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses     Course[]
+  attendances Attendance[]
+
+  @@index([collegeId])
+  @@index([branchId])
+}
+
+model College {
+  id String @id @default(uuid())
+
+  name String @unique
+  code String @unique
+
+  students Student[]
+  branches Branch[]
+  users    User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  courses   Course[]
+}
+
+model Branch {
+  id String @id @default(uuid())
+
+  name String @unique
+  code String @unique
+
+  colleges College[]
+  users    User[]
+  students Student[]
+
+  subjects Subject[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  courses   Course[]
+}
+
+enum ExamType {
+  REGULAR
+  SUPPLEMENTARY
+}
+
+model ExamResult {
+  id String @id @default(uuid())
+
+  student      Student? @relation(fields: [studentRegNo], references: [registerNo])
+  studentRegNo String
+
+  month String
+  year  Int
+
+  type ExamType @default(REGULAR)
+
+  semester Int
+  marks    Mark[]
+
+  sgpa Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentRegNo])
+}
+
+model Mark {
+  id String @id @default(uuid())
+
+  exam   ExamResult @relation(fields: [examId], references: [id])
+  examId String
+
+  subject     Subject @relation(fields: [subjectCode], references: [code])
+  subjectCode String
+
+  grade    String
+  internal String
+
+  isAbsent      Boolean @default(false)
+  isWithheld    Boolean @default(false)
+  isMalpractice Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([examId])
+  @@index([subjectCode])
+}
+
+enum SubjectType {
+  THEORY
+  PRACTICAL
+  DRAWING
+}
+
+enum EvaluationMode {
+  INTERNAL
+  EXTERNAL
+}
+
+model Subject {
+  code        String @id
+  name        String
+  gradePoints Int
+
+  revision Int
+  category String
+  branches Branch[]
+
+  marks Mark[]
+
+  semester       Int
+  totalMarks     Int
+  type           SubjectType
+  evaluationMode EvaluationMode
+
+  courses Course[]
+}
+
+model Course {
+  id String @id @default(uuid())
+
+  college   College @relation(fields: [collegeId], references: [id])
+  collegeId String
+
+  branch   Branch @relation(fields: [branchId], references: [id])
+  branchId String
+
+  users    User[]
+  students Student[]
+
+  subject     Subject @relation(fields: [subjectCode], references: [code])
+  subjectCode String
+
+  semester Int
+  year     Int
+
+  periods Period[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([collegeId])
+  @@index([branchId])
+  @@index([subjectCode])
+}
+
+model Period {
+  id String @id @default(uuid())
+
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String
+
+  startTime DateTime
+  endTime   DateTime
+
+  attendance Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model Attendance {
+  id String @id @default(uuid())
+
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId String
+
+  period   Period? @relation(fields: [periodId], references: [id])
+  periodId String
+
+  isPresent Boolean @default(true)
+  lateTime  Int? // in minutes
+  isLate    Boolean @default(false)
+
+  @@index([studentId])
+  @@index([periodId])
+}
