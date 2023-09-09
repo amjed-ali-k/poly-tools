@@ -1,14 +1,4 @@
 {
-  "name": "sbte-tools",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "clean": "rm -rf .next dist node_modules"
-  },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -54,6 +44,20 @@
     "eslint-config-next": "13.4.13",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.1",
     "typescript": "5.1.6"
-  }
+  },
+  "name": "sbte-tools",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "clean": "rm -rf .next dist node_modules",
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start"
+  },
+  "version": "0.1.0"
 }

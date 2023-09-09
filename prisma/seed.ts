@@ -1,15 +1,25 @@
-import { prisma } from "@/server/db/prisma";
 import collegesList from "./college-list.json";
 import branchesList from "./branches-list.json";
 import subjectList from "./subjects-list.json";
-import { NextRequest, NextResponse } from "next/server";
-import { EvaluationMode, SubjectType } from "@prisma/client";
+import { EvaluationMode, SubjectType, PrismaClient } from "@prisma/client";
 
-export async function GET(request: NextRequest) {
-  return NextResponse.json({
-    res: "Good",
-  });
+const prisma = new PrismaClient();
+
+async function main() {
+  await populateColleges();
+  await populateBranches();
+  await populateSubjects();
 }
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
 
 async function populateColleges() {
   const colleges = collegesList;
