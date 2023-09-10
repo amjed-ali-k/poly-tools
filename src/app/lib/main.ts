@@ -2,6 +2,7 @@ import * as xlsx from "xlsx-js-style";
 import { FormattedType, OptionsType, ResultType } from "./resultSorter/types";
 import { getAllCourses } from "./resultSorter/formatData";
 import Color from "colorjs.io";
+import { mapEntries } from "radash";
 // convert formatted data to xlsx using cell coloring. Also put title "SBTE FORMATTER by Amjed Ali" on Top of the sheet
 export const convertToXlsx = (
   data: FormattedType[],
@@ -46,9 +47,8 @@ const calculateGradesCountInEachCourse = (data: FormattedType[]) => {
     };
   });
   data.forEach((item) => {
-    Object.keys(item.grades).forEach((course) => {
-      const val = item.grades[course];
-      val && item.grades && gradesCount[course][val]++;
+    Object.values(item.grades).forEach(({ name, grade }) => {
+      grade && gradesCount[name][grade]++;
     });
   });
 
@@ -122,7 +122,7 @@ const createResultWorksheet = (data: FormattedType[], options: OptionsType) => {
         registerNo: item.registerNo,
         studentName: item.studentName,
         semester: item.semester,
-        ...item.grades,
+        ...mapEntries(item.grades, (_key, value) => [value.name, value.grade]), // change here to add internal mark
       };
       let obj: TreformatedData = _obj;
 

@@ -123,6 +123,9 @@ function ResultUploadForm() {
       description:
         "File is downloaded to your device. Open it with Excel or Google Sheets.",
     });
+
+    if (data.upload) {
+    }
   };
 
   return (

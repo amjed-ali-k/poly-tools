@@ -20,31 +20,39 @@ export const formatData = async (
         semester: item.semester,
         examType: item.examType,
         grades: {
-          [item.course]: item.grade
-            ? item.grade
-            : item.attendance === "Absent"
-            ? "Absent"
-            : item.withheld === "With held for Malpractice"
-            ? "Malpractice"
-            : item.withheld === '"With held for Malpractice"'
-            ? "Malpractice"
-            : item.withheld === "Withheld"
-            ? "Withheld"
-            : null,
+          [getCourseCode(item.course)]: {
+            internal: item.iMark || 0,
+            name: item.course,
+            grade: item.grade
+              ? item.grade
+              : item.attendance === "Absent"
+              ? "Absent"
+              : item.withheld === "With held for Malpractice"
+              ? "Malpractice"
+              : item.withheld === '"With held for Malpractice"'
+              ? "Malpractice"
+              : item.withheld === "Withheld"
+              ? "Withheld"
+              : null,
+          },
         },
       });
     } else {
-      formattedData[index].grades[item.course] = item.grade
-        ? item.grade
-        : item.attendance === "Absent"
-        ? "Absent"
-        : item.withheld === "With held for Malpractice"
-        ? "Malpractice"
-        : item.withheld === '"With held for Malpractice"'
-        ? "Malpractice"
-        : item.withheld === "Withheld"
-        ? "Withheld"
-        : null;
+      formattedData[index].grades[getCourseCode(item.course)] = {
+        internal: item.iMark || 0,
+        name: item.course,
+        grade: item.grade
+          ? item.grade
+          : item.attendance === "Absent"
+          ? "Absent"
+          : item.withheld === "With held for Malpractice"
+          ? "Malpractice"
+          : item.withheld === '"With held for Malpractice"'
+          ? "Malpractice"
+          : item.withheld === "Withheld"
+          ? "Withheld"
+          : null,
+      };
     }
     if (
       item.course &&
@@ -68,7 +76,8 @@ export const formatData = async (
         if (!course) return;
         totalCredits += course?.credits || 0;
         totalPoints +=
-          (course?.credits || 0) * getGradePoint(element.grades[e]);
+          (course?.credits || 0) *
+          getGradePoint(element.grades[getCourseCode(e)].grade);
       });
 
       formattedData[i].cgpa = (totalPoints / totalCredits).toFixed(2);
@@ -128,7 +137,7 @@ export const parseCsv = (
 export const getAllCourses = (data: FormattedType[]): string[] => {
   const courses: string[] = [];
   data.forEach((item) => {
-    Object.keys(item.grades).forEach((course) => {
+    Object.values(item.grades).forEach(({ name: course }) => {
       if (!courses.includes(course)) {
         courses.push(course);
       }

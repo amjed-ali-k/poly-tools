@@ -144,8 +144,7 @@ model Student {
 
   examResults ExamResult[]
 
-  batch   Batch  @relation(fields: [batchId], references: [id])
-  batchId String
+  batch Batch[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -155,7 +154,6 @@ model Student {
 
   @@index([collegeId])
   @@index([branchId])
-  @@index([batchId])
 }
 
 model College {
@@ -192,7 +190,7 @@ model Branch {
 }
 
 model Subject {
-  code    String @id
+  code    String @id @unique
   name    String
   credits Int?
 
@@ -229,9 +227,10 @@ model ExamResult {
   type ExamType @default(REGULAR)
 
   semester Int
-  marks    Mark[]
 
-  sgpa Int?
+  marks Mark[]
+
+  sgpa Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -254,10 +253,6 @@ model Mark {
 
   grade    String
   internal String
-
-  isAbsent      Boolean @default(false)
-  isWithheld    Boolean @default(false)
-  isMalpractice Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

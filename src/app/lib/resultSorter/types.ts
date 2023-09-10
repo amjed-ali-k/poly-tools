@@ -28,7 +28,7 @@ export interface ResultType {
   result: "P" | "F" | null;
 }
 
-export type courseName = string;
+export type courseCode = string;
 export interface FormattedType {
   registerNo: number;
   studentName: string;
@@ -36,7 +36,11 @@ export interface FormattedType {
   semester: number;
   examType: "Regular" | "Supplementary";
   grades: {
-    [key: courseName]: AllGrades | null;
+    [key: courseCode]: {
+      name: string;
+      internal: number;
+      grade: AllGrades | null;
+    };
   };
   cgpa?: string;
   // withheld: "Withheld" | "With held for Malpractice" | null;
