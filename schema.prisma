@@ -60,6 +60,7 @@ model Role {
 model UserLink {
   id   String @id @default(uuid())
   user User[]
+  name String
   url  String @db.VarChar(256)
 
   createdAt DateTime @default(now())
@@ -77,17 +78,17 @@ model User {
   roles         Role[]
 
   /// this is the bio that shows up on the profile page
-  bio String @default("") @db.VarChar(256)
-
+  bio         String     @default("") @db.VarChar(256)
+  designation String?
   /// this is the twitter URL that shows up on the profile page
-  userLinks UserLink[]
+  userLinks   UserLink[]
 
   status UserStatus @default(ACTIVE)
 
   accounts Account[]
   sessions Session[]
 
-  college   College? @relation(fields: [collegeId], references: [id])
+  college   College? @relation(fields: [collegeId], references: [code])
   collegeId String?
 
   branches Branch[]
