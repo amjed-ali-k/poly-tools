@@ -42,7 +42,8 @@ function Navigation() {
                 className={clsx(
                   "hover:text-foreground text-foreground/80 transition-colors",
                   {
-                    "!text-foreground": pathname === "/explore",
+                    "!text-foreground":
+                      pathname === "/dashboard/result-formatter",
                   }
                 )}
               >
@@ -74,7 +75,19 @@ function Navigation() {
               </div>
             </Link>
           </div>
-          <div className="flex">
+          <div className="flex items-center">
+            <Link href="/dashboard/profile" className="mr-4">
+              <div
+                className={clsx(
+                  "hover:text-foreground text-foreground/80 transition-colors",
+                  {
+                    "!text-foreground": pathname === "/dashboard/profile",
+                  }
+                )}
+              >
+                Profile
+              </div>
+            </Link>
             <div className="flex items-center justify-end gap-2">
               <Button
                 className="h-8 w-full justify-start rounded-b-lg rounded-t-lg bg-opacity-50 px-2 text-red-500 hover:bg-red-500/20 hover:text-red-500"

@@ -81,6 +81,16 @@
   inherits: false;
 }
 
+body {
+  min-height: 100vh;
+  min-height: fill-available;
+  min-height: -webkit-fill-available;
+}
+html {
+  height: fill-available;
+  height: -webkit-fill-available;
+}
+
 .hero-join-button {
   background: linear-gradient(
     var(--gradient-angle),

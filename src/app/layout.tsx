@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "./providers";
+import { Footsies } from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -60,9 +61,10 @@ export default function RootLayout({
           gtag('config', 'G-3DZN7M50RE');
         `}
       </Script> */}
-      <body className={inter.className + " dark "}>
+      <body className={inter.className + " dark flex flex-col"}>
         <Providers>
-          <main>{children}</main>
+          <main className="flex-1">{children}</main>
+          <Footsies />
           <Toaster />
         </Providers>
         <Analytics />
