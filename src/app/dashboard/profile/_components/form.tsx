@@ -27,12 +27,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { useToast } from "@/components/ui/use-toast";
-import { useSession } from "@/lib/auth";
+import { useProfile } from "@/lib/swr";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { CheckIcon } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -71,25 +72,38 @@ export function ProfileForm({
   }[];
 }) {
   const { toast } = useToast();
-  const { data } = useSession();
-  console.log(data);
+  const { data: user, mutate } = useProfile();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    mode: "onBlur",
   });
+
+  useEffect(() => {
+    form.reset({
+      name: user?.name,
+      designation: user?.designation || "",
+      college: user?.college.code || "",
+      phone: user?.phone || "",
+      bio: user?.bio,
+      //   links: user?.userLinks.reduce((acc, curr) => {
+      //     acc[curr.name] = curr.url;
+      //     return acc;
+      //   }, {} as Record<string, string>),
+    });
+  }, [form, user]);
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     axios
       .put("/api/secure/profile", data)
-      .then((res) => {
-        console.log(res.data);
+      .then((_res) => {
         toast({
           title: "Profile Updated",
           description: "Your profile has been updated successfully.",
         });
+        mutate();
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((_err) => {
         toast({
           title: "Profile Update Failed",
           description: "Your profile could not be updated.",

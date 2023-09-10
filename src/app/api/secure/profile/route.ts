@@ -2,6 +2,7 @@ import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/server/auth/server";
 import { prisma } from "@/server/db/prisma";
+import { College, User, UserLink } from "@prisma/client";
 
 const schema = z.object({
   phone: z
@@ -103,3 +104,8 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ ...res });
 }
+
+export type ProfileApiResponse = User & {
+  userLinks: UserLink[];
+  college: College;
+};
