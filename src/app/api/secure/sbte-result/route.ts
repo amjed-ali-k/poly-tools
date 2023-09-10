@@ -7,7 +7,19 @@ import { FormattedType } from "@/app/lib/resultSorter/types";
 
 type IncomingBody = FormattedType[];
 const allowedMonths = ["April", "November"];
-
+const allowedGrades = [
+  "F",
+  "E",
+  "D",
+  "C",
+  "B",
+  "A",
+  "S",
+  "Absent",
+  "Withheld",
+  "Malpractice",
+  null,
+];
 const schema = z.object({
   month: z.string().refine((val) => {
     return allowedMonths.includes(val);
@@ -36,22 +48,8 @@ const schema = z.object({
           internal: z.number(),
           grade: z
             .string()
-            .optional()
-            .refine((e) => {
-              return (
-                e === "F" ||
-                e === "E" ||
-                e === "D" ||
-                e === "C" ||
-                e === "B" ||
-                e === "A" ||
-                e === "S" ||
-                e === "Absent" ||
-                e === "Withheld" ||
-                e === "Malpractice" ||
-                e === null
-              );
-            }),
+            .nullable()
+            .refine((e) => allowedGrades.includes(e)),
         })
       ),
       cgpa: z
@@ -98,9 +96,9 @@ export async function POST(request: NextRequest) {
               registerNo: e.registerNo,
             },
             create: {
+              collegeId: myProfile?.collegeId as string,
               name: e.studentName,
               registerNo: e.registerNo,
-              collegeId: myProfile?.collegeId as string,
               branchId: branches.find((k) => k.name === e.branch)?.id as string,
             },
           },

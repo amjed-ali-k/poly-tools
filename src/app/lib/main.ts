@@ -3,7 +3,7 @@ import { FormattedType, OptionsType, ResultType } from "./resultSorter/types";
 import { getAllCourses } from "./resultSorter/formatData";
 import Color from "colorjs.io";
 import { mapEntries } from "radash";
-// convert formatted data to xlsx using cell coloring. Also put title "SBTE FORMATTER by Amjed Ali" on Top of the sheet
+
 export const convertToXlsx = (
   data: FormattedType[],
   options: OptionsType
@@ -414,7 +414,7 @@ const sheetStyles = (
   // Add Top Title
   ws["A1"] = {
     t: "s",
-    v: "SBTE Tools",
+    v: "Poly Tools",
     s: {
       font: {
         sz: 20,

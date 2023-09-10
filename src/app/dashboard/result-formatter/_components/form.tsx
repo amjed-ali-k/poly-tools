@@ -32,6 +32,7 @@ import { writeFile } from "xlsx-js-style";
 import { convertToXlsx } from "@/app/lib/main";
 import { useToast } from "@/components/ui/use-toast";
 import { Ban, FileSpreadsheet, UploadCloud } from "lucide-react";
+import axios from "axios";
 
 const allowedMonths = ["April", "November"];
 
@@ -125,6 +126,15 @@ function ResultUploadForm() {
     });
 
     if (data.upload) {
+      axios
+        .post("/api/secure/sbte-result/", {
+          data: formatedData,
+          month: data.month,
+          year: data.year,
+        })
+        .then((res) => {
+          console.log(res);
+        });
     }
   };
 

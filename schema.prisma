@@ -131,7 +131,7 @@ model Student {
   phone       String? @unique
   admissionNo String?
 
-  college   College @relation(fields: [collegeId], references: [id])
+  college   College? @relation(fields: [collegeId], references: [code])
   collegeId String
 
   branch   Branch @relation(fields: [branchId], references: [id])

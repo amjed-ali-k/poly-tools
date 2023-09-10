@@ -11,7 +11,6 @@ export default function RootLayout({
 }) {
   const profile = useProfile();
 
-  console.log(profile);
   const { replace } = useRouter();
   const pathname = usePathname();
 
