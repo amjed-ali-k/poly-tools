@@ -6,6 +6,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { signOut } from "@/lib/auth";
 import SBTEToolsLogo from "./Logo";
+import { cn } from "@/lib/utils";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { Badge } from "./ui/badge";
 
 function Navigation() {
   const pathname = usePathname();
@@ -36,44 +47,9 @@ function Navigation() {
                 Tools
               </span>
             </a>
-
-            <Link href="/dashboard/result-formatter" className="ml-4">
-              <div
-                className={clsx(
-                  "hover:text-foreground text-foreground/80 transition-colors",
-                  {
-                    "!text-foreground":
-                      pathname === "/dashboard/result-formatter",
-                  },
-                )}
-              >
-                Result Formatter
-              </div>
-            </Link>
-            <Link href="/tracks" className="ml-4">
-              <div
-                className={clsx(
-                  "hover:text-foreground text-foreground/80 transition-colors",
-                  {
-                    "!text-foreground": pathname === "/tracks",
-                  },
-                )}
-              >
-                Attendance marker
-              </div>
-            </Link>
-            <Link href="/tracks" className="ml-4">
-              <div
-                className={clsx(
-                  "hover:text-foreground text-foreground/80 transition-colors",
-                  {
-                    "!text-foreground": pathname === "/tracks",
-                  },
-                )}
-              >
-                Courses
-              </div>
-            </Link>
+            <div className="ml-5">
+              <NavBar />
+            </div>
           </div>
           <div className="flex items-center">
             <Link href="/dashboard/profile" className="mr-4">
@@ -82,7 +58,7 @@ function Navigation() {
                   "hover:text-foreground text-foreground/80 transition-colors",
                   {
                     "!text-foreground": pathname === "/dashboard/profile",
-                  },
+                  }
                 )}
               >
                 Profile
@@ -105,3 +81,138 @@ function Navigation() {
 }
 
 export default Navigation;
+
+const components: { title: string; href: string; description: string }[] = [
+  {
+    title: "New Attendance",
+    href: "/attendance/new",
+    description: "Create a new attendance record for your students.",
+  },
+  {
+    title: "Periods",
+    href: "/attendance/periods",
+    description: "Periods are the time slots in which you teach your students.",
+  },
+  {
+    title: "Courses",
+    href: "/attendance/courses",
+    description: "Courses are the subjects you teach.",
+  },
+  {
+    title: "Batches",
+    href: "/attendance/batches",
+    description: "Batches are the groups of students you teach. ie, EL 2021-24",
+  },
+  {
+    title: "Students",
+    href: "/attendance/students",
+    description: "Students are the people who attend your classes.",
+  },
+  {
+    title: "History",
+    href: "/attendance/history",
+    description:
+      "Previous attendance records of your students made by you. View and manage your attendance history.",
+  },
+];
+
+export function NavBar() {
+  return (
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Result Formatter</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <li className="row-span-3">
+                <NavigationMenuLink asChild>
+                  <a
+                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    href="/dashboard/result-formatter"
+                  >
+                    <SBTEToolsLogo className="h-6 w-6" />
+                    <div className="mb-2 mt-4 text-lg font-medium">
+                      Result Formatter
+                    </div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      Generate fully customisible result analysis and reports.
+                    </p>
+                  </a>
+                </NavigationMenuLink>
+              </li>
+              <ListItem
+                href="/dashboard/result-formatter"
+                title="Upload and generate"
+              >
+                Upload your result and get started.
+              </ListItem>
+              <ListItem href="/docs/installation" title="Analysis History">
+                View your previous analysis results.
+              </ListItem>
+              <ListItem
+                href="/docs/primitives/typography"
+                title="Student Progress"
+              >
+                View aggregated analysis of each student in your class.
+              </ListItem>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger disabled>
+            Attendance{" "}
+            <Badge variant="secondary" className="ml-2">
+              Upcoming
+            </Badge>
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+              {components.map((component) => (
+                <ListItem
+                  key={component.title}
+                  title={component.title}
+                  href={component.href}
+                >
+                  {component.description}
+                </ListItem>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        {/* <NavigationMenuItem >
+          <Link href="/docs" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Exams
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem> */}
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";

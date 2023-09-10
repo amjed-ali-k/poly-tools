@@ -100,8 +100,9 @@ model User {
 
   courses Course[]
 
-  createdExamResults ExamResult[]
-  createdBatches     Batch[]
+  createdExamResults      ExamResult[]
+  createdBatches          Batch[]
+  ExamResultFormatHistory ExamResultFormatHistory[]
 
   @@index([collegeId])
 }
@@ -134,11 +135,11 @@ model Student {
   college   College? @relation(fields: [collegeId], references: [code])
   collegeId String
 
-  branch   Branch @relation(fields: [branchId], references: [id])
+  branch   Branch        @relation(fields: [branchId], references: [id])
   branchId String
-
-  image  String?
-  status StudentStatus @default(ACTIVE)
+  rollNo   Int?
+  image    String?
+  status   StudentStatus @default(ACTIVE)
 
   cgpa Int?
 
@@ -210,13 +211,35 @@ model Subject {
 
 //  EXAM RESULT ANALYSIS PURPOSES
 
+model ExamResultFormatHistory {
+  id String @id @default(uuid())
+
+  data Json
+
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  semesters Json
+
+  regularResultCount       Int
+  supplementaryResultCount Int
+
+  month String
+  year  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdById])
+}
+
 enum ExamType {
   REGULAR
   SUPPLEMENTARY
 }
 
 model ExamResult {
-  id String @id @default(uuid())
+  id Int @id @default(autoincrement())
 
   student      Student? @relation(fields: [studentRegNo], references: [registerNo])
   studentRegNo String
@@ -243,10 +266,10 @@ model ExamResult {
 }
 
 model Mark {
-  id String @id @default(uuid())
+  id Int @id @default(autoincrement())
 
   exam   ExamResult @relation(fields: [examId], references: [id])
-  examId String
+  examId Int
 
   subject     Subject @relation(fields: [subjectCode], references: [code])
   subjectCode String
