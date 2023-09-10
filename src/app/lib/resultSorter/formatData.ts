@@ -4,13 +4,13 @@ import { fetchGrades } from "./externalApi";
 
 export const formatData = async (
   data: ResultType[],
-  isCgpa: boolean = true
+  isCgpa: boolean = true,
 ): Promise<FormattedType[]> => {
   const formattedData: FormattedType[] = [];
   const allCourses: string[] = [];
   data.forEach((item) => {
     const index = formattedData.findIndex(
-      (i) => i.registerNo === item.registerNo
+      (i) => i.registerNo === item.registerNo,
     );
     if (index === -1) {
       formattedData.push({
@@ -65,7 +65,7 @@ export const formatData = async (
 
   if (isCgpa && allCourses.length > 0) {
     const courseDetails = await fetchGrades(
-      allCourses.map((e) => getCourseCode(e))
+      allCourses.map((e) => getCourseCode(e)),
     );
     if (!courseDetails) return formattedData;
     formattedData.forEach((element, i) => {
@@ -89,7 +89,7 @@ export const formatData = async (
 export const parseCsv = (
   inputFile: File,
   onSuccess: (e: ResultType[]) => void = (e) => console.log(e),
-  onError: (e: string) => void = (e) => console.log(e)
+  onError: (e: string) => void = (e) => console.log(e),
 ) => {
   const reader = new FileReader();
 

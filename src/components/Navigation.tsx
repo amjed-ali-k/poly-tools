@@ -44,7 +44,7 @@ function Navigation() {
                   {
                     "!text-foreground":
                       pathname === "/dashboard/result-formatter",
-                  }
+                  },
                 )}
               >
                 Result Formatter
@@ -56,7 +56,7 @@ function Navigation() {
                   "hover:text-foreground text-foreground/80 transition-colors",
                   {
                     "!text-foreground": pathname === "/tracks",
-                  }
+                  },
                 )}
               >
                 Attendance marker
@@ -68,7 +68,7 @@ function Navigation() {
                   "hover:text-foreground text-foreground/80 transition-colors",
                   {
                     "!text-foreground": pathname === "/tracks",
-                  }
+                  },
                 )}
               >
                 Courses
@@ -82,7 +82,7 @@ function Navigation() {
                   "hover:text-foreground text-foreground/80 transition-colors",
                   {
                     "!text-foreground": pathname === "/dashboard/profile",
-                  }
+                  },
                 )}
               >
                 Profile

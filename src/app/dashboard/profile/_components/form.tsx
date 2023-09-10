@@ -159,12 +159,12 @@ export function ProfileForm({
                         role="combobox"
                         className={cn(
                           "min-w-[340px] justify-between truncate whitespace-nowrap flex-nowrap overflow-hidden",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value
                           ? collegeList.find(
-                              (language) => language.code === field.value
+                              (language) => language.code === field.value,
                             )?.name
                           : "Select College"}
                         <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -194,7 +194,7 @@ export function ProfileForm({
                                   "ml-auto h-4 w-4",
                                   college.code === field.value
                                     ? "opacity-100"
-                                    : "opacity-0"
+                                    : "opacity-0",
                                 )}
                               />
                             </CommandItem>

@@ -6,24 +6,24 @@ import { mapEntries } from "radash";
 
 export const convertToXlsx = (
   data: FormattedType[],
-  options: OptionsType
+  options: OptionsType,
 ): xlsx.WorkBook => {
   const wb = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(
     wb,
     createResultWorksheet(
       data.filter((e) => e.examType === "Regular"),
-      options
+      options,
     ),
-    "Regular Result"
+    "Regular Result",
   );
   xlsx.utils.book_append_sheet(
     wb,
     createResultWorksheet(
       data.filter((e) => e.examType === "Supplementary"),
-      options
+      options,
     ),
-    "Supplementary Result"
+    "Supplementary Result",
   );
 
   return wb;
@@ -256,7 +256,7 @@ const createResultWorksheet = (data: FormattedType[], options: OptionsType) => {
     headerPreDefinedCols.length,
     courseLength,
     reFormattedData.length,
-    isCgpa
+    isCgpa,
   );
 
   return ws;
@@ -268,7 +268,7 @@ const iterateThroughCells = (
   endRow: number,
   startColumn: number,
   endColumn: number,
-  func: (C: number, R: number, e?: xlsx.CellObject) => void
+  func: (C: number, R: number, e?: xlsx.CellObject) => void,
 ) => {
   for (let R = startRow; R <= endRow; ++R) {
     for (let C = startColumn; C <= endColumn; ++C) {
@@ -282,7 +282,7 @@ const iterateThroughCells = (
 const addGradeDetailsToSheet = (
   ws: xlsx.WorkSheet,
   data: FormattedType[],
-  reFormattedData: TreformatedData[]
+  reFormattedData: TreformatedData[],
 ) => {
   // store each grade count in each subject at bottom of the sheet
   const gradeData = calculateGradesCountInEachCourse(data);
@@ -376,7 +376,7 @@ const sheetStyles = (
   firstColLength: number,
   courseLength: number,
   dataLength: number,
-  isCgpa = false
+  isCgpa = false,
 ) => {
   // Add Large row on top of the sheet
   ws["!rows"] = [...(ws["!rows"] as [])];
@@ -391,7 +391,7 @@ const sheetStyles = (
       .map((_, i) => ({
         s: { r: 2, c: i },
         e: { r: 3, c: i },
-      }))
+      })),
   );
 
   // Merge top row and Subject Columns
@@ -491,7 +491,7 @@ const sheetStyles = (
               },
             },
           };
-        }
+        },
       );
   }
 };

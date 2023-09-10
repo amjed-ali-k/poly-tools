@@ -2,10 +2,8 @@ import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/server/auth/server";
 import { prisma } from "@/server/db/prisma";
-import { College, ExamType, User, UserLink } from "@prisma/client";
-import { FormattedType } from "@/app/lib/resultSorter/types";
+import { ExamType } from "@prisma/client";
 
-type IncomingBody = FormattedType[];
 const allowedMonths = ["April", "November"];
 const allowedGrades = [
   "F",
@@ -20,6 +18,7 @@ const allowedGrades = [
   "Malpractice",
   null,
 ];
+
 const schema = z.object({
   month: z.string().refine((val) => {
     return allowedMonths.includes(val);
@@ -50,28 +49,27 @@ const schema = z.object({
             .string()
             .nullable()
             .refine((e) => allowedGrades.includes(e)),
-        })
+        }),
       ),
       cgpa: z
         .string()
         .optional()
         .transform((e) => (e ? parseFloat(e) : undefined)),
-    })
+    }),
   ),
 });
 
 export async function POST(request: NextRequest) {
-  // get session
-
   const body = schema.safeParse(await request.json());
 
   if (!body.success) {
     const { errors } = body.error;
     return NextResponse.json(
       { message: "Invalid request", errors },
-      { status: 400 }
+      { status: 400 },
     );
   }
+
   const session = await getServerAuthSession();
 
   // if no session, throw unauthenticated response

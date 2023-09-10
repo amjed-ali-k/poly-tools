@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     const { errors } = body.error;
     return NextResponse.json(
       { message: "Invalid request", errors },
-      { status: 400 }
+      { status: 400 },
     );
   }
   const session = await getServerAuthSession();

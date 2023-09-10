@@ -7,7 +7,7 @@ export const fetchGrades = async (courseCodes: string[]) => {
       "/api/secure/sbte-result/course-details",
       {
         courses: courseCodes,
-      }
+      },
     );
     return res.data;
   } catch (error) {
