@@ -146,7 +146,10 @@ export function NavBar() {
               >
                 Upload your result and get started.
               </ListItem>
-              <ListItem href="/docs/installation" title="Analysis History">
+              <ListItem
+                href="/dashboard/result-formatter/history"
+                title="Analysis History"
+              >
                 View your previous analysis results.
               </ListItem>
               <ListItem

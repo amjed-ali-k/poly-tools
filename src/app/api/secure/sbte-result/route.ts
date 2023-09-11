@@ -163,9 +163,6 @@ export async function POST(request: NextRequest) {
 
       return;
     }
-    console.log("EXAM RESULT DONT EXIST");
-    console.log(examResult);
-
     await prisma.examResult.create({
       data: {
         student: {
