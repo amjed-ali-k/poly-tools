@@ -75,7 +75,7 @@ function ResultUploadForm() {
           "File you uploaded is not a CSV file. Please upload a CSV file.",
       });
       console.log(
-        "File you uploaded is not a CSV file. Please upload a CSV file.",
+        "File you uploaded is not a CSV file. Please upload a CSV file."
       );
       return;
     }
@@ -91,7 +91,7 @@ function ResultUploadForm() {
           "It seems you uploaded modified file. Please upload the original file.",
       });
       console.log(
-        "It seems you uploaded modified file. Please upload the original file.",
+        "It seems you uploaded modified file. Please upload the original file."
       );
       return;
     }
@@ -110,13 +110,15 @@ function ResultUploadForm() {
     }
 
     const formatedData = await formatData(verifiedData, true);
+
+    console.log(formatedData);
     writeFile(
       convertToXlsx(formatedData, {
         isCgpa: true,
         isImark: true,
         sortType: "registerNo",
       }),
-      `SBTE Exam result (${data.month}-${data.year}).xlsx`,
+      `SBTE Exam result (${data.month}-${data.year}).xlsx`
     );
 
     toast({

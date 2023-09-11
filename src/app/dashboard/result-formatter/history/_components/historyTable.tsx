@@ -47,6 +47,9 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
 import { mutate } from "swr";
+import { ExamResultSingleApiType } from "@/app/api/secure/sbte-result/single/[resultId]/route";
+import { convertToXlsx } from "@/app/lib/main";
+import { writeFile } from "xlsx-js-style";
 
 const data: Payment[] = [
   {
@@ -86,6 +89,23 @@ export type Payment = {
   amount: number;
   status: "pending" | "processing" | "success" | "failed";
   email: string;
+};
+
+const handleResultDownload = (id: string) => {
+  axios
+    .get<ExamResultSingleApiType | null>(`/api/secure/sbte-result/single/${id}`)
+    .then(({ data }) => {
+      console.log(data);
+      data &&
+        writeFile(
+          convertToXlsx(data.data, {
+            isCgpa: true,
+            isImark: true,
+            sortType: "registerNo",
+          }),
+          `SBTE Exam result (${data.month}-${data.year}).xlsx`
+        );
+    });
 };
 
 export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
@@ -188,7 +208,11 @@ export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Download sheet</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleResultDownload(row.original.id)}
+            >
+              Download sheet
+            </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-500"
               onClick={() =>
