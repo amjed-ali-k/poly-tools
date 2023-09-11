@@ -44,6 +44,9 @@ import {
 import { useGet } from "@/lib/swr";
 import { ExamResultHistoryApiType } from "@/app/api/secure/sbte-result/history/route";
 import { Badge } from "@/components/ui/badge";
+import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
+import { mutate } from "swr";
 
 const data: Payment[] = [
   {
@@ -121,7 +124,7 @@ export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
     },
     cell: (value) => (
       <div className="capitalize">
-        {dayjs(value.getValue() as string).format("DD-MM-YY HH:MM A")}
+        {dayjs(value.getValue() as string).format("DD-MM-YY hh:mm A")}
       </div>
     ),
   },
@@ -153,29 +156,28 @@ export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
       </div>
     ),
   },
-  //   {
-  //     accessorKey: "supplementaryResultCount",
-  //     header: "Semesters",
-  //     cell: (cell) => (
-  //       <div>
-  //         {Object.keys(cell.row.original.semsters || {}).map((e) => {
-  //           console.log(cell.row.original);
-  //           const v = cell.row.original.semsters;
-  //           return (
-  //             <>
-  //               <span className="mx-1">
-  //                 Sem {e} <Badge variant="secondary">{v[e]}</Badge>
-  //               </span>
-  //             </>
-  //           );
-  //         })}
-  //       </div>
-  //     ),
-  //   },
+  {
+    accessorKey: "semesters",
+    header: "Semesters",
+    cell: (cell) => (
+      <div>
+        {Object.keys(cell.row.original.semesters || {}).map((e) => {
+          const v = cell.row.original.semesters;
+          return (
+            <>
+              <span className="mx-1">
+                Sem {e} <Badge variant="secondary">{v[e]}</Badge>
+              </span>
+            </>
+          );
+        })}
+      </div>
+    ),
+  },
   {
     id: "id",
     enableHiding: false,
-    cell: () => {
+    cell: ({ row }) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -187,7 +189,22 @@ export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>Download sheet</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-500"
+              onClick={() =>
+                axios
+                  .delete("/api/secure/sbte-result/history", {
+                    data: {
+                      id: row.original.id,
+                    },
+                  })
+                  .then((e) => {
+                    mutate("/api/secure/sbte-result/history");
+                  })
+              }
+            >
+              Delete
+            </DropdownMenuItem>
             {/* <DropdownMenuSeparator /> */}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -197,15 +214,19 @@ export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
 ];
 
 export function HistoryTable() {
-  const { data } = useGet<ExamResultHistoryApiType>(
+  const { data: apiData } = useGet<ExamResultHistoryApiType>(
     "/api/secure/sbte-result/history"
   );
 
+  const data = React.useMemo(() => {
+    return apiData || [];
+  }, [apiData]);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-
+  console.log(data);
   const table = useReactTable({
-    data: data || [],
+    data: data,
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -244,7 +265,7 @@ export function HistoryTable() {
             {table.getRowModel().rows?.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.original.id}
+                  key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
