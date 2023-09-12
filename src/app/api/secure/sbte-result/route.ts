@@ -52,10 +52,7 @@ const schema = z.object({
             .refine((e) => allowedGrades.includes(e)),
         })
       ),
-      cgpa: z
-        .string()
-        .optional()
-        .transform((e) => (e ? parseFloat(e) : undefined)),
+      cgpa: z.string().optional(),
     })
   ),
 });
@@ -151,7 +148,7 @@ export async function POST(request: NextRequest) {
                       ?.id,
                   },
                   data: {
-                    grade: values.grade || "Null",
+                    grade: values.grade,
                     internal: values.internal.toString(),
                   },
                 };
