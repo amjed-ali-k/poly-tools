@@ -1,3 +1,5 @@
+![sbte-refactor](https://socialify.git.ci/amjed-ali-k/sbte-refactor/image?description=1&descriptionEditable=Simplify%20Your%20Result%20Evaluation%20Process&font=KoHo&language=1&name=1&owner=1&pattern=Charlie%20Brown&theme=Auto)
+
 # SBTE Tool - Simplify Your Result Evaluation Process
 
 SBTE Tool is a comprehensive software designed exclusively for Engineering college lecturers, aimed at streamlining the time-consuming and tedious task of evaluating student results. With its intuitive interface and powerful features, SBTE Tool revolutionizes the way lecturers handle and organize semester exam results.
