@@ -9,7 +9,17 @@ export async function middleware(request: NextRequest) {
 
     // if no session, throw unauthenticated response
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json(
+        {
+          message: "Unauthenticated",
+          detail: !session
+            ? "No session"
+            : !session.user
+            ? "No user in session"
+            : "No user id in session",
+        },
+        { status: 401 }
+      );
     }
   }
 }

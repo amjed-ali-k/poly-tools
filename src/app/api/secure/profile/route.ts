@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     const { errors } = body.error;
     return NextResponse.json(
       { message: "Invalid request", errors },
-      { status: 400 },
+      { status: 400 }
     );
   }
   const session = await getServerAuthSession();
@@ -89,7 +89,17 @@ export async function GET(request: NextRequest) {
 
   // if no session, throw unauthenticated response
   if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+    return NextResponse.json(
+      {
+        message: "Unauthenticated",
+        detail: !session
+          ? "No session"
+          : !session.user
+          ? "No user in session"
+          : "No user id in session",
+      },
+      { status: 401 }
+    );
   }
 
   const res = await prisma.user.findUnique({
