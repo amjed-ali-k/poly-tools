@@ -30,7 +30,7 @@ main()
 async function populateColleges() {
   const colleges = collegesList;
 
-  await prisma.college.createMany({ data: colleges });
+  await prisma.college.createMany({ data: colleges, skipDuplicates: true });
 }
 
 async function populateBranches() {
@@ -100,6 +100,8 @@ async function populateSubjects() {
       },
     });
     results.push(e.code);
+    // create 10ms delay
+    await new Promise((resolve) => setTimeout(resolve, 10));
   });
 
   await Promise.all(unresolvedPromises);
