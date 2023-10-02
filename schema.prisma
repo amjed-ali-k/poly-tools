@@ -137,6 +137,7 @@ model Student {
 
   branch   Branch        @relation(fields: [branchId], references: [id])
   branchId String
+  
   rollNo   Int?
   image    String?
   status   StudentStatus @default(ACTIVE)

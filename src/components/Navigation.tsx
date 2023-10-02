@@ -23,7 +23,7 @@ function Navigation() {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut({ redirect: false });
+    await signOut({ callbackUrl: "/" });
     router.refresh();
   };
 
@@ -153,7 +153,7 @@ export function NavBar() {
                 View your previous analysis results.
               </ListItem>
               <ListItem
-                href="/docs/primitives/typography"
+                href="/dashboard/result-formatter/progress"
                 title="Student Progress"
               >
                 View aggregated analysis of each student in your class.

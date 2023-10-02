@@ -5,6 +5,7 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import type { Role, RoleTypes } from "@prisma/client";
 import { prisma } from "../db/prisma";
@@ -42,6 +43,7 @@ if (!process.env.GITHUB_SECRET) {
 const useSecureCookies = Boolean(process.env.VERCEL_URL);
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.SECRET!,
   cookies: {
     sessionToken: {
       name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
@@ -119,6 +121,10 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
 };

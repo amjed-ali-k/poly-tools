@@ -10,7 +10,7 @@ import { Footsies } from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SBTE Tools",
+  title: "Poly Tools",
   keywords: [
     "SBTE",
     "SBTE Tools",
