@@ -17,7 +17,7 @@ function SignInButton() {
     try {
       setLoading(true);
       // page reloads after sign in, so no need to setLoading(false), othersiwe ugly visual glitch
-      await signIn("github", { redirect: false });
+      await signIn("github", { callbackUrl: "/dashboard" });
     } catch (error) {
       // only set loading to false if there was an error and page didn't reload after sign in
       setLoading(false);
