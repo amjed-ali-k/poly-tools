@@ -1,4 +1,5 @@
 import { Binary } from "lucide-react";
+import Link from "next/link";
 
 export function Footsies() {
   return (
@@ -9,7 +10,14 @@ export function Footsies() {
           by Amjed Ali.
         </div>
         <div className="text-neutral-500 dark:text-neutral-400">
-          © {new Date().getFullYear()}
+          <Link className="hover:text-white duration-500 mr-2" href={"privacy"}>
+            Privacy Policy
+          </Link>
+          |
+          <Link className="hover:text-white duration-500 mx-2" href={"terms"}>
+            Terms and Conditions
+          </Link>
+          |<span className="ml-2">Copyright © {new Date().getFullYear()}</span>
         </div>
       </div>
     </footer>

@@ -41,7 +41,7 @@ export async function Hero() {
                 target="_blank"
                 rel="noreferrer noopener"
                 className="gap-1 md:inline-flex"
-                href="https://github.com/amjed-ali-k/sbte-refactor"
+                href="https://github.com/amjed-ali-k/poly-tools"
               >
                 <Github className="h-4 w-4" />
                 Star on GitHub

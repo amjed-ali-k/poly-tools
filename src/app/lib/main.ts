@@ -430,7 +430,7 @@ const sheetStyles = (
 
   ws["A2"] = {
     t: "s",
-    v: "By Amjed Ali K (https://sbte-tools.vercel.app)",
+    v: "By Amjed Ali K (https://poly-tools.vercel.app)",
     s: {
       font: {
         sz: 8,
