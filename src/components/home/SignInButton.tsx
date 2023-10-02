@@ -28,10 +28,10 @@ function SignInButton() {
     return (
       <Button
         asChild
-        className="hero-join-button-dark group relative mx-auto w-fit overflow-hidden rounded-xl p-[1px] font-bold transition-all duration-300 block dark:hover:shadow-[0_0_2rem_-0.5rem_#fff8] md:mr-0 lg:mr-auto"
+        className="hero-join-button-dark group h-11 mt-0.5 relative mx-auto w-fit overflow-hidden rounded-sm p-[1px] font-bold transition-all duration-300 block dark:hover:shadow-[0_0_2rem_-0.5rem_#fff8] md:mr-0 lg:mr-auto"
       >
         <Link href="/dashboard">
-          <span className="inline-flex h-full w-fit items-center gap-1 rounded-xl px-4 py-2 transition-all duration-300 dark:bg-neutral-900 dark:text-white group-hover:dark:bg-black">
+          <span className="inline-flex h-full w-fit items-center gap-1 rounded-sm px-4 py-2 transition-all duration-300 dark:bg-neutral-900 dark:text-white group-hover:dark:bg-black">
             Dashboard
           </span>
         </Link>
@@ -42,10 +42,10 @@ function SignInButton() {
   return (
     <Button
       asChild
-      className="hero-join-button-dark group relative mx-auto w-fit overflow-hidden rounded-xl p-[1px] font-bold transition-all duration-300 block dark:hover:shadow-[0_0_2rem_-0.5rem_#fff8] md:mr-0 lg:mr-auto"
+      className="hero-join-button-dark group h-11 mt-0.5 relative mx-auto w-fit overflow-hidden rounded-sm p-[1px] font-bold transition-all duration-300 block dark:hover:shadow-[0_0_2rem_-0.5rem_#fff8] md:mr-0 lg:mr-auto"
     >
       <Link href="" onClick={handleSignIn}>
-        <span className="inline-flex h-full w-fit items-center gap-1 rounded-xl px-4 py-2 transition-all duration-300 dark:bg-neutral-900 dark:text-white group-hover:dark:bg-black">
+        <span className="inline-flex h-full w-fit items-center gap-1 rounded-sm px-4 py-2 transition-all duration-300 dark:bg-neutral-900 dark:text-white group-hover:dark:bg-black">
           {loading || status === "loading" ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : (

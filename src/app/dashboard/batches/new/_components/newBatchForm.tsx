@@ -25,7 +25,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Textarea } from "@/components/ui/textarea";
 
 import { useToast } from "@/components/ui/use-toast";
 import { usePermenantGet, useProfile } from "@/lib/swr";

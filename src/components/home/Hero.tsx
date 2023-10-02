@@ -5,6 +5,7 @@ import { HeroIllustration } from "./heroillistruation";
 import { Button } from "../ui/button";
 import SBTEToolsLogo from "../Logo";
 import SignInButton from "./SignInButton";
+import GoogleSignInButton from "./GoogleSigninButton";
 
 export async function Hero() {
   return (
@@ -29,10 +30,11 @@ export async function Hero() {
             </Balancer>
           </p>
           <div className="flex flex-col gap-3 md:flex-row">
+            <GoogleSignInButton />
             <SignInButton />
             <Button
               asChild
-              className="flex items-center gap-2 rounded-xl border-2 px-4 py-2 dark:text-white"
+              className="flex items-center gap-2  h-11 mt-0.5 border-2 px-4 py-2 dark:text-white"
               variant="outline"
             >
               <a
@@ -43,21 +45,6 @@ export async function Hero() {
               >
                 <Github className="h-4 w-4" />
                 GitHub
-              </a>
-            </Button>
-            <Button
-              asChild
-              className="flex items-center gap-2 rounded-xl border-2 px-4 py-2 dark:text-white"
-              variant="outline"
-            >
-              <a
-                target="_blank"
-                rel="noreferrer noopener"
-                className="gap-1 md:inline-flex"
-                href="https://twitter.com/amjed_ali_k"
-              >
-                <Twitter className="h-4 w-4" />
-                Twitter
               </a>
             </Button>
           </div>
