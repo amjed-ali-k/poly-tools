@@ -15,7 +15,11 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!profile.isLoading && !profile.data?.phone) {
+    console.log(profile);
+    if (!profile.isLoading && !!profile.error) {
+      replace(`/?redirect=${pathname}`);
+    }
+    if (!profile.isLoading && !profile.error && !profile.data?.phone) {
       replace(`/dashboard/profile?redirect=${pathname}`);
     }
   }, [pathname, profile, replace]);

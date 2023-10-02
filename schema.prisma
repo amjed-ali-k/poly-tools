@@ -135,12 +135,12 @@ model Student {
   college   College? @relation(fields: [collegeId], references: [code])
   collegeId String
 
-  branch   Branch        @relation(fields: [branchId], references: [id])
+  branch   Branch @relation(fields: [branchId], references: [id])
   branchId String
-  
-  rollNo   Int?
-  image    String?
-  status   StudentStatus @default(ACTIVE)
+
+  rollNo Int?
+  image  String?
+  status StudentStatus @default(ACTIVE)
 
   cgpa Int?
 
@@ -404,4 +404,21 @@ model Attendance {
 
   @@index([studentId])
   @@index([periodId])
+}
+
+model Tool {
+  slug String @id @unique
+
+  author    String
+  authorUrl String
+
+  name        String
+  description String
+  type        String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  likes Int @default(0)
+  views Int @default(0)
 }

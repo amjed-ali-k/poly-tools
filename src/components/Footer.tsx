@@ -9,7 +9,7 @@ export function Footsies() {
           by Amjed Ali.
         </div>
         <div className="text-neutral-500 dark:text-neutral-400">
-          © {new Date().getFullYear()} Amjed Ali
+          © {new Date().getFullYear()}
         </div>
       </div>
     </footer>

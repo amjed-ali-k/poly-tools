@@ -33,6 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { CheckIcon } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -74,6 +75,9 @@ export function ProfileForm({
   const { toast } = useToast();
   const { data: user, mutate } = useProfile();
 
+  const redirect = useSearchParams().get("redirect");
+  const { replace } = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
@@ -83,7 +87,7 @@ export function ProfileForm({
     form.reset({
       name: user?.name,
       designation: user?.designation || "",
-      college: user?.college.code || "",
+      college: user?.college?.code || "",
       phone: user?.phone || "",
       bio: user?.bio,
       //   links: user?.userLinks.reduce((acc, curr) => {
@@ -102,6 +106,7 @@ export function ProfileForm({
           description: "Your profile has been updated successfully.",
         });
         mutate();
+        redirect && replace(redirect);
       })
       .catch((_err) => {
         toast({
@@ -159,12 +164,12 @@ export function ProfileForm({
                         role="combobox"
                         className={cn(
                           "min-w-[340px] justify-between truncate whitespace-nowrap flex-nowrap overflow-hidden",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? collegeList.find(
-                              (language) => language.code === field.value,
+                              (language) => language.code === field.value
                             )?.name
                           : "Select College"}
                         <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -194,7 +199,7 @@ export function ProfileForm({
                                   "ml-auto h-4 w-4",
                                   college.code === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                             </CommandItem>

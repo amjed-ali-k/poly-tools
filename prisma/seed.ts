@@ -1,7 +1,12 @@
 import collegesList from "./college-list.json";
 import branchesList from "./branches-list.json";
 import subjectList from "./subjects-list.json";
-import { EvaluationMode, SubjectType, PrismaClient } from "@prisma/client";
+import {
+  EvaluationMode,
+  SubjectType,
+  PrismaClient,
+  Tool,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,6 +14,7 @@ async function main() {
   await populateColleges();
   await populateBranches();
   await populateSubjects();
+  await populateTools();
 }
 
 main()
@@ -97,4 +103,24 @@ async function populateSubjects() {
   });
 
   await Promise.all(unresolvedPromises);
+}
+
+async function populateTools() {
+  const tools: Tool[] = [
+    {
+      slug: "result-formatter",
+      name: "Result Formatter",
+      description:
+        "A simple tool to format your SBTE Results into an Excel Sheet.",
+      author: "amjed-ali-k",
+      authorUrl: "https://github.com/amjed-ali-k",
+      likes: 59,
+      views: 593,
+      type: "FREE",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
+
+  await prisma.tool.createMany({ data: tools });
 }

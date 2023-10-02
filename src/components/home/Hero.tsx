@@ -31,7 +31,7 @@ export async function Hero() {
           </p>
           <div className="flex flex-col gap-3 md:flex-row">
             <GoogleSignInButton />
-            <SignInButton />
+            {/* <SignInButton /> */}
             <Button
               asChild
               className="flex items-center gap-2  h-11 mt-0.5 border-2 px-4 py-2 dark:text-white"
@@ -44,7 +44,7 @@ export async function Hero() {
                 href="https://github.com/amjed-ali-k/sbte-refactor"
               >
                 <Github className="h-4 w-4" />
-                GitHub
+                Star on GitHub
               </a>
             </Button>
           </div>
