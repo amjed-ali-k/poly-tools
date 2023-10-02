@@ -130,7 +130,7 @@ export function ProfileForm({
                 <FormControl>
                   <Input placeholder="Your name" {...field} />
                 </FormControl>
-                <FormDescription>Enter you full name.</FormDescription>
+                <FormDescription>Enter your full name.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -226,7 +226,7 @@ export function ProfileForm({
                 <FormControl>
                   <Input placeholder="+91 97xxxx" {...field} />
                 </FormControl>
-                <FormDescription>Enter you phone number.</FormDescription>
+                <FormDescription>Enter your phone number.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
