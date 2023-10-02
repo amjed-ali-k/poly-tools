@@ -15,11 +15,12 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log(profile);
     if (!profile.isLoading && !!profile.error) {
+      // User not authenticated
       replace(`/?redirect=${pathname}`);
     }
     if (!profile.isLoading && !profile.error && !profile.data?.phone) {
+      // Profile not completed
       replace(`/dashboard/profile?redirect=${pathname}`);
     }
   }, [pathname, profile, replace]);

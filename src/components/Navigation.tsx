@@ -38,7 +38,7 @@ function Navigation() {
           <div className="relative flex items-center gap-3">
             <a
               className="flex items-center space-x-2 focus:outline-none focus-visible:ring-2"
-              href="/"
+              href="/dashboard"
             >
               <SBTEToolsLogo className="h-8 w-8 rounded-md bg-[#3178C6] p-[2px]" />
               <span className="font-bold leading-[14px]">

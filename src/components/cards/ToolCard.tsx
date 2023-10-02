@@ -1,6 +1,5 @@
 import {
   Diamond,
-  MessageCircle,
   ThumbsUp,
   Circle,
   Plus,
@@ -18,10 +17,7 @@ import {
 } from "../ui/card";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-
-dayjs.extend(relativeTime);
+import RelativeTime from "../other/RelativeTime";
 
 const BORDERS_BY_DIFFICULTY = {
   BEGINNER:
@@ -139,15 +135,15 @@ function ToolCard({
               @{author}
             </div>
             <div className="text-muted-foreground whitespace-nowrap text-sm">
-              {dayjs(date).toNow()}
+              <RelativeTime date={date} />
             </div>
           </div>
           <CardDescription className="relative h-20 pb-4">
-            <div className="pointer-events-none absolute inset-0 h-full w-full shadow-[inset_0_-1.5rem_1rem_-0.5rem_hsl(var(--card))] duration-300 group-hover/card:shadow-[inset_0_-1.5rem_1rem_-0.5rem_hsl(var(--card-hovered))] group-focus:shadow-[inset_0_-1.5rem_1rem_-0.5rem_hsl(var(--card-hovered))]" />
-            <p>{description}</p>
+            {/* <span className="pointer-events-none absolute inset-0 h-full w-full shadow-[inset_0_-1.5rem_1rem_-0.5rem_hsl(var(--card))] duration-300 group-hover/card:shadow-[inset_0_-1.5rem_1rem_-0.5rem_hsl(var(--card-hovered))] group-focus:shadow-[inset_0_-1.5rem_1rem_-0.5rem_hsl(var(--card-hovered))]" /> */}
+            {description}
           </CardDescription>
         </CardContent>
-      </Card>{" "}
+      </Card>
     </Link>
   );
 }
