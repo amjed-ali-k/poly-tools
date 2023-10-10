@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db/prisma";
-import { getServerAuthSession } from "@/server/auth/server";
-import { z } from "zod";
 import { Branch, Student } from "@prisma/client";
+import { getUserId } from "@/components/auth/server";
 
 export async function GET(request: NextRequest) {
-  const session = await getServerAuthSession();
-
-  // if no session, throw unauthenticated response
-  if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const results = await prisma.batch.findMany({
     where: {
-      createdById: session.user.id,
+      createdById: userId,
     },
     select: {
       id: true,

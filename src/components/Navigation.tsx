@@ -14,18 +14,15 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Badge } from "./ui/badge";
+import { useLogout } from "./auth/LogOut";
 
 function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" });
-    router.refresh();
-  };
+  const logout = useLogout();
 
   return (
     <header className="z-10 w-full">
@@ -67,7 +64,7 @@ function Navigation() {
             <div className="flex items-center justify-end gap-2">
               <Button
                 className="h-8 w-full justify-start rounded-b-lg rounded-t-lg bg-opacity-50 px-2 text-red-500 hover:bg-red-500/20 hover:text-red-500"
-                onClick={handleSignOut}
+                onClick={logout}
                 variant="ghost"
               >
                 <span className="text-red-500">Log out</span>

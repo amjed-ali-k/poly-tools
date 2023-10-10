@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerAuthSession } from "@/server/auth/server";
 import { prisma } from "@/server/db/prisma";
 import { ExamType, Prisma } from "@prisma/client";
-import { counting, flat, sift, unique } from "radash";
+import { counting, sift } from "radash";
+import { getUserId } from "@/components/auth/server";
 
 const allowedMonths = ["April", "November"];
 const allowedGrades = [
@@ -67,17 +67,11 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  const session = await getServerAuthSession();
-
-  // if no session, throw unauthenticated response
-  if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const myProfile = await prisma.user.findUnique({
     where: {
-      id: session.user.id,
+      id: userId,
     },
   });
 
@@ -100,7 +94,7 @@ export async function POST(request: NextRequest) {
       ).length,
       createdBy: {
         connect: {
-          id: session.user.id,
+          id: userId,
         },
       },
     },
@@ -182,7 +176,7 @@ export async function POST(request: NextRequest) {
         sgpa: e.cgpa,
         createdBy: {
           connect: {
-            id: session.user.id,
+            id: userId,
           },
         },
         marks: {

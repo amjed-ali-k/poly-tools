@@ -1,6 +1,7 @@
 import { prisma } from "@/server/db/prisma";
 import React from "react";
 import { ProfileForm } from "./_components/form";
+import HankoProfile from "@/components/auth/Profile";
 
 async function page() {
   const colleges = await prisma.college.findMany({});
@@ -19,6 +20,9 @@ async function page() {
       </div>
       <div className="container">
         <ProfileForm collegeList={colleges} />
+      </div>
+      <div className="container">
+        <HankoProfile />
       </div>
     </div>
   );

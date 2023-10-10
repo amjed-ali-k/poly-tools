@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db/prisma";
-import { getServerAuthSession } from "@/server/auth/server";
 import { z } from "zod";
+import { getUserId } from "@/components/auth/server";
 
 export async function GET(request: NextRequest) {
-  const session = await getServerAuthSession();
-
-  // if no session, throw unauthenticated response
-  if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const results = await prisma.examResultFormatHistory.findMany({
     where: {
-      createdById: session.user.id,
+      createdById: userId,
     },
     select: {
       id: true,
@@ -55,12 +50,7 @@ export async function DELETE(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  const session = await getServerAuthSession();
-  // if no session, throw unauthenticated response
-  if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   await prisma.examResultFormatHistory.delete({
     where: {

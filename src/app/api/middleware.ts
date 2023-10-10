@@ -1,30 +1,27 @@
-import { getServerAuthSession } from "@/server/auth/server";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { jwtVerify, createRemoteJWKSet } from "jose";
+
+const hankoApiUrl = process.env.NEXT_PUBLIC_HANKO_API_URL!;
 
 // This function can be marked `async` if using `await` inside
-export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/secure")) {
-    const session = await getServerAuthSession();
+export async function middleware(req: NextRequest) {
+  const hanko = req.cookies.get("hanko")?.value;
 
-    // if no session, throw unauthenticated response
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        {
-          message: "Unauthenticated",
-          detail: !session
-            ? "No session"
-            : !session.user
-            ? "No user in session"
-            : "No user id in session",
-        },
-        { status: 401 }
-      );
-    }
+  const JWKS = createRemoteJWKSet(
+    new URL(`${hankoApiUrl}/.well-known/jwks.json`)
+  );
+  try {
+    const verifiedJWT = await jwtVerify(hanko ?? "", JWKS);
+  } catch {
+    return NextResponse.json(
+      {
+        message: "Unauthenticated",
+        detail: "Please log in to access this resource.",
+      },
+      { status: 401 }
+    );
   }
 }
-
-// // See "Matching Paths" below to learn more
-// export const config = {
-//   matcher: "/api/secure/:path*",
-// };
+export const config = {
+  matcher: ["/api/secure/:path*"],
+};

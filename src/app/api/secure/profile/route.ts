@@ -1,30 +1,19 @@
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerAuthSession } from "@/server/auth/server";
 import { prisma } from "@/server/db/prisma";
-import { College, User, UserLink } from "@prisma/client";
+import { College, User } from "@prisma/client";
+import { getUserId } from "@/components/auth/server";
 
 const schema = z.object({
   phone: z
     .string()
-    .nonempty()
+    .min(1)
     .regex(/^[0-9]{10}$/),
   bio: z.string().optional(),
-  name: z.string().nonempty(),
-  college: z.string().nonempty(),
+  name: z.string().min(1),
+  college: z.string().min(1),
   image: z.string().url().optional(),
-  designation: z.string().nonempty(),
-  links: z
-    .object({
-      instagram: z.string().url(),
-      linkedin: z.string().url(),
-      github: z.string().url(),
-      facebook: z.string().url(),
-      twitter: z.string().url(),
-      threads: z.string().url(),
-      telegram: z.string().url(),
-    })
-    .optional(),
+  designation: z.string().min(1),
 });
 
 export async function PUT(request: NextRequest) {
@@ -39,45 +28,28 @@ export async function PUT(request: NextRequest) {
       { status: 400 }
     );
   }
-  const session = await getServerAuthSession();
+  const userId = await getUserId();
 
-  // if no session, throw unauthenticated response
-  if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
-  }
-
-  // save data to db
-  const links = body.data.links;
-  const res = await prisma.user.update({
+  const res = await prisma.user.upsert({
     where: {
-      id: session.user.id,
+      id: userId,
     },
-    data: {
+    create: {
+      id: userId,
       phone: body.data.phone,
       bio: body.data.bio,
       name: body.data.name,
       collegeId: body.data.college,
       image: body.data.image,
       designation: body.data.designation,
-      userLinks: links && {
-        create: Object.keys(links)
-          .map((key) => {
-            const name = key as keyof typeof links;
-            const url = links[name] as string;
-            if (url)
-              return {
-                name,
-                url,
-              };
-          })
-          .filter((e) => e !== undefined) as {
-          name: string;
-          url: string;
-        }[],
-      },
     },
-    include: {
-      userLinks: true,
+    update: {
+      phone: body.data.phone,
+      bio: body.data.bio,
+      name: body.data.name,
+      collegeId: body.data.college,
+      image: body.data.image,
+      designation: body.data.designation,
     },
   });
 
@@ -85,29 +57,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const session = await getServerAuthSession();
-
-  // if no session, throw unauthenticated response
-  if (!session || !session.user || !session.user.id) {
-    return NextResponse.json(
-      {
-        message: "Unauthenticated",
-        detail: !session
-          ? "No session"
-          : !session.user
-          ? "No user in session"
-          : "No user id in session",
-      },
-      { status: 401 }
-    );
-  }
+  const userId = await getUserId();
 
   const res = await prisma.user.findUnique({
     where: {
-      id: session.user.id,
+      id: userId,
     },
     include: {
-      userLinks: true,
       college: true,
     },
   });
@@ -116,6 +72,5 @@ export async function GET(request: NextRequest) {
 }
 
 export type ProfileApiResponse = User & {
-  userLinks: UserLink[];
   college: College;
 };

@@ -1,4 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db/prisma";
@@ -27,7 +26,7 @@ export async function POST(request: NextRequest) {
     const { errors } = body.error;
     return NextResponse.json(
       { message: "Invalid request", errors },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
