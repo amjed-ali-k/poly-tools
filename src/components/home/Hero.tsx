@@ -30,8 +30,8 @@ export async function Hero() {
             </Balancer>
           </p>
           <div className="flex flex-col gap-3 md:flex-row">
-            <GoogleSignInButton />
-            {/* <SignInButton /> */}
+            {/* <GoogleSignInButton /> */}
+            <SignInButton />
             <Button
               asChild
               className="flex items-center gap-2  h-11 mt-0.5 border-2 px-4 py-2 dark:text-white"
