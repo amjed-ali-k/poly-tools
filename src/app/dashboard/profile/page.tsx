@@ -18,11 +18,14 @@ async function page() {
           before proceeding.
         </p>
       </div>
-      <div className="container">
-        <ProfileForm collegeList={colleges} />
-      </div>
-      <div className="container">
-        <HankoProfile />
+      <div className="container flex flex-col md:flex-row">
+        <div className="md:mr-4">
+          <ProfileForm collegeList={colleges} />
+        </div>
+
+        <div className="bg-slate-800 m-4 rounded-lg border-l-4 border-blue-600 rounded-l-none">
+          <HankoProfile />
+        </div>
       </div>
     </div>
   );
