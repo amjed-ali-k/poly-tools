@@ -5,7 +5,6 @@ import { HeroIllustration } from "./heroillistruation";
 import { Button } from "../ui/button";
 import SBTEToolsLogo from "../Logo";
 import SignInButton from "./SignInButton";
-import GoogleSignInButton from "./GoogleSigninButton";
 
 export async function Hero() {
   return (
@@ -30,7 +29,6 @@ export async function Hero() {
             </Balancer>
           </p>
           <div className="flex flex-col gap-3 md:flex-row">
-            <GoogleSignInButton />
             <SignInButton />
             <Button
               asChild

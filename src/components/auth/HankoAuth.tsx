@@ -6,9 +6,10 @@ import { register } from "@teamhanko/hanko-elements";
 
 import { Hanko } from "@teamhanko/hanko-frontend-sdk";
 
-const hankoApi = process.env.HANKO_API_URL!;
+const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL!;
 
-export default function HankoAuth() {
+export default function HankoAuth({ className }: { className?: string }) {
+  console.log("API URL", hankoApi);
   const router = useRouter();
 
   const [hanko, setHanko] = useState<Hanko>();
@@ -38,5 +39,5 @@ export default function HankoAuth() {
     });
   }, []);
 
-  return <hanko-auth />;
+  return <hanko-auth class={className} />;
 }

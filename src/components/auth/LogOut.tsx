@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Hanko } from "@teamhanko/hanko-elements";
 
-const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL;
+const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL!;
 
 export const useLogout = () => {
   const router = useRouter();

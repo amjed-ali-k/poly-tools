@@ -41,24 +41,13 @@ import * as z from "zod";
 const formSchema = z.object({
   phone: z
     .string()
-    .nonempty()
+    .min(1)
     .regex(/^[0-9]{10}$/, "Enter a valid phone number."),
   bio: z.string().optional(),
-  name: z.string().min(5, "Minimum 5 characters required").nonempty("Required"),
-  college: z.string().nonempty(),
+  name: z.string().min(5, "Minimum 5 characters required").min(1),
+  college: z.string().min(1),
   image: z.string().url().optional(),
-  designation: z.string().nonempty(),
-  links: z
-    .object({
-      instagram: z.string().url(),
-      linkedin: z.string().url(),
-      github: z.string().url(),
-      facebook: z.string().url(),
-      twitter: z.string().url(),
-      threads: z.string().url(),
-      telegram: z.string().url(),
-    })
-    .optional(),
+  designation: z.string().min(1),
 });
 
 export function ProfileForm({

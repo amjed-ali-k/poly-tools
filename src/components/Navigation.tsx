@@ -4,7 +4,6 @@ import Link from "next/link";
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
-import { signOut } from "@/lib/auth";
 import SBTEToolsLogo from "./Logo";
 import { cn } from "@/lib/utils";
 import {
@@ -20,8 +19,6 @@ import { useLogout } from "./auth/LogOut";
 
 function Navigation() {
   const pathname = usePathname();
-  const router = useRouter();
-
   const logout = useLogout();
 
   return (
