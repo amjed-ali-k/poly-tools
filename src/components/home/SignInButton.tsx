@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { Github, Loader2 } from "lucide-react";
+import { Github, Loader2, LogIn } from "lucide-react";
 import { useState } from "react";
 
 function SignInButton() {
@@ -46,7 +46,7 @@ function SignInButton() {
           {loading || status === "loading" ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <Github className="mr-1 h-4 w-4 stroke-[3]" />
+            <LogIn className="mr-1 h-4 w-4 stroke-[3]" />
           )}
           Login
         </span>
