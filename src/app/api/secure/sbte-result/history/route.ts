@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getUserId } from "@/components/auth/server";
 
 export async function GET(request: NextRequest) {
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const results = await prisma.examResultFormatHistory.findMany({
     where: {
@@ -50,7 +50,7 @@ export async function DELETE(request: NextRequest) {
       { status: 400 }
     );
   }
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   await prisma.examResultFormatHistory.delete({
     where: {

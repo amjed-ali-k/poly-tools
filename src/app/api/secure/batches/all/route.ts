@@ -4,7 +4,7 @@ import { Branch, Student } from "@prisma/client";
 import { getUserId } from "@/components/auth/server";
 
 export async function GET(request: NextRequest) {
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const results = await prisma.batch.findMany({
     where: {

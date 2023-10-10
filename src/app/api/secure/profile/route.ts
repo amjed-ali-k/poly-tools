@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
       { status: 400 }
     );
   }
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const res = await prisma.user.upsert({
     where: {
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const res = await prisma.user.findUnique({
     where: {

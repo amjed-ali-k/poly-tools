@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const myProfile = await prisma.user.findUnique({
     where: {

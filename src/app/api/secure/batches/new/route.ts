@@ -16,7 +16,7 @@ const schema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const userId = await getUserId();
+  const userId = await getUserId(request);
   const body = schema.safeParse(await request.json());
   if (!body.success) {
     const { errors } = body.error;

@@ -3,7 +3,7 @@ import { prisma } from "@/server/db/prisma";
 import { getUserId } from "@/components/auth/server";
 
 export async function GET(request: NextRequest) {
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const results = await prisma.branch.findMany({
     select: {

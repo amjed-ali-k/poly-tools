@@ -7,7 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { resultId: string } }
 ) {
-  const userId = await getUserId();
+  const userId = await getUserId(request);
 
   const results = await prisma.examResultFormatHistory.findUnique({
     where: {
