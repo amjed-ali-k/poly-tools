@@ -68,6 +68,8 @@ export async function POST(request: NextRequest) {
     );
   }
   const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
 
   const myProfile = await prisma.user.findUnique({
     where: {

@@ -17,6 +17,9 @@ const schema = z.object({
 
 export async function GET(request: NextRequest) {
   const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+
   const body = schema.safeParse(await request.json());
   if (!body.success) {
     const { errors } = body.error;

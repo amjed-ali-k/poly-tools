@@ -43,7 +43,7 @@ function SignInButton() {
     >
       <Link href="/auth">
         <span className="inline-flex h-full w-fit items-center gap-1 rounded-sm px-4 py-2 transition-all duration-300 dark:bg-neutral-900 dark:text-white group-hover:dark:bg-black">
-          {loading || status === "loading" ? (
+          {loading ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
             <LogIn className="mr-1 h-4 w-4 stroke-[3]" />

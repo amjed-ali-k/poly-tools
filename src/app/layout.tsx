@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Poly Tools",
+  metadataBase: new URL("https://poly-tools.vercel.app"),
   keywords: [
     "SBTE",
     "SBTE Tools",

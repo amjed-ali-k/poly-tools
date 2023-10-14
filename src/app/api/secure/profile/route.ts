@@ -28,7 +28,10 @@ export async function PUT(request: NextRequest) {
       { status: 400 }
     );
   }
+
   const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
 
   const res = await prisma.user.upsert({
     where: {
@@ -58,6 +61,8 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
 
   const res = await prisma.user.findUnique({
     where: {

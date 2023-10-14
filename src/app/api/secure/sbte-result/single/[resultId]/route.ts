@@ -8,6 +8,8 @@ export async function GET(
   { params }: { params: { resultId: string } }
 ) {
   const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
 
   const results = await prisma.examResultFormatHistory.findUnique({
     where: {

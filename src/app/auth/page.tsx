@@ -1,6 +1,9 @@
 import SBTEToolsLogo from "@/components/Logo";
 import HankoAuth from "@/components/auth/HankoAuth";
 
+// CI fails without this
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   return (
     <>

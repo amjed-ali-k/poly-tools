@@ -3,13 +3,11 @@
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "@teamhanko/hanko-elements";
-
-import { Hanko } from "@teamhanko/hanko-frontend-sdk";
+import type { Hanko } from "@teamhanko/hanko-frontend-sdk";
 
 const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL!;
 
 export default function HankoAuth({ className }: { className?: string }) {
-  console.log("API URL", hankoApi);
   const router = useRouter();
 
   const [hanko, setHanko] = useState<Hanko>();
