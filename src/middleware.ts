@@ -3,6 +3,12 @@ import { NextResponse, NextRequest } from "next/server";
 import { fetchUserId, getUserId } from "@/components/auth/server";
 
 export async function middleware(req: NextRequest) {
+  // If localHost is true, we are running in development mode, so we can skip authentication
+  const localHost = req.headers.get("host")?.startsWith("localhost");
+  if (localHost) {
+    return NextResponse.next();
+  }
+
   try {
     const hanko = req.cookies.get("hanko")?.value;
     if (!hanko) {

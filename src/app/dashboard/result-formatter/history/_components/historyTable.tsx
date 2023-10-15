@@ -32,7 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -49,6 +48,7 @@ import { mutate } from "swr";
 import { ExamResultSingleApiType } from "@/app/api/secure/sbte-result/single/[resultId]/route";
 import { convertToXlsx } from "@/app/lib/main";
 import { writeFile } from "xlsx-js-style";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const handleResultDownload = (id: string) => {
   axios
@@ -197,7 +197,7 @@ export const columns: ColumnDef<ExamResultHistoryApiType[0]>[] = [
 ];
 
 export function HistoryTable() {
-  const { data: apiData } = useGet<ExamResultHistoryApiType>(
+  const { data: apiData, isLoading } = useGet<ExamResultHistoryApiType>(
     "/api/secure/sbte-result/history"
   );
 
@@ -245,6 +245,13 @@ export function HistoryTable() {
             ))}
           </TableHeader>
           <TableBody>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={columns.length}>
+                  <Skeleton className="w-full h-[20px]" />
+                </TableCell>
+              </TableRow>
+            )}
             {table.getRowModel().rows?.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
