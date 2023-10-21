@@ -14,6 +14,9 @@ interface ExamHall {
   theoryOnlySeats: number;
   drawingOnlySeats: number;
   name: number;
+  studentCount?: {
+    [key: string]: number;
+  };
 }
 
 type ExamAssignment = {
@@ -43,128 +46,78 @@ function assignStudentsToHalls(
   maxSubjectsPerHall: number = Infinity
 ): ExamAssignment[] {
   const assignments: ExamAssignment[] = [...halls];
+  const assignmentMap: { [key: number]: ExamAssignment } = {};
+  halls.forEach((hall) => (assignmentMap[hall.name] = hall));
 
-  // Get total seats avaliable in all halls by exam type
-  const totalSeatsByType = halls.reduce(
-    (acc, curr) => {
-      acc.theory += curr.theoryOnlySeats + curr.commonSeats;
-      acc.drawing += curr.drawingOnlySeats + curr.commonSeats;
-      return acc;
-    },
-    { theory: 0, drawing: 0 }
-  );
+  const drawingHalls = halls.filter((h) => h.drawingOnlySeats > 0);
+  const theoryHalls = halls.filter((h) => h.theoryOnlySeats > 0);
+  const commonHalls = halls.filter((h) => h.commonSeats > 0);
 
-  // Get the total students count by exam type and subject
-  const totalStudentsByType = subjects.reduce(
-    (acc, curr) => {
-      acc.theory += curr.examType === ExamType.THEORY ? curr.count : 0;
-      acc.drawing += curr.examType === ExamType.DRAWING ? curr.count : 0;
-      return acc;
-    },
-    { theory: 0, drawing: 0 }
-  );
+  const assignToHall = (subject: Subjects, hall: ExamHall, type: ExamType) => {
+    const diff =
+      type === ExamType.DRAWING
+        ? Math.min(hall.drawingOnlySeats, subject.count)
+        : Math.min(hall.theoryOnlySeats, subject.count);
+
+    hall[type === ExamType.DRAWING ? "drawingOnlySeats" : "theoryOnlySeats"] -=
+      diff;
+    subject.count -= diff;
+
+    if (!hall.studentCount) {
+      hall.studentCount = {};
+    }
+    hall.studentCount[subject.subjectCode] =
+      (hall.studentCount[subject.subjectCode] || 0) + diff;
+  };
 
   subjects.sort((a, b) => b.count - a.count);
 
-  function getRemainingSeats(h: ExamHall[], type?: ExamType) {
-    return halls.reduce((acc, curr) => {
-      acc +=
-        curr.commonSeats +
-        (type && type === ExamType.DRAWING
-          ? curr.drawingOnlySeats
-          : curr.theoryOnlySeats);
-      return acc;
-    }, 0);
-  }
-
-  function getRemainingStudents(s: Subjects[]) {
-    return subjects.reduce((acc, curr) => {
-      acc += curr.count;
-      return acc;
-    }, 0);
-  }
-
-  function assigntoHalls(
-    subs: Subjects[],
-    _halls: ExamHall[],
-    type?: ExamType
-  ) {
-    const maxSubsPerHall = Math.min(maxSubjectsPerHall, subs.length);
-    while (
-      getRemainingSeats(_halls, type) > 0 &&
-      getRemainingStudents(subs) > 0
-    ) {
-      const _subs = subs.slice(0, maxSubsPerHall);
-      const _h = _halls.filter(
-        (e) =>
-          e.commonSeats > 0 ||
-          (type === ExamType.DRAWING
-            ? e.drawingOnlySeats > 0
-            : e.theoryOnlySeats > 0)
-      );
-
-      // assign students to halls
-
-      _h.forEach((h) => {
-        _subs.forEach((s) => {
-          if (s.count < 1) return;
-
-          if (type === ExamType.DRAWING && h.drawingOnlySeats > 0) {
-            const diff = Math.abs(h.drawingOnlySeats - s.count);
-            h.drawingOnlySeats -= diff;
-            s.count -= diff;
-            const assing = assignments.find((e) => e.name === h.name)!;
-            assing.studentCount = {
-              ...assing.studentCount,
-              [s.subjectCode]:
-                (assing.studentCount?.[s.subjectCode] || 0) + diff,
-            };
-          } else if (type === ExamType.THEORY && h.theoryOnlySeats > 0) {
-            const diff = Math.abs(h.theoryOnlySeats - s.count);
-            h.theoryOnlySeats -= diff;
-            s.count -= diff;
-            const assing = assignments.find((e) => e.name === h.name)!;
-            assing.studentCount = {
-              ...assing.studentCount,
-              [s.subjectCode]:
-                (assing.studentCount?.[s.subjectCode] || 0) + diff,
-            };
-          } else if (h.commonSeats > 0) {
-            const diff = Math.abs(h.commonSeats - s.count);
-            h.commonSeats -= diff;
-            s.count -= diff;
-            const assing = assignments.find((e) => e.name === h.name)!;
-            assing.studentCount = {
-              ...assing.studentCount,
-              [s.subjectCode]:
-                (assing.studentCount?.[s.subjectCode] || 0) + diff,
-            };
+  for (const subject of subjects) {
+    while (subject.count > 0) {
+      if (subject.examType === ExamType.DRAWING) {
+        for (const hall of drawingHalls) {
+          if (hall.drawingOnlySeats > 0) {
+            assignToHall(subject, hall, ExamType.DRAWING);
+            if (maxSubjectsPerHall > 1) {
+              const theoryHall = theoryHalls.find((h) => h.theoryOnlySeats > 0);
+              if (theoryHall) {
+                assignToHall(subject, theoryHall, ExamType.THEORY);
+              }
+            }
+            break;
           }
-        });
-      });
+        }
+      } else {
+        for (const hall of theoryHalls) {
+          if (hall.theoryOnlySeats > 0) {
+            assignToHall(subject, hall, ExamType.THEORY);
+            if (maxSubjectsPerHall > 1) {
+              const drawingHall = drawingHalls.find(
+                (h) => h.drawingOnlySeats > 0
+              );
+              if (drawingHall) {
+                assignToHall(subject, drawingHall, ExamType.DRAWING);
+              }
+            }
+            break;
+          }
+        }
+      }
+      for (const hall of commonHalls) {
+        if (hall.commonSeats > 0) {
+          assignToHall(subject, hall, ExamType.THEORY);
+          if (maxSubjectsPerHall > 1) {
+            const drawingHall = drawingHalls.find(
+              (h) => h.drawingOnlySeats > 0
+            );
+            if (drawingHall) {
+              assignToHall(subject, drawingHall, ExamType.DRAWING);
+            }
+          }
+        }
+      }
     }
   }
-
-  if (totalStudentsByType.drawing > totalSeatsByType.drawing) {
-    // assign students to drawing halls first
-    const drawingHalls = halls.filter((h) => h.drawingOnlySeats > 0);
-    const drawingSubjects = subjects.filter(
-      (s) => s.examType === ExamType.DRAWING
-    );
-    assigntoHalls(drawingSubjects, drawingHalls, ExamType.DRAWING);
-  } else {
-    // assign students to theory halls first
-    const theoryHalls = halls.filter((h) => h.theoryOnlySeats > 0);
-    const theorySubjects = subjects.filter(
-      (s) => s.examType === ExamType.THEORY
-    );
-    assigntoHalls(theorySubjects, theoryHalls, ExamType.THEORY);
-  }
-
-  // assign students to common halls
-  const commonHalls = halls.filter((h) => h.commonSeats > 0);
-  const commonSubjects = subjects;
-  assigntoHalls(commonSubjects, commonHalls);
 
   return assignments;
 }
