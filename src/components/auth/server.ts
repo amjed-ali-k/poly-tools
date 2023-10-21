@@ -14,6 +14,12 @@ export const fetchUserId = async (hanko: string) => {
 };
 
 export const getUserId = async (req: NextRequest) => {
+  // if localhost, return default userId
+  const localHost = req.headers.get("host")?.startsWith("localhost");
+  if (localHost) {
+    return "9c646448-d852-448b-abc5-b1d04fdcc0cc"; // default userId
+  }
+
   // const userId = req.headers.get("x-user-id");
   // return userId;
   const hanko = req.cookies.get("hanko")?.value ?? "";
