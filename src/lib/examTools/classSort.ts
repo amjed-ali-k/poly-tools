@@ -20,13 +20,12 @@ interface ExamAssignment {
   student: Student;
   hall: ExamHall;
 }
-
 function assignStudentsToHalls(
   students: Student[],
   halls: ExamHall[]
 ): ExamAssignment[] {
   const assignments: ExamAssignment[] = [];
-  const unassignedStudents: Student[] = []; // Create an array to store unassigned students
+  const unassignedStudents: Student[] = [];
 
   // Group students by exam type
   const theoryStudents = students.filter(
@@ -62,7 +61,7 @@ function assignStudentsToHalls(
       } else if (hall.commonSeats > 0) {
         hall.commonSeats--;
       } else {
-        unassignedStudents.push(student); // Store unassigned students
+        unassignedStudents.push(student);
       }
 
       assignments.push({ student, hall });
@@ -88,9 +87,13 @@ function assignStudentsToHalls(
 
   // Assign any remaining students (both theory and drawing) to halls
   for (const hall of sortedHalls) {
+    if (students.length === 0) break;
     const studentsInHall = students.splice(0, hall.commonSeats);
     assignStudentsToHall(studentsInHall, hall);
   }
+
+  // Store any remaining students in the unassignedStudents array
+  unassignedStudents.push(...students, ...theoryStudents, ...drawingStudents);
 
   // Console log the unassigned students
   console.log("Unassigned Students:", unassignedStudents);
