@@ -92,9 +92,6 @@ function assignStudentsToHalls(
     assignStudentsToHall(studentsInHall, hall);
   }
 
-  // Store any remaining students in the unassignedStudents array
-  unassignedStudents.push(...students, ...theoryStudents, ...drawingStudents);
-
   // Console log the unassigned students
   console.log("Unassigned Students:", unassignedStudents);
 
