@@ -169,39 +169,37 @@ function assignStudentsToHalls(
   return assignments;
 }
 
-// const subjectCode = [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010];
+const subjectCode = [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010];
 
-// function draw(e: Array<number>): number {
-//   const index = Math.floor(Math.random() * e.length);
-//   return e[index];
-// }
+function draw(e: Array<number>): number {
+  const index = Math.floor(Math.random() * e.length);
+  return e[index];
+}
 
-// const students: Student[] = Array(500)
-//   .fill(0)
-//   .map((_, i) => {
-//     const sub = draw(subjectCode);
-//     return {
-//       regNo: i + 1,
-//       subjectCode: sub,
-//       examType: ExamType.THEORY,
-//     };
-//   });
+const fakeSubjects: Subjects[] = subjectCode.map((_, i) => {
+  return {
+    count: 30,
+    subjectCode: _,
+    examType: ExamType.THEORY,
+  };
+});
 
-// console.log("Students Count: ", students.length);
+console.log(
+  "Students Count: ",
+  fakeSubjects.reduce((acc, curr) => acc + curr.count, 0)
+);
 
-// const halls: ExamHall[] = Array(10)
-//   .fill(0)
-//   .map((_, i) => ({
-//     commonSeats: 5,
-//     theoryOnlySeats: 30,
-//     drawingOnlySeats: 0,
-//     name: i,
-//   }));
+const halls: ExamHall[] = Array(10)
+  .fill(0)
+  .map((_, i) => ({
+    commonSeats: 5,
+    theoryOnlySeats: 30,
+    drawingOnlySeats: 0,
+    name: i,
+  }));
 
-// console.log("Seats count: ");
-
-// const _halls: ExamHall[] = JSON.parse(JSON.stringify(halls));
-// const result = assignStudentsToHalls(students, halls, 4);
+const _halls: ExamHall[] = JSON.parse(JSON.stringify(halls));
+const result = assignStudentsToHalls(fakeSubjects, halls, 4);
 
 // console.clear();
 
@@ -238,19 +236,11 @@ function assignStudentsToHalls(
 //   })
 // );
 
-// console.table(
-//   _halls.map((h) => {
-//     const hallResult = subjectCode.reduce((acc, s) => {
-//       return {
-//         ...acc,
-//         [s.toString()]: result.filter(
-//           (r) => r.hall.name === h.name && r.student.subjectCode === s
-//         ).length,
-//       };
-//     }, {});
-//     return {
-//       hall: h.name,
-//       ...hallResult,
-//     };
-//   })
-// );
+console.table(
+  _halls.map((h) => {
+    return {
+      hall: h.name,
+      ...result.find((r) => r.name === h.name)?.studentCount,
+    };
+  })
+);
