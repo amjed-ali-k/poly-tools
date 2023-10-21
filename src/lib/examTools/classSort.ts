@@ -20,6 +20,7 @@ interface ExamAssignment {
   student: Student;
   hall: ExamHall;
 }
+
 function assignStudentsToHalls(
   students: Student[],
   halls: ExamHall[]
@@ -90,6 +91,11 @@ function assignStudentsToHalls(
     if (students.length === 0) break;
     const studentsInHall = students.splice(0, hall.commonSeats);
     assignStudentsToHall(studentsInHall, hall);
+  }
+
+  // Handle any remaining unassigned students when there are more students than available seats
+  if (students.length > 0) {
+    unassignedStudents.push(...students);
   }
 
   // Console log the unassigned students
