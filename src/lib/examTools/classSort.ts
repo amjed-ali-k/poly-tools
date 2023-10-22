@@ -39,15 +39,17 @@ const unique: <T, K extends string | number | symbol>(
   }, {});
   return Object.values(valueMap);
 };
-function assignStudentsToHalls(
+
+function assignStudentsToHallsType1(
   subjects: Subjects[],
   halls: ExamHall[],
-  maxSubjectsPerHall: number = Infinity
+  maxSubjectsPerHall: number | undefined = undefined
 ): ExamAssignment[] {
   const assignments: ExamAssignment[] = [...halls];
   const assignmentMap: { [key: number]: ExamAssignment } = {};
   halls.forEach((hall) => (assignmentMap[hall.name] = hall));
 
+  const remainingSubjects: Subjects[] = [...subjects];
   const availableHalls = [...halls];
 
   const assignToHall = (subject: Subjects, hall: ExamHall, type: ExamType) => {
@@ -67,27 +69,40 @@ function assignStudentsToHalls(
       (hall.studentCount[subject.subjectCode] || 0) + diff;
   };
 
-  subjects.sort((a, b) => b.count - a.count);
-
-  for (const subject of subjects) {
-    let remainingSubs = subject.count;
-    while (remainingSubs > 0) {
-      for (const hall of availableHalls) {
+  if (maxSubjectsPerHall === undefined) {
+    // Assign students from all subjects to each hall
+    for (const hall of availableHalls) {
+      for (const subject of remainingSubjects) {
         const canAssign =
           subject.examType === ExamType.DRAWING
             ? hall.drawingOnlySeats > 0
             : hall.theoryOnlySeats > 0;
 
-        if (
-          canAssign &&
-          hall.studentCount &&
-          Object.keys(hall.studentCount).length < maxSubjectsPerHall
-        ) {
+        if (canAssign) {
           assignToHall(subject, hall, subject.examType);
-          remainingSubs -= Math.min(
-            remainingSubs,
-            maxSubjectsPerHall - (hall.studentCount[subject.subjectCode] || 0)
-          );
+        }
+      }
+    }
+  } else {
+    // Distribute students from different subjects across multiple halls
+    remainingSubjects.sort((a, b) => b.count - a.count);
+
+    while (remainingSubjects.length > 0) {
+      for (const hall of availableHalls) {
+        if (remainingSubjects.length === 0) {
+          break;
+        }
+
+        const subjectsForHall = remainingSubjects.splice(0, maxSubjectsPerHall);
+        for (const subject of subjectsForHall) {
+          const canAssign =
+            subject.examType === ExamType.DRAWING
+              ? hall.drawingOnlySeats > 0
+              : hall.theoryOnlySeats > 0;
+
+          if (canAssign) {
+            assignToHall(subject, hall, subject.examType);
+          }
         }
       }
     }
@@ -126,7 +141,7 @@ const halls: ExamHall[] = Array(10)
   }));
 
 const _halls: ExamHall[] = JSON.parse(JSON.stringify(halls));
-const result = assignStudentsToHalls(fakeSubjects, halls, 4);
+const result = assignStudentsToHallsType1(fakeSubjects, halls, 4);
 
 // console.clear();
 
