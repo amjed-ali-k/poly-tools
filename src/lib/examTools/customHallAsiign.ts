@@ -1,7 +1,7 @@
 /**
  * Interface to represent an exam hall
  */
-interface ExamHall {
+export interface ExamHall {
   // Number of seats available for all students
   commonSeats: number;
 
@@ -18,7 +18,7 @@ interface ExamHall {
 /**
  * Enum for exam types
  */
-enum ExamType {
+export enum ExamType {
   THEORY,
   DRAWING,
 }
@@ -26,7 +26,7 @@ enum ExamType {
 /**
  * Interface for student count per exam
  */
-type StudentCount = {
+export type StudentCount = {
   count: number; // Number of students
   branch: string; // Branch name
   subjectCode: number; // Subject code
@@ -39,7 +39,7 @@ type StudentCount = {
  * @param {ExamHall[]} examHalls - Available exam halls
  * @returns {Object} - Allocated seats per hall and subject
  */
-function assignHallsCustom(
+export function assignHallsCustom(
   studentCount: StudentCount[],
   examHalls: ExamHall[]
 ) {
