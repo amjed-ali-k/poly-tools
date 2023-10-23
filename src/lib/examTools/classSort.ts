@@ -1,8 +1,3 @@
-enum ExamType {
-  THEORY,
-  DRAWING,
-}
-
 interface Subjects {
   count: number;
   subjectCode: number;

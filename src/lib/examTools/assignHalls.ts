@@ -4,7 +4,7 @@ const maxSubjectsPerHall = 2;
 
 // Models & interfaces
 
-interface Student {
+interface SubjectStudentCount {
   count: number;
   subjectCode: number;
   examType: ExamType;
@@ -14,13 +14,6 @@ interface Student {
 //   THEORY,
 //   DRAWING,
 // }
-
-interface ExamHall {
-  commonSeats: number;
-  theoryOnlySeats: number;
-  drawingOnlySeats: number;
-  name: number;
-}
 
 interface Assignment {
   hallName: string;
@@ -36,7 +29,7 @@ interface AssignedStudents {
 const subjectAssignments: Record<string, Record<number, number>> = {};
 
 // Input data
-const students: Student[] = [];
+const students: SubjectStudentCount[] = [];
 const examHalls: ExamHall[] = [];
 
 // Main logic
@@ -44,7 +37,7 @@ const examHalls: ExamHall[] = [];
  * Assign students to exam halls
  */
 function assignStudentsToHalls(
-  students: Student[],
+  students: SubjectStudentCount[],
   examHalls: ExamHall[]
 ): Assignment[] {
   // Initialize data structures
@@ -54,10 +47,7 @@ function assignStudentsToHalls(
   // Sort students by exam type
   // This allows assigning drawing students first
   students.sort((a, b) => {
-    // Compare exam types
-    if (a.examType < b.examType) return -1;
-    if (a.examType > b.examType) return 1;
-    return 0;
+    return a.examType - b.examType;
   });
 
   // Iterate over students
@@ -109,6 +99,8 @@ function assignStudentsToHalls(
         }
       }
     }
+    console.log("Hall:", hallName);
+    console.log("Remaining seats:", remainingSeats);
   }
 
   // Format output
@@ -155,7 +147,8 @@ function updateSubjectAssignments(
  */
 function getHallWithSeats(halls: ExamHall[], seatType: string) {
   for (const hall of halls) {
-    if ((hall[seatType as keyof ExamHall] as number) > 0) {
+    //@ts-ignore
+    if (hall[seatType] > 0) {
       return hall.name;
     }
   }
@@ -163,7 +156,115 @@ function getHallWithSeats(halls: ExamHall[], seatType: string) {
   return "";
 }
 
-// Testing
-const assignments = assignStudentsToHalls(students, examHalls);
-
 // Add tests
+
+// Test data
+const testStudents: SubjectStudentCount[] = [
+  { count: 50, subjectCode: 101, examType: ExamType.THEORY },
+  { count: 30, subjectCode: 102, examType: ExamType.DRAWING },
+  { count: 20, subjectCode: 103, examType: ExamType.THEORY },
+];
+
+const testHalls: ExamHall[] = [
+  { name: 109, commonSeats: 40, theoryOnlySeats: 10, drawingOnlySeats: 0 },
+  { name: 120, commonSeats: 60, theoryOnlySeats: 0, drawingOnlySeats: 30 },
+  { name: 221, commonSeats: 50, theoryOnlySeats: 20, drawingOnlySeats: 10 },
+];
+
+// Helper functions
+
+function getStudentCountsBySubject(students: SubjectStudentCount[]) {
+  const counts: Record<number, number> = {};
+
+  for (let student of students) {
+    counts[student.subjectCode] =
+      (counts[student.subjectCode] || 0) + student.count;
+  }
+
+  return counts;
+}
+
+function getTotalSeats(hall: ExamHall) {
+  return hall.commonSeats + hall.theoryOnlySeats + hall.drawingOnlySeats;
+}
+
+// Validation tests
+
+function validateAssignmentCounts(
+  assignments: Assignment[],
+  expectedCounts: Record<number, number>
+) {
+  // Track assigned counts
+  const assignedCounts: Record<number, number> = {};
+
+  for (let assignment of assignments) {
+    for (let assigned of assignment.students) {
+      assignedCounts[assigned.subjectCode] =
+        (assignedCounts[assigned.subjectCode] || 0) + assigned.count;
+    }
+  }
+
+  for (let subjectCode in expectedCounts) {
+    const expected = expectedCounts[subjectCode];
+    const assigned = assignedCounts[subjectCode] || 0;
+    if (expected !== assigned) {
+      throw new Error(`Invalid count for subject ${subjectCode}`);
+    }
+  }
+}
+
+function validateHallCapacities(assignments: Assignment[], halls: ExamHall[]) {
+  // Get total seats used per hall
+  const hallUsage: Record<string, number> = {};
+
+  for (let assignment of assignments) {
+    let totalStudents = 0;
+
+    for (let assigned of assignment.students) {
+      totalStudents += assigned.count;
+    }
+
+    hallUsage[assignment.hallName] = totalStudents;
+  }
+
+  // Check against capacities
+  for (let hall of halls) {
+    const totalSeats = getTotalSeats(hall);
+    const usedSeats = hallUsage[hall.name] || 0;
+
+    if (usedSeats > totalSeats) {
+      throw new Error(`Hall ${hall.name} over capacity!`);
+    }
+  }
+}
+
+function validateSubjectDistribution(assignments: Assignment[]) {
+  for (let assignment of assignments) {
+    // Get subject codes
+    const subjects = assignment.students.map((s) => s.subjectCode);
+
+    // Validate min/max constraints
+    const uniqueSubjects = new Set(subjects).size;
+    if (uniqueSubjects < minSubjectsPerHall) {
+      throw new Error(`Too few subjects in ${assignment.hallName}`);
+    }
+
+    if (uniqueSubjects > maxSubjectsPerHall) {
+      throw new Error(`Too many subjects in ${assignment.hallName}`);
+    }
+  }
+}
+
+// Usage
+
+try {
+  const assignments = assignStudentsToHalls(students, examHalls);
+  console.log(assignments);
+  const expectedCounts = getStudentCountsBySubject(testStudents);
+  validateAssignmentCounts(assignments, expectedCounts);
+  validateHallCapacities(assignments, testHalls);
+  validateSubjectDistribution(assignments);
+  console.log("All tests passed!");
+} catch (error: any) {
+  console.log("Test failed: ", error.message);
+}
