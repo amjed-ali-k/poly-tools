@@ -60,11 +60,14 @@ import cn from "classnames";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { ExamHall } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 function NewClassComponent() {
   const [hallName, setHallName] = useState("");
   const [structure, setStructure] = useState([[]] as SeatObjectType[][]);
   const { toast } = useToast();
+
+  const router = useRouter();
 
   const onSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -74,13 +77,15 @@ function NewClassComponent() {
         description: "Please enter a name for the hall",
         variant: "destructive",
       });
+    console.log(structure);
     axios
-      .put<ExamHall>("/api/secure/exam-seating", { hallName, structure })
+      .put<ExamHall>("/api/secure/exam-seating", { name: hallName, structure })
       .then((res) => {
         toast({
           title: "Well done!",
           description: `Class ${res.data.name} added successfully`,
         });
+        router.push("/dashboard/tools/exam-seating/class-list");
       });
   };
   return (
@@ -154,7 +159,7 @@ function ClassLayout({
             savedTypes={savedDesks}
             onAddNew={(k) => onAddNew(k, i, e.length)}
           >
-            <div className="flex p-4 items-center space-x-2">
+            <div className="flex p-4 items-center space-x-2 group/x-axis">
               {e.map((k, j) => (
                 <SeatComponent
                   onAddNew={() => onAddNew(k, i, e.length)}
@@ -164,7 +169,14 @@ function ClassLayout({
                 />
               ))}
 
-              <div className="h-20 w-20 border border-dashed rounded-lg">
+              <div
+                className={cn(
+                  "h-20 w-20 duration-300 group-hover/x-axis:opacity-100 border border-dashed rounded-lg",
+                  {
+                    "opacity-0": e.length > 0,
+                  }
+                )}
+              >
                 <AddNewButton
                   savedTypes={savedDesks}
                   onAddNew={(st) => {

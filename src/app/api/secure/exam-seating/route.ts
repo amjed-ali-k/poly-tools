@@ -1,8 +1,14 @@
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db/prisma";
-import { SeatType } from "@/app/dashboard/tools/exam-seating/new-class/_components/newClass";
 import { getUserId } from "@/components/auth/server";
+
+enum SeatType {
+  THEORY,
+  DRAWING,
+  COMMON,
+  BLANK,
+}
 
 const schema = z.object({
   name: z.string(),
@@ -13,7 +19,7 @@ const schema = z.object({
           z.object({
             name: z.string(),
             seatCount: z.number().positive(),
-            structure: z.array(z.number().positive()),
+            structure: z.array(z.number().nonnegative()),
           })
         )
         .min(1)
@@ -40,61 +46,60 @@ export async function PUT(request: NextRequest) {
       name: body.data.name,
       structure: body.data.structure,
       createdById: userId,
-      theoryOnlySeats: body.data.structure.reduce((acc, curr) => {
-        return (
-          acc +
-          curr.reduce((acc, curr) => {
-            return (
-              acc +
-              curr.structure.reduce((acc, curr) => {
-                return curr === SeatType.THEORY ? acc++ : acc;
-              }, 0)
-            );
-          }, 0)
-        );
-      }, 0),
-      drawingOnlySeats: body.data.structure.reduce((acc, curr) => {
-        return (
-          acc +
-          curr.reduce((acc, curr) => {
-            return (
-              acc +
-              curr.structure.reduce((acc, curr) => {
-                return curr === SeatType.DRAWING ? acc++ : acc;
-              }, 0)
-            );
-          }, 0)
-        );
-      }, 0),
-      commonSeats: body.data.structure.reduce((acc, curr) => {
-        return (
-          acc +
-          curr.reduce((acc, curr) => {
-            return (
-              acc +
-              curr.structure.reduce((acc, curr) => {
-                return curr === SeatType.COMMON ? acc++ : acc;
-              }, 0)
-            );
-          }, 0)
-        );
-      }, 0),
+      theoryOnlySeats: getCount(body.data.structure, SeatType.THEORY),
+      drawingOnlySeats: getCount(body.data.structure, SeatType.DRAWING),
+      commonSeats: getCount(body.data.structure, SeatType.COMMON),
     },
   });
 
-  // const unresolvedPromises = body.data.courses.map(async (e) => {
+  return NextResponse.json(results);
+}
 
-  //     const res = (await coursesDb.get(
-  //       `REV2021-${e}`
-  //     )) as unknown as CourseType | null;
-  //     res && results.push(res);
-  //     if (!res) {
-  //       const newRes = (await coursesDb.get(
-  //         `REV2015-${e}`
-  //       )) as unknown as CourseType | null;
-  //       newRes && results.push(newRes);
-  //     }
-  //   });
+export type SeatObjectType = {
+  name: string;
+  seatCount: number;
+  structure: SeatType[];
+};
+
+function getCount(structure: SeatObjectType[][], type: SeatType) {
+  return structure.reduce((acc, curr) => {
+    return (
+      acc +
+      curr.reduce((acc, curr) => {
+        return (
+          acc +
+          curr.structure.reduce((acc, curr) => {
+            return curr === type ? (acc += 1) : acc;
+          }, 0)
+        );
+      }, 0)
+    );
+  }, 0);
+}
+
+const deleteSchema = z.object({
+  id: z.string(),
+});
+
+export async function DELETE(request: NextRequest) {
+  const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+
+  const body = deleteSchema.safeParse(await request.json());
+  if (!body.success) {
+    const { errors } = body.error;
+    return NextResponse.json(
+      { message: "Invalid request", errors },
+      { status: 400 }
+    );
+  }
+
+  const results = await prisma.examHall.delete({
+    where: {
+      id: body.data.id,
+    },
+  });
 
   return NextResponse.json(results);
 }

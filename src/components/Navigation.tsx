@@ -183,7 +183,7 @@ export function NavBar() {
                 </NavigationMenuLink>
               </li>
               <ListItem
-                href="/dashboard/result-formatter"
+                href="/dashboard/tools/exam-seating/class-list"
                 title="Add class layout"
               >
                 Structure of desks and tables in each class

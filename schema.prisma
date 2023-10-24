@@ -379,6 +379,13 @@ model Tool {
   views Int @default(0)
 }
 
+enum SeatType {
+  THEORY
+  DRAWING
+  COMMON
+  BLANK
+}
+
 model ExamHall {
   id String @id @default(uuid())
 

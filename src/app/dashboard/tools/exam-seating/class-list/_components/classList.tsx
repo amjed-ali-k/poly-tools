@@ -43,6 +43,7 @@ import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExamHall } from "@prisma/client";
+import { useToast } from "@/components/ui/use-toast";
 
 type ClassLayoutApiType = {
   id: string;
@@ -57,6 +58,7 @@ type ClassLayoutApiType = {
 export const columns: ColumnDef<ExamHall>[] = [
   {
     accessorKey: "name",
+    header: "Hall Name",
   },
   {
     accessorKey: "createdAt",
@@ -76,10 +78,6 @@ export const columns: ColumnDef<ExamHall>[] = [
         {dayjs(value.getValue() as string).format("DD-MM-YY hh:mm A")}
       </div>
     ),
-  },
-  {
-    accessorKey: "commonSeats",
-    header: "Common Seats",
   },
   {
     accessorKey: "commonSeats",
@@ -117,17 +115,17 @@ export const columns: ColumnDef<ExamHall>[] = [
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-500"
-              //   onClick={() =>
-              //     axios
-              //       .delete("/api/secure/sbte-result/history", {
-              //         data: {
-              //           id: row.original.id,
-              //         },
-              //       })
-              //       .then((e) => {
-              //         mutate("/api/secure/sbte-result/history");
-              //       })
-              //   }
+              onClick={() =>
+                axios
+                  .delete("/api/secure/exam-seating", {
+                    data: {
+                      id: row.original.id,
+                    },
+                  })
+                  .then(() => {
+                    mutate("/api/secure/exam-seating/all");
+                  })
+              }
             >
               Delete
             </DropdownMenuItem>
