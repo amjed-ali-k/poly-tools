@@ -42,23 +42,13 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExamHall } from "@prisma/client";
+import { ExamHall, StudentBatchForExam } from "@prisma/client";
 import { useToast } from "@/components/ui/use-toast";
 
-type ClassLayoutApiType = {
-  id: string;
-  createdAt: string;
-  commonSeats: number;
-  theoryOnlySeats: number;
-  drawingOnlySeats: number;
-  name: string;
-  createdBy: string;
-};
-
-export const columns: ColumnDef<ExamHall>[] = [
+export const columns: ColumnDef<StudentBatchForExam>[] = [
   {
     accessorKey: "name",
-    header: "Hall Name",
+    header: "Batch Name",
   },
   {
     accessorKey: "createdAt",
@@ -80,23 +70,8 @@ export const columns: ColumnDef<ExamHall>[] = [
     ),
   },
   {
-    accessorKey: "commonSeats",
-    header: "Seats",
-    cell: ({ row }) => (
-      <div className="">
-        <span>
-          Common <Badge variant="secondary">{row.original.commonSeats}</Badge>
-        </span>
-        <span className="ml-2">
-          Theory{" "}
-          <Badge variant="secondary">{row.original.theoryOnlySeats}</Badge>
-        </span>
-        <span className="ml-2">
-          Drawing{" "}
-          <Badge variant="secondary">{row.original.drawingOnlySeats}</Badge>
-        </span>
-      </div>
-    ),
+    accessorKey: "studentsCount",
+    header: "Total Students",
   },
   {
     id: "id",
@@ -117,13 +92,13 @@ export const columns: ColumnDef<ExamHall>[] = [
               className="text-red-500"
               onClick={() =>
                 axios
-                  .delete("/api/secure/exam-seating", {
+                  .delete("/api/secure/exam-seating/student-batches", {
                     data: {
                       id: row.original.id,
                     },
                   })
                   .then(() => {
-                    mutate("/api/secure/exam-seating/all");
+                    mutate("/api/secure/exam-seating/student-batches/all");
                   })
               }
             >
@@ -138,13 +113,13 @@ export const columns: ColumnDef<ExamHall>[] = [
 ];
 
 export function StudentBatchTable() {
-  const { data: apiData, isLoading } = useGet<ExamHall[]>(
-    "/api/secure/exam-seating/all"
+  const { data: apiData, isLoading } = useGet<StudentBatchForExam[]>(
+    "/api/secure/exam-seating/student-batches/all"
   );
 
   const data = React.useMemo(() => {
     return apiData ?? [];
-  }, [apiData]) as ExamHall[];
+  }, [apiData]) as StudentBatchForExam[];
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
