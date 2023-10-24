@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -67,6 +67,7 @@ function NewClassComponent() {
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <Label htmlFor="name">Class/Hall Name</Label>
           <Input
+            aria-invalid={hallName === ""}
             value={hallName}
             onChange={(e) => setHallName(e.target.value)}
             type="text"
@@ -79,6 +80,9 @@ function NewClassComponent() {
         <h3 className="mb-3">Class structure</h3>
         <ClassLayout />
       </div>
+      <div>
+        <Button>Save and submit</Button>
+      </div>
     </div>
   );
 }
@@ -87,12 +91,17 @@ export default NewClassComponent;
 
 function ClassLayout() {
   const [structure, setStructure] = useState([[]] as SeatObjectType[][]);
+  const [savedDesks, setsavedDesks] = useState([] as SeatObjectType[]);
+
   const onAddNew = (seatType: SeatObjectType, row: number, col: number) => {
     const _structure = [...structure];
     const _row = _structure[row] ?? [];
     _row[col] = seatType;
     _structure[row] = _row;
     setStructure(_structure);
+
+    if (preDefinedSeats[seatType.name]) return;
+    setsavedDesks([...savedDesks, seatType]);
   };
 
   const onRemove = (row: number, col: number) => {
@@ -102,9 +111,8 @@ function ClassLayout() {
     _structure[row] = _row;
     setStructure(_structure);
   };
-
   return (
-    <div className="border flex flex-col gap-8 pb-8 md:gap-10 md:pb-10">
+    <div className="border flex flex-col md:pb-10">
       <div className="w-full flex justify-center">
         <p className="border text-xs text-gray-400 tracking-widest px-4">
           <ArrowUp className="inline-block mx-1" size={12} />
@@ -114,7 +122,11 @@ function ClassLayout() {
       </div>
       <div className="overflow-auto">
         {structure.map((e, i) => (
-          <MyContextMenu key={i} onAddNew={(k) => onAddNew(k, i, e.length)}>
+          <MyContextMenu
+            key={i}
+            savedTypes={savedDesks}
+            onAddNew={(k) => onAddNew(k, i, e.length)}
+          >
             <div className="flex p-4 items-center space-x-2">
               {e.map((k, j) => (
                 <SeatComponent
@@ -127,6 +139,7 @@ function ClassLayout() {
 
               <div className="h-20 w-20 border border-dashed rounded-lg">
                 <AddNewButton
+                  savedTypes={savedDesks}
                   onAddNew={(st) => {
                     onAddNew(st, i, e.length);
                   }}
@@ -137,9 +150,12 @@ function ClassLayout() {
         ))}
       </div>
       <hr />
-      <div className="px-4 w-full flex items-center">
+      <div className="p-4 w-full flex items-center">
         <div>
-          <AddNewButton onAddNew={(st) => onAddNew(st, structure.length, 0)} />
+          <AddNewButton
+            savedTypes={savedDesks}
+            onAddNew={(st) => onAddNew(st, structure.length, 0)}
+          />
         </div>
         <div className="mx-2">Add seat in new row</div>
       </div>
@@ -240,7 +256,7 @@ function MyContextMenu({
           <DialogTrigger asChild>
             <ContextMenuItem>Custom</ContextMenuItem>
           </DialogTrigger>
-          {savedTypes && (
+          {savedTypes && savedTypes.length > 1 && (
             <>
               <ContextMenuSeparator />
 
@@ -342,14 +358,14 @@ function SeatComponent({
   );
 }
 
-enum SeatType {
+export enum SeatType {
   THEORY,
   DRAWING,
   COMMON,
   BLANK,
 }
 
-type SeatObjectType = {
+export type SeatObjectType = {
   name: string;
   seatCount: number;
   structure: SeatType[];
@@ -514,7 +530,7 @@ function AddNewButton({
               </DropdownMenuItem>
             </DialogTrigger>
           </DropdownMenuGroup>
-          {savedTypes && (
+          {/* {savedTypes && savedTypes.length > 1 && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
@@ -525,22 +541,21 @@ function AddNewButton({
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     {savedTypes.map((e) => (
-                      <React.Fragment key={e.name}>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            onAddNew && onAddNew(e);
-                          }}
-                        >
-                          <RockingChair className="mr-2 h-4 w-4" />
-                          {e.name}
-                        </DropdownMenuItem>
-                      </React.Fragment>
+                      <DropdownMenuItem
+                        key={e.name + e.seatCount}
+                        onClick={() => {
+                          onAddNew && onAddNew(e);
+                        }}
+                      >
+                        <RockingChair className="mr-2 h-4 w-4" />
+                        {e.name}
+                      </DropdownMenuItem>
                     ))}
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
               </DropdownMenuGroup>
             </>
-          )}
+          )} */}
         </DropdownMenuContent>
       </DropdownMenu>
       <AddNewSeatDialog closeModal={closeModal} onAddNew={onAddNew} />
