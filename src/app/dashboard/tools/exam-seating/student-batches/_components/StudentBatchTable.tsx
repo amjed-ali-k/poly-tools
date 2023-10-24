@@ -3,16 +3,10 @@
 import * as React from "react";
 import dayjs from "dayjs";
 
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
+import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -23,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -38,12 +31,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGet } from "@/lib/swr";
-import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExamHall, StudentBatchForExam } from "@prisma/client";
-import { useToast } from "@/components/ui/use-toast";
+import { StudentBatchForExam } from "@prisma/client";
 
 export const columns: ColumnDef<StudentBatchForExam>[] = [
   {

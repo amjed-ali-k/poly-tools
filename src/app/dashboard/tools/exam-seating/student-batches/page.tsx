@@ -22,7 +22,7 @@ async function page() {
       </div>
       <div className="container">
         <div className="flex mb-3 justify-end">
-          <Link href="/dashboard/tools/exam-seating/new-class">
+          <Link href="/dashboard/tools/exam-seating/student-batches/new">
             <Button className="">
               <Plus className="mr-2 h-4 w-4" />
               Add new batch
