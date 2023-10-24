@@ -21,6 +21,7 @@
     "@vercel/analytics": "^1.0.2",
     "axios": "^1.5.1",
     "class-variance-authority": "^0.7.0",
+    "classnames": "^2.3.2",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
     "colorjs.io": "^0.4.5",

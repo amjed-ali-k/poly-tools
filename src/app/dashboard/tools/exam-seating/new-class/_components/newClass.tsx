@@ -46,53 +46,39 @@ import {
 import {
   ArrowUp,
   BoxSelect,
+  Copy,
   Dice1,
   RectangleHorizontal,
   RockingChair,
   Save,
+  Trash,
 } from "lucide-react";
 import { CalendarIcon, PlusCircledIcon, PlusIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import cn from "classnames";
 
 function NewClassComponent() {
+  const [hallName, setHallName] = useState("");
+
   return (
-    <div>
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <ClassLayout />
-        </ContextMenuTrigger>
-        <ContextMenuContent className="w-64">
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              New Desk
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-48">
-              <ContextMenuItem>2 Seats</ContextMenuItem>
-              <ContextMenuItem>3 Seats</ContextMenuItem>
-              <ContextMenuItem>4 Seats</ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem>Custom</ContextMenuItem>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuItem>New Drawing Table</ContextMenuItem>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              New Free Space
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-48">
-              <ContextMenuItem>2 Seats</ContextMenuItem>
-              <ContextMenuItem>3 Seats</ContextMenuItem>
-              <ContextMenuItem>4 Seats</ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem>Custom</ContextMenuItem>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuItem>Custom</ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+    <div className="flex-col space-y-3">
+      <div>
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="name">Class/Hall Name</Label>
+          <Input
+            value={hallName}
+            onChange={(e) => setHallName(e.target.value)}
+            type="text"
+            id="name"
+            placeholder="Name"
+          />
+        </div>
+      </div>
+      <div>
+        <h3 className="mb-3">Class structure</h3>
+        <ClassLayout />
+      </div>
     </div>
   );
 }
@@ -100,6 +86,23 @@ function NewClassComponent() {
 export default NewClassComponent;
 
 function ClassLayout() {
+  const [structure, setStructure] = useState([[]] as SeatObjectType[][]);
+  const onAddNew = (seatType: SeatObjectType, row: number, col: number) => {
+    const _structure = [...structure];
+    const _row = _structure[row] ?? [];
+    _row[col] = seatType;
+    _structure[row] = _row;
+    setStructure(_structure);
+  };
+
+  const onRemove = (row: number, col: number) => {
+    const _structure = [...structure];
+    const _row = _structure[row] ?? [];
+    _row.splice(col, 1);
+    _structure[row] = _row;
+    setStructure(_structure);
+  };
+
   return (
     <div className="border flex flex-col gap-8 pb-8 md:gap-10 md:pb-10">
       <div className="w-full flex justify-center">
@@ -109,10 +112,233 @@ function ClassLayout() {
           <ArrowUp className="inline-block mx-1" size={12} />
         </p>
       </div>
-      <div className="flex p-4 items-start space-x-2">
-        <AddNewButton />
+      <div className="overflow-auto">
+        {structure.map((e, i) => (
+          <MyContextMenu key={i} onAddNew={(k) => onAddNew(k, i, e.length)}>
+            <div className="flex p-4 items-center space-x-2">
+              {e.map((k, j) => (
+                <SeatComponent
+                  onAddNew={() => onAddNew(k, i, e.length)}
+                  key={j}
+                  seat={k}
+                  onRemove={() => onRemove(i, j)}
+                />
+              ))}
+
+              <div className="h-20 w-20 border border-dashed rounded-lg">
+                <AddNewButton
+                  onAddNew={(st) => {
+                    onAddNew(st, i, e.length);
+                  }}
+                />
+              </div>
+            </div>
+          </MyContextMenu>
+        ))}
+      </div>
+      <hr />
+      <div className="px-4 w-full flex items-center">
+        <div>
+          <AddNewButton onAddNew={(st) => onAddNew(st, structure.length, 0)} />
+        </div>
+        <div className="mx-2">Add seat in new row</div>
       </div>
     </div>
+  );
+}
+
+function MyContextMenu({
+  children,
+  savedTypes,
+  onAddNew,
+}: {
+  savedTypes?: SeatObjectType[];
+  onAddNew?: (seatType: SeatObjectType) => void;
+  children: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const closeModal = () => setIsOpen(false);
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <ContextMenu>
+        <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <ContextMenuContent className="w-64">
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              New Desk
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.twoSeatDesk);
+                }}
+              >
+                2 Seats
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.threeSeatDesk);
+                }}
+              >
+                3 Seats
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.fourSeatDesk);
+                }}
+              >
+                4 Seats
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <DialogTrigger asChild>
+                <ContextMenuItem>Custom</ContextMenuItem>
+              </DialogTrigger>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+          <ContextMenuItem>New Drawing Table</ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              New Free Space
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.oneBlackSpace);
+                }}
+              >
+                1 Seats
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.twoBlankSpace);
+                }}
+              >
+                2 Seats
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.threeBlankSpace);
+                }}
+              >
+                3 Seats
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => {
+                  onAddNew && onAddNew(preDefinedSeats.fourBlankSpace);
+                }}
+              >
+                4 Seats
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <DialogTrigger asChild>
+                <ContextMenuItem>Custom</ContextMenuItem>
+              </DialogTrigger>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+          <DialogTrigger asChild>
+            <ContextMenuItem>Custom</ContextMenuItem>
+          </DialogTrigger>
+          {savedTypes && (
+            <>
+              <ContextMenuSeparator />
+
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>
+                  <Save className="mr-2 h-4 w-4" />
+                  Saved seats
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent>
+                  {savedTypes.map((e) => (
+                    <React.Fragment key={e.name}>
+                      <ContextMenuItem
+                        onClick={() => {
+                          onAddNew && onAddNew(e);
+                        }}
+                      >
+                        <RockingChair className="mr-2 h-4 w-4" />
+                        {e.name}
+                      </ContextMenuItem>
+                    </React.Fragment>
+                  ))}
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+      <AddNewSeatDialog closeModal={closeModal} onAddNew={onAddNew} />
+    </Dialog>
+  );
+}
+
+function SeatComponent({
+  seat,
+  onRemove,
+  onAddNew,
+}: {
+  seat: SeatObjectType;
+  onAddNew?: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div
+          className={cn(
+            "flex shrink-0 relative group border m-4 rounded-lg overflow-hidden",
+            {
+              "border-dashed border-2":
+                seat.structure.reduce((a, b) => b !== SeatType.BLANK, false) ===
+                false,
+            }
+          )}
+        >
+          <div className="absolute opacity-0 delay-1000 translate-x-20 group-hover:opacity-100 group-hover:translate-x-0 duration-500 right-1 top-5">
+            <Button variant="destructive" onClick={onRemove}>
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+          {seat.structure.map((e, i) => {
+            return (
+              <TooltipProvider key={i}>
+                <Tooltip>
+                  <TooltipTrigger
+                    className={cn(
+                      `flex w-20 h-20 shrink-0 items-center justify-center`,
+                      {
+                        "": e === SeatType.BLANK,
+                        "bg-teal-950/20": e === SeatType.COMMON,
+                        "bg-indigo-950/20": e === SeatType.DRAWING,
+                        "bg-green-950/20": e === SeatType.THEORY,
+                        "border-x first:border-l-0 last:border-r-0":
+                          e !== SeatType.BLANK,
+                      }
+                    )}
+                  >
+                    {SeatType.BLANK !== e && seatTypeMin[e]}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{seatTypeDescription[e]}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-64">
+        <ContextMenuItem className="" onClick={onAddNew}>
+          <Copy className="mr-2 h-4 w-4" />
+          Duplicate
+        </ContextMenuItem>
+        <ContextMenuItem onClick={onRemove} className="text-red-500">
+          <Trash className="mr-2 h-4 w-4" />
+          Delete
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
@@ -190,7 +416,7 @@ function AddNewButton({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">
+          <Button className="h-full w-full border-0" variant="outline">
             <PlusIcon className="w-8 h-8" />
           </Button>
         </DropdownMenuTrigger>
