@@ -156,6 +156,54 @@ export function NavBar() {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
+          <NavigationMenuTrigger>Seating Arrangement</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <li
+                className="row-span-3 overflow-hidden bg-cover bg-right-bottom bg-no-repeat"
+                style={{
+                  backgroundImage: "url(/images/exam-hall.jpg)",
+                }}
+              >
+                <NavigationMenuLink asChild>
+                  <a
+                    className="flex h-full w-full select-none  flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    // href="/dashboard/result-formatter"
+                  >
+                    <div className="relative">
+                      <div className="bg-gray-950/30 blur-md inset-0 absolute" />
+                      <div className="relative mb-2 mt-4 text-lg font-medium">
+                        Seating Arrangement
+                      </div>
+                      <p className="relative text-sm leading-tight text-muted-foreground">
+                        Generate seating arrangement in simple steps
+                      </p>
+                    </div>
+                  </a>
+                </NavigationMenuLink>
+              </li>
+              <ListItem
+                href="/dashboard/result-formatter"
+                title="Add class layout"
+              >
+                Structure of desks and tables in each class
+              </ListItem>
+              <ListItem
+                href="/dashboard/result-formatter/history"
+                title="Add Student Batches"
+              >
+                Student directory and their batches
+              </ListItem>
+              <ListItem
+                href="/dashboard/result-formatter/progress"
+                title="Add Exams"
+              >
+                Create seating arrangements for each exams
+              </ListItem>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
           <NavigationMenuTrigger disabled>
             Attendance{" "}
             <Badge variant="secondary" className="ml-2">

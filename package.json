@@ -45,6 +45,9 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^14.0.0",
+    "@types/jest": "^29.5.6",
     "@types/node": "20.8.0",
     "@types/papaparse": "^5.3.9",
     "@types/react": "18.2.24",
@@ -53,6 +56,8 @@
     "encoding": "^0.1.13",
     "eslint": "8.50.0",
     "eslint-config-next": "13.5.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "postcss": "8.4.31",
     "prettier": "^3.0.3",
     "prisma": "^5.3.1",

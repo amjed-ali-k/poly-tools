@@ -1,17 +1,10 @@
 /**
  * Interface to represent an exam hall
  */
-export interface ExamHall {
-  // Number of seats available for all students
+export interface ExamHallSeatsCount {
   commonSeats: number;
-
-  // Number of seats available only for theory exam students
   theoryOnlySeats: number;
-
-  // Number of seats available only for drawing exam students
   drawingOnlySeats: number;
-
-  // Unique name/id for the hall
   name: number;
 }
 
@@ -36,18 +29,20 @@ export type StudentCount = {
 /**
  * Allocates exam halls to students
  * @param {StudentCount[]} studentCount - Array of student count per exam
- * @param {ExamHall[]} examHalls - Available exam halls
+ * @param {ExamHallSeatsCount[]} examHalls - Available exam halls
  * @returns {Object} - Allocated seats per hall and subject
  */
 export function assignHallsCustom(
   studentCount: StudentCount[],
-  examHalls: ExamHall[]
+  examHalls: ExamHallSeatsCount[]
 ) {
   // Deep copy input to avoid mutation
   const _studentCount = JSON.parse(
     JSON.stringify(studentCount)
   ) as StudentCount[];
-  const _examHalls = JSON.parse(JSON.stringify(examHalls)) as ExamHall[];
+  const _examHalls = JSON.parse(
+    JSON.stringify(examHalls)
+  ) as ExamHallSeatsCount[];
 
   // Object to store final hall allocation
   const assignedResult: {
@@ -75,13 +70,14 @@ export function assignHallsCustom(
   // Helper function to allocate seats
 
   function assignNow(
-    halls: ExamHall[],
+    halls: ExamHallSeatsCount[],
     students: StudentCount,
     isCommon: boolean = false
   ) {
     if (students.count < 1) return;
     const { count: allowedStudents, examType, subjectCode } = students;
-    const getSeats = (e: ExamHall) => getSeatsByType(e, examType, isCommon);
+    const getSeats = (e: ExamHallSeatsCount) =>
+      getSeatsByType(e, examType, isCommon);
     const allowedHalls = halls
       .filter((h) => getSeatsByType(h, examType, isCommon) > 0)
       .sort((a, b) => getSeats(a) - getSeats(b));
@@ -172,13 +168,13 @@ export function assignHallsCustom(
 // Helper function to get available seats by exam type
 /**
  * Gets available seats by exam type
- * @param {ExamHall} hall - Exam hall object
+ * @param {ExamHallSeatsCount} hall - Exam hall object
  * @param {ExamType} examType - Type of exam
  * @param {boolean} isCommon - Flag for common seats
  * @returns {number} - Number of available seats
  */
-function getSeatsByType(
-  e: ExamHall,
+export function getSeatsByType(
+  e: ExamHallSeatsCount,
   examType: ExamType,
   common: boolean = false
 ) {
