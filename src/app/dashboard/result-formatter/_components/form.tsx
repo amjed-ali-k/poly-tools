@@ -37,16 +37,10 @@ import axios from "axios";
 const allowedMonths = ["April", "November"];
 
 const fomrSchema = z.object({
-  month: z
-    .string()
-    .nonempty()
-    .refine((val) => {
-      return allowedMonths.includes(val);
-    }),
-  year: z
-    .string()
-    .nonempty()
-    .regex(/^[0-9]{4}$/),
+  month: z.string().refine((val) => {
+    return allowedMonths.includes(val);
+  }),
+  year: z.string().regex(/^[0-9]{4}$/),
   upload: z.boolean(),
 });
 

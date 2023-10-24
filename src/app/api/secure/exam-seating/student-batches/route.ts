@@ -3,26 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db/prisma";
 import { getUserId } from "@/components/auth/server";
 
-enum SeatType {
-  THEORY,
-  DRAWING,
-  COMMON,
-  BLANK,
-}
-
 const schema = z.object({
-  name: z.string(),
-  structure: z
+  name: z.string().min(3, "Minimum 3 characters required"),
+  students: z
     .array(
-      z
-        .array(
-          z.object({
-            name: z.string(),
-            seatCount: z.number().positive(),
-            structure: z.array(z.number().nonnegative()),
-          })
-        )
-        .min(1)
+      z.object({
+        name: z.string().optional(),
+        primaryNumber: z.string(),
+        rollNumber: z.string().optional(),
+        regNumber: z.string().optional(),
+        admnNumber: z.string().optional(),
+      })
     )
     .min(1),
 });
@@ -41,40 +32,16 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const results = await prisma.examHall.create({
+  const results = await prisma.studentBatchForExam.create({
     data: {
       name: body.data.name,
-      structure: body.data.structure,
+      students: body.data.students,
       createdById: userId,
-      theoryOnlySeats: getCount(body.data.structure, SeatType.THEORY),
-      drawingOnlySeats: getCount(body.data.structure, SeatType.DRAWING),
-      commonSeats: getCount(body.data.structure, SeatType.COMMON),
+      studentsCount: body.data.students.length,
     },
   });
 
   return NextResponse.json(results);
-}
-
-export type SeatObjectType = {
-  name: string;
-  seatCount: number;
-  structure: SeatType[];
-};
-
-function getCount(structure: SeatObjectType[][], type: SeatType) {
-  return structure.reduce((acc, curr) => {
-    return (
-      acc +
-      curr.reduce((acc, curr) => {
-        return (
-          acc +
-          curr.structure.reduce((acc, curr) => {
-            return curr === type ? (acc += 1) : acc;
-          }, 0)
-        );
-      }, 0)
-    );
-  }, 0);
 }
 
 const deleteSchema = z.object({

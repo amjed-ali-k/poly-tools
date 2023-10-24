@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileSpreadsheet, Hash, User } from "lucide-react";
+import { Ban, FileSpreadsheet, Hash, UploadCloud, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +39,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
+import Papa from "papaparse";
+import { Label } from "@/components/ui/label";
+import Dropzone from "react-dropzone";
+import axios from "axios";
+import { StudentBatchForExam } from "@prisma/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const formSchema: z.ZodType<{
   name: string;
@@ -52,14 +60,15 @@ const formSchema: z.ZodType<{
 }> = z.object({
   name: z.string().min(3, "Minimum 3 characters required"),
   students: z
-    .array({
-      //@ts-ignore
-      name: z.string().optional(),
-      primaryNumber: z.string(),
-      rollNumber: z.string().optional(),
-      regNumber: z.string().optional(),
-      admnNumber: z.string().optional(),
-    })
+    .array(
+      z.object({
+        name: z.string().optional(),
+        primaryNumber: z.string(),
+        rollNumber: z.string().optional(),
+        regNumber: z.string().optional(),
+        admnNumber: z.string().optional(),
+      })
+    )
     .min(1),
 });
 
@@ -68,8 +77,29 @@ function NewStudentBatchComponent() {
     resolver: zodResolver(formSchema),
     mode: "onBlur",
   });
+  const { toast } = useToast();
+  const router = useRouter();
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {};
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    axios
+      .put<StudentBatchForExam>(
+        "/api/secure/exam-seating/student-batches",
+        data
+      )
+      .then((res) => {
+        toast({
+          title: "Well done!",
+          description: `Class ${res.data.name} added successfully`,
+        });
+        router.push("/dashboard/tools/exam-seating/student-batches");
+      })
+      .catch((e) => {
+        toast({
+          title: "Error!",
+          description: `Something went wrong`,
+        });
+      });
+  };
 
   const [isOpen, setIsOpen] = useState(false);
   const modalType = useRef<"add-student" | "add-roll" | "add-csv">(
@@ -195,7 +225,22 @@ function NewStudentBatchComponent() {
             }}
           />
         )}
-        {modalType.current === "add-csv" && <CsvModal />}
+        {modalType.current === "add-csv" && (
+          <CsvModal
+            onAdd={(e) => {
+              form.setValue("students", [...students, ...e]);
+              setIsOpen(false);
+            }}
+          />
+        )}
+        {modalType.current === "add-roll" && (
+          <RollModal
+            onAdd={(e) => {
+              form.setValue("students", [...students, ...e]);
+              setIsOpen(false);
+            }}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -205,7 +250,7 @@ export default NewStudentBatchComponent;
 
 const studentFormSchema = z
   .object({
-    name: z.string().optional(),
+    name: z.string(),
     rollNumber: z.string().optional(),
     regNumber: z.string().optional(),
     admnNumber: z.string().optional(),
@@ -215,11 +260,9 @@ const studentFormSchema = z
     path: ["rollNumber", "regNumber", "admnNumber"],
   });
 
-function SingleModal({
-  onAdd,
-}: {
-  onAdd?: (data: z.infer<typeof formSchema>["students"][0]) => void;
-}) {
+type StudentType = z.infer<typeof formSchema>["students"][0];
+
+function SingleModal({ onAdd }: { onAdd?: (data: StudentType) => void }) {
   const form = useForm<z.infer<typeof studentFormSchema>>({
     resolver: zodResolver(studentFormSchema),
   });
@@ -238,7 +281,7 @@ function SingleModal({
         className="space-y-8 @container"
       >
         <DialogHeader>
-          <DialogTitle>Add students</DialogTitle>
+          <DialogTitle>Add student</DialogTitle>
           <DialogDescription>Enter student details here</DialogDescription>
         </DialogHeader>
         <div className="grid  @md:grid-cols-2 gap-4">
@@ -317,22 +360,194 @@ function SingleModal({
   );
 }
 
-const csvFormSchema = z.object({
-  csvFile: z.string().refine((data) => data.endsWith(".csv"), {
-    message: "Only CSV file is allowed.",
-  }),
-});
+type studentSchemaType = z.infer<typeof studentFormSchema>;
+
+const parseCsv = (
+  inputFile: File,
+  onSuccess: (e: studentSchemaType[]) => void = (e) => console.log(e),
+  onError: (e: string) => void = (e) => console.log(e)
+) => {
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    if (!event.target) return;
+    const file = event.target.result;
+    if (typeof file !== "string") return;
+    let allLines = file.split(/\r\n|\n/);
+    // Reading line by line
+    if (allLines.length < 2) {
+      onError("File is empty");
+      return;
+    }
+    Papa.parse<studentSchemaType>(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: function (results) {
+        onSuccess(results.data);
+      },
+    });
+  };
+};
 
 function CsvModal({
   onAdd,
 }: {
   onAdd?: (data: z.infer<typeof formSchema>["students"]) => void;
 }) {
-  const form = useForm<z.infer<typeof csvFormSchema>>({
-    resolver: zodResolver(csvFormSchema),
+  const [error, seterror] = useState("");
+  const verifyAndFormatFile = async (e: File) => {
+    parseCsv(
+      e,
+      (k) => {
+        onAdd?.(
+          k.map((l) => ({
+            ...l,
+            primaryNumber: l.regNumber || l.rollNumber || l.admnNumber,
+          }))
+        );
+      },
+      seterror
+    );
+  };
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>Add students from CSV</DialogTitle>
+        <DialogDescription>
+          Upload your csv file contianing student data here
+        </DialogDescription>
+      </DialogHeader>
+      <div className="grid  @md:grid-cols-2 gap-4">
+        <p className="text-sm text-gray-400">
+          You can download a sample .csv file{" "}
+          <Link
+            className="hover:underline font-bold !text-indigo-400"
+            href="/student-sample.csv"
+          >
+            from here
+          </Link>
+          . Modifying and re-uploading it is recommeneded. You can also try to
+          create your own csv file. We only look for headers{" "}
+          <strong className="text-gray-300">
+            name, rollNumber, regNumber, admnNumber
+          </strong>
+          .
+        </p>
+        <Dropzone
+          multiple={false}
+          accept={{
+            "text/csv": [".csv"],
+          }}
+          onDrop={(acceptedFiles) => {
+            verifyAndFormatFile(acceptedFiles[0]);
+          }}
+        >
+          {({ getRootProps, getInputProps, acceptedFiles, isDragReject }) => (
+            <div
+              {...getRootProps()}
+              className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-slate-900 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            >
+              {acceptedFiles.length > 0 ? (
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <FileSpreadsheet className="w-10 h-10 mb-1 text-gray-400" />
+                  <p className="mb-2 text-sm text-gray-500 font-bold dark:text-gray-400">
+                    {acceptedFiles[0].name}
+                  </p>
+                  <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span className=" ">Click to upload another file</span> or
+                    drag and drop
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  {isDragReject ? (
+                    <>
+                      <Ban className="w-10 h-10 mb-3 text-red-500 dark:text-red-400" />
+                      <p className="mb-2 text-sm text-red-500 dark:text-red-400">
+                        <span className="font-semibold">
+                          File format not supported
+                        </span>
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <UploadCloud className="w-10 h-10 mb-3 text-gray-400" />
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-semibold">Click to upload</span>{" "}
+                        or drag and drop
+                      </p>
+                    </>
+                  )}
+                  <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                    CSV files only.
+                    <br /> Results won&apos;t be accurate if you upload modified
+                    files.
+                  </p>
+                </div>
+              )}
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      </div>
+      {error !== "" && <p className="text-red-500 text-sm">{error}</p>}
+      <Button role="button" type="submit">
+        Add students
+      </Button>
+    </>
+  );
+}
+
+const rollFormSchema = z.object({
+  start: z.string().optional(),
+  end: z.string().optional(),
+  exclude: z
+    .string()
+    .optional()
+    .refine(
+      (e) => {
+        if (!e) return true;
+        return e.split(",").every((e) => !isNaN(parseInt(e)));
+      },
+      {
+        message: "Please enter a valid numbers seperated by comma",
+      }
+    ),
+  prefix: z.string().optional(),
+});
+
+function RollModal({
+  onAdd,
+}: {
+  onAdd?: (data: z.infer<typeof formSchema>["students"]) => void;
+}) {
+  const form = useForm<z.infer<typeof rollFormSchema>>({
+    resolver: zodResolver(rollFormSchema),
+    defaultValues: {
+      start: "",
+      end: "",
+      prefix: "",
+      exclude: "",
+    },
   });
 
-  const onSubmit = (data: z.infer<typeof csvFormSchema>) => {};
+  const onSubmit = (data: z.infer<typeof rollFormSchema>) => {
+    const students: StudentType[] = [];
+    if (data.start && data.end) {
+      const start = parseInt(data.start);
+      const end = parseInt(data.end);
+      const exclude = data.exclude?.split(",").map((e) => parseInt(e));
+      for (let i = start; i <= end; i++) {
+        if (exclude?.includes(i)) continue;
+        students.push({
+          name: `${data.prefix || ""}${i}`,
+          rollNumber: i.toString(),
+          primaryNumber: i.toString(),
+        });
+      }
+    }
+    onAdd?.(students);
+  };
 
   return (
     <Form {...form}>
@@ -341,29 +556,65 @@ function CsvModal({
         className="space-y-8 @container"
       >
         <DialogHeader>
-          <DialogTitle>Add students from CSV</DialogTitle>
-          <DialogDescription>
-            Upload your csv file contianing student data here
-          </DialogDescription>
+          <DialogTitle>Add student</DialogTitle>
+          <DialogDescription>Enter student details here</DialogDescription>
         </DialogHeader>
         <div className="grid  @md:grid-cols-2 gap-4">
-          <p className="text-sm text-gray-400">
-            You can download a sample .csv file from here. Modifying and
-            re-uploading it is recommeneded. You can also try to create your own
-            csv file. We only look for headers{" "}
-            <strong>name, rollNumber, regNumber, admnNumber</strong>.
-          </p>
           <FormField
             control={form.control}
-            name="csvFile"
+            name="start"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload csv file</FormLabel>
+                <FormLabel>Starting roll no</FormLabel>
                 <FormControl>
-                  <Input type="file" placeholder="Name" {...field} />
+                  <Input placeholder="1" {...field} />
+                </FormControl>
+                <FormDescription>Enter starting roll number.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="end"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ending roll no</FormLabel>
+                <FormControl>
+                  <Input placeholder="66" {...field} />
+                </FormControl>
+                <FormDescription>Enter ending roll number.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="exclude"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Roll no.s to exclude</FormLabel>
+                <FormControl>
+                  <Input placeholder="24,31,43" {...field} />
                 </FormControl>
                 <FormDescription>
-                  Choose a .csv file in given format
+                  Enter numbers seperated by comma
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="prefix"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prefix</FormLabel>
+                <FormControl>
+                  <Input placeholder="EL-" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Enter prefix to add with roll no as name
                 </FormDescription>
                 <FormMessage />
               </FormItem>
