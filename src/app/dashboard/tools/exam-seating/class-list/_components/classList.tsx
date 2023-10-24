@@ -42,6 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ExamHall } from "@prisma/client";
 
 type ClassLayoutApiType = {
   id: string;
@@ -53,7 +54,7 @@ type ClassLayoutApiType = {
   createdBy: string;
 };
 
-export const columns: ColumnDef<ClassLayoutApiType>[] = [
+export const columns: ColumnDef<ExamHall>[] = [
   {
     accessorKey: "name",
   },
@@ -139,13 +140,13 @@ export const columns: ColumnDef<ClassLayoutApiType>[] = [
 ];
 
 export function ClassListTable() {
-  const { data: apiData, isLoading } = useGet<ClassLayoutApiType>(
-    "/api/secure/sbte-result/history"
+  const { data: apiData, isLoading } = useGet<ExamHall[]>(
+    "/api/secure/exam-seating/all"
   );
 
   const data = React.useMemo(() => {
     return apiData ?? [];
-  }, [apiData]) as ClassLayoutApiType[];
+  }, [apiData]) as ExamHall[];
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
