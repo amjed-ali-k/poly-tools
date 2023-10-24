@@ -55,10 +55,10 @@ model User {
 
   courses Course[]
 
-  createdExamResults      ExamResult[]
   createdBatches          Batch[]
   ExamResultFormatHistory ExamResultFormatHistory[]
   ExamHall                ExamHall[]
+  StudentBatchForExam     StudentBatchForExam[]
 
   @@index([collegeId])
 }
@@ -99,8 +99,6 @@ model Student {
   status StudentStatus @default(ACTIVE)
 
   cgpa Int?
-
-  examResults ExamResult[]
 
   batch Batch[]
 
@@ -156,8 +154,6 @@ model Subject {
   category String
   branches Branch[]
 
-  marks Mark[]
-
   semester       Int
   totalMarks     Int?
   type           SubjectType
@@ -193,52 +189,6 @@ model ExamResultFormatHistory {
 enum ExamType {
   REGULAR
   SUPPLEMENTARY
-}
-
-model ExamResult {
-  id Int @id @default(autoincrement())
-
-  student      Student? @relation(fields: [studentRegNo], references: [registerNo])
-  studentRegNo String
-
-  month String
-  year  Int
-
-  type ExamType @default(REGULAR)
-
-  semester Int
-
-  marks Mark[]
-
-  sgpa String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User?   @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  @@index([studentRegNo])
-  @@index([createdById])
-}
-
-model Mark {
-  id Int @id @default(autoincrement())
-
-  exam   ExamResult @relation(fields: [examId], references: [id])
-  examId Int
-
-  subject     Subject @relation(fields: [subjectCode], references: [code])
-  subjectCode String
-
-  grade    String?
-  internal String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([examId])
-  @@index([subjectCode])
 }
 
 enum SubjectType {
@@ -396,6 +346,22 @@ model ExamHall {
   drawingOnlySeats Int
 
   structure Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  @@index([createdById])
+}
+
+model StudentBatchForExam {
+  id   String @id @default(uuid())
+  name String
+
+  students      Json
+  studentsCount Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
