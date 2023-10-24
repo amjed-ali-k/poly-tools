@@ -57,15 +57,37 @@ import { CalendarIcon, PlusCircledIcon, PlusIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import cn from "classnames";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { ExamHall } from "@prisma/client";
 
 function NewClassComponent() {
   const [hallName, setHallName] = useState("");
+  const [structure, setStructure] = useState([[]] as SeatObjectType[][]);
+  const { toast } = useToast();
 
+  const onSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    if (hallName === "")
+      return toast({
+        title: "Hall name is required",
+        description: "Please enter a name for the hall",
+        variant: "destructive",
+      });
+    axios
+      .put<ExamHall>("/api/secure/exam-seating", { hallName, structure })
+      .then((res) => {
+        toast({
+          title: "Well done!",
+          description: `Class ${res.data.name} added successfully`,
+        });
+      });
+  };
   return (
     <div className="flex-col space-y-3">
       <div>
         <div className="grid w-full max-w-sm items-center gap-1.5">
-          <Label htmlFor="name">Class/Hall Name</Label>
+          <Label htmlFor="name">Class/Hall Name (Required)</Label>
           <Input
             aria-invalid={hallName === ""}
             value={hallName}
@@ -78,10 +100,10 @@ function NewClassComponent() {
       </div>
       <div>
         <h3 className="mb-3">Class structure</h3>
-        <ClassLayout />
+        <ClassLayout structure={structure} setStructure={setStructure} />
       </div>
       <div>
-        <Button>Save and submit</Button>
+        <Button onClick={onSubmit}>Save and submit</Button>
       </div>
     </div>
   );
@@ -89,8 +111,13 @@ function NewClassComponent() {
 
 export default NewClassComponent;
 
-function ClassLayout() {
-  const [structure, setStructure] = useState([[]] as SeatObjectType[][]);
+function ClassLayout({
+  structure,
+  setStructure,
+}: {
+  structure: SeatObjectType[][];
+  setStructure: (structure: SeatObjectType[][]) => void;
+}) {
   const [savedDesks, setsavedDesks] = useState([] as SeatObjectType[]);
 
   const onAddNew = (seatType: SeatObjectType, row: number, col: number) => {
