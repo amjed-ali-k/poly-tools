@@ -184,13 +184,13 @@ export function NavBar() {
               </li>
               <ListItem
                 href="/dashboard/tools/exam-seating/class-list"
-                title="Add class layout"
+                title="Class layouts"
               >
                 Structure of desks and tables in each class
               </ListItem>
               <ListItem
-                href="/dashboard/result-formatter/history"
-                title="Add Student Batches"
+                href="/dashboard/tools/exam-seating/student-batches"
+                title="Student Batches"
               >
                 Student directory and their batches
               </ListItem>

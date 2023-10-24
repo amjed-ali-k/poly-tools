@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db/prisma";
-import { ExamType, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { counting, sift } from "radash";
 import { getUserId } from "@/components/auth/server";
+
+enum ExamType {
+  REGULAR,
+  SUPPLEMENTARY,
+}
 
 const allowedMonths = ["April", "November"];
 const allowedGrades = [
