@@ -5,7 +5,7 @@ export interface ExamHallSeatsCount {
   commonSeats: number;
   theoryOnlySeats: number;
   drawingOnlySeats: number;
-  name: number;
+  name: string;
 }
 
 /**
@@ -21,21 +21,27 @@ export enum ExamType {
  */
 export type StudentCount = {
   count: number; // Number of students
-  branch: string; // Branch name
+  // branch: string; // Branch name
   subjectCode: number; // Subject code
   examType: ExamType; // Exam type
+};
+
+type ReturnType = {
+  [key: string]: {
+    [key: number]: number;
+  };
 };
 
 /**
  * Allocates exam halls to students
  * @param {StudentCount[]} studentCount - Array of student count per exam
  * @param {ExamHallSeatsCount[]} examHalls - Available exam halls
- * @returns {Object} - Allocated seats per hall and subject
+ * @returns {ReturnType} - Allocated seats per hall and subject
  */
 export function assignHallsCustom(
   studentCount: StudentCount[],
   examHalls: ExamHallSeatsCount[]
-) {
+): ReturnType {
   // Deep copy input to avoid mutation
   const _studentCount = JSON.parse(
     JSON.stringify(studentCount)
@@ -89,11 +95,9 @@ export function assignHallsCustom(
 
     while (remainingSeats > 0 && remainingStudents > 0) {
       const remainingHalls = allowedHalls.filter((e) => getSeats(e) > 0);
-      console.log(remainingHalls.length);
       // find minimum seats
       const minSeats =
         remainingHalls.length > 0 ? getSeats(remainingHalls[0]) : 0;
-      console.log(minSeats);
       // find total seats
       remainingSeats = remainingHalls.reduce(
         (acc, curr) => acc + getSeats(curr),
@@ -112,7 +116,6 @@ export function assignHallsCustom(
           if (!(remainingStudents > 1)) {
             throw "No students remaining";
           }
-          console.log(remainingStudents);
           const seats2Assign =
             seatsToAssign < remainingStudents
               ? seatsToAssign
@@ -191,50 +194,50 @@ export function getSeatsByType(
   return 0;
 }
 
-// Test cases
+// // Test cases
 
-const fakeHalls = [
-  {
-    branch: "EL",
-    count: 10,
-    examType: ExamType.THEORY,
-    subjectCode: 2003,
-  },
-  {
-    branch: "CS",
-    count: 10,
-    examType: ExamType.THEORY,
-    subjectCode: 2004,
-  },
-  {
-    branch: "CS",
-    count: 20,
-    examType: ExamType.DRAWING,
-    subjectCode: 2005,
-  },
-];
+// const fakeHalls = [
+//   {
+//     branch: "EL",
+//     count: 10,
+//     examType: ExamType.THEORY,
+//     subjectCode: 2003,
+//   },
+//   {
+//     branch: "CS",
+//     count: 10,
+//     examType: ExamType.THEORY,
+//     subjectCode: 2004,
+//   },
+//   {
+//     branch: "CS",
+//     count: 20,
+//     examType: ExamType.DRAWING,
+//     subjectCode: 2005,
+//   },
+// ];
 
-const fakeStudentCount = [
-  {
-    theoryOnlySeats: 5,
-    drawingOnlySeats: 0,
-    commonSeats: 0,
-    name: 106,
-  },
-  {
-    theoryOnlySeats: 5,
-    drawingOnlySeats: 0,
-    commonSeats: 0,
-    name: 107,
-  },
-  {
-    theoryOnlySeats: 0,
-    drawingOnlySeats: 0,
-    commonSeats: 6,
-    name: 108,
-  },
-];
+// const fakeStudentCount = [
+//   {
+//     theoryOnlySeats: 5,
+//     drawingOnlySeats: 0,
+//     commonSeats: 0,
+//     name: "106",
+//   },
+//   {
+//     theoryOnlySeats: 5,
+//     drawingOnlySeats: 0,
+//     commonSeats: 0,
+//     name: "107",
+//   },
+//   {
+//     theoryOnlySeats: 0,
+//     drawingOnlySeats: 0,
+//     commonSeats: 6,
+//     name: "108",
+//   },
+// ];
 
-const res = assignHallsCustom(fakeHalls, fakeStudentCount);
+// const res = assignHallsCustom(fakeHalls, fakeStudentCount);
 
-console.log(res);
+// console.log(res);

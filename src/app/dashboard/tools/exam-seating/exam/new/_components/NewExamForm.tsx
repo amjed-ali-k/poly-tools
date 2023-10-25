@@ -1,7 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckIcon, Cross, Diamond, Users, X } from "lucide-react";
+import {
+  CheckCircle,
+  CheckCircle2,
+  CheckIcon,
+  Circle,
+  CircleDashed,
+  CircleSlash,
+  Cross,
+  Diamond,
+  PlayCircle,
+  StopCircle,
+  Users,
+  X,
+  XCircle,
+} from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -57,7 +71,13 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { sum } from "radash";
+import { sum, flat, group, sift } from "radash";
+import { assignHallsCustom } from "@/lib/examTools/customHallAsiign";
+import { allocateSeats } from "@/lib/examTools/hallSort";
+import {
+  SeatObjectType,
+  SeatType,
+} from "../../../new-class/_components/newClass";
 
 type tabsType = "batches-section" | "halls-section" | "generate-section";
 
@@ -104,12 +124,26 @@ function CreateExamFrom() {
             onSuccess={() => settab("generate-section")}
           />
         </TabsContent>
+        <TabsContent value="generate-section">
+          <GenerateSection
+            finalBatches={finalBatches}
+            finalHalls={finalHalls}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
 }
 
 export default CreateExamFrom;
+
+type IncomeStudent = {
+  name?: string | undefined;
+  rollNumber?: string | undefined;
+  regNumber?: string | undefined;
+  admnNumber?: string | undefined;
+  primaryNumber?: string | undefined;
+};
 
 function GenerateSection({
   finalHalls,
@@ -118,7 +152,106 @@ function GenerateSection({
   finalHalls: ExamHall[];
   finalBatches: BatchWithSub[];
 }) {
-  return <div></div>;
+  const seats = useMemo(() => {
+    const assignedHalls = assignHallsCustom(
+      finalBatches.map((e) => ({
+        count: e.studentsCount,
+        subjectCode: parseInt(e.subject.code),
+        examType: e.type === "THEORY" ? 0 : 1,
+      })),
+      finalHalls.map((e) => ({
+        name: e.id,
+        commonSeats: e.commonSeats,
+        theoryOnlySeats: e.theoryOnlySeats,
+        drawingOnlySeats: e.drawingOnlySeats,
+      }))
+    );
+
+    const remainingStudents = group(
+      flat(
+        finalBatches.map((e) => {
+          const st = e.students as IncomeStudent[];
+          const students = st.map((k) => ({
+            regNo: (k.name || k.primaryNumber)!,
+            subjectCode: parseInt(e.subject.code),
+            examType: e.type === "THEORY" ? 0 : 1,
+          }));
+          return students;
+        })
+      ),
+      (e) => e.subjectCode
+    );
+
+    const indexes: { [key: string]: number } = {};
+
+    const seats = sift(
+      Object.keys(assignedHalls).map((e) => {
+        const hall = assignedHalls[e];
+        const ogHall = finalHalls.find((k) => k.id === e);
+        const subjectCodes = Object.keys(assignedHalls[e]);
+
+        const students: {
+          regNo: string;
+          subjectCode: number;
+          examType: number;
+        }[] = [];
+
+        subjectCodes.map((subCode) => {
+          if (indexes[subCode] === undefined) indexes[subCode] = 0;
+          const count = hall[parseInt(subCode)];
+          console.log(
+            `${count} students assigned from ${subCode} in Hall ${ogHall?.name}`
+          );
+          const toAdd = remainingStudents[parseInt(subCode)]?.slice(
+            indexes[subCode],
+            indexes[subCode] - 1 + count
+          );
+          indexes[subCode] += count;
+          if (!toAdd) return;
+          students.push(...toAdd);
+          indexes[subCode] ? (indexes[subCode] += count) : 0;
+        });
+        if (!ogHall?.structure) return;
+
+        const seatType = (ogHall.structure as SeatObjectType[][]).map((e) =>
+          flat(e.map((k) => k.structure))
+        );
+
+        // console.log("Structure", ogHall.structure);
+        return {
+          hall: ogHall.id,
+          hallName: ogHall.name,
+          hallStructure: ogHall.structure,
+          seats: allocateSeats(students, seatType as any),
+        };
+      })
+    );
+    console.log(seats);
+    return seats;
+  }, [finalBatches, finalHalls]);
+
+  return (
+    <Card className="w-full">
+      <CardContent className="p-4">
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center">
+            <CheckCircle2 className="mr-2 text-green-500" /> Validating inputs
+          </div>
+          <div className="flex items-center">
+            <CheckCircle2 className="mr-2 text-green-500" /> Processing data
+          </div>
+          <div className="flex items-center">
+            <CheckCircle2 className="mr-2 text-green-500" /> Alloting halls for
+            students
+          </div>
+          <div className="flex items-center">
+            <PlayCircle className="mr-2 animate-spin" /> Assigning students in
+            each halls
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 const schema = z.object({

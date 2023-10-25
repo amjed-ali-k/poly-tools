@@ -1,14 +1,14 @@
 import { ExamType } from "./customHallAsiign";
 
 enum SeatType {
-  NOT_USABLE,
   THEORY_ONLY,
   DRAWING_ONLY,
   THEORY_AND_DRAWING, // Add THEORY_AND_DRAWING seat type
+  NOT_USABLE,
 }
 
 interface Student {
-  regNo: number;
+  regNo: string;
   subjectCode: number;
   examType: ExamType; // Add examType to student
 }
@@ -26,7 +26,7 @@ type ExamHallStucture = SeatType[][]; // Use SeatType enum in ExamHallStucture
  * @param {SeatType[][]} examHall - A 2D array representing the exam hall with seat types.
  * @returns {AllocatedSeat[]} An array of seating assignments for students including row and seat numbers.
  */
-function allocateSeats(
+export function allocateSeats(
   students: Student[],
   examHall: ExamHallStucture
 ): AllocatedSeat[] {
@@ -119,8 +119,7 @@ function allocateSeats(
         examHall[chosenSeat.row][chosenSeat.seat] = SeatType.NOT_USABLE;
         availableSeats[student.subjectCode].push(chosenSeat);
       } else {
-        console.log("No usable seat available for student:");
-        console.log(student);
+        console.log(`No usable seat available for student: ${student.regNo}`);
       }
     }
   }
@@ -128,117 +127,117 @@ function allocateSeats(
   return seating;
 }
 
-const examHall: ExamHallStucture = [
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-    SeatType.THEORY_AND_DRAWING,
-  ],
-  [
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.THEORY_AND_DRAWING,
-    SeatType.NOT_USABLE,
-  ],
-];
+// const examHall: ExamHallStucture = [
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//     SeatType.THEORY_AND_DRAWING,
+//   ],
+//   [
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.THEORY_AND_DRAWING,
+//     SeatType.NOT_USABLE,
+//   ],
+// ];
 
-const students: Student[] = [
-  { subjectCode: 2002, regNo: 1, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 2, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 3, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 4, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 5, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 6, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 7, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 8, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 9, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 10, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 11, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 12, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 13, examType: ExamType.THEORY },
-  { subjectCode: 2005, regNo: 14, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 15, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 16, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 17, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 18, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 19, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 20, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 21, examType: ExamType.THEORY },
-  { subjectCode: 2001, regNo: 22, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 23, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 24, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 25, examType: ExamType.THEORY },
-  { subjectCode: 2002, regNo: 26, examType: ExamType.THEORY },
-];
+// const students: Student[] = [
+//   { subjectCode: 2002, regNo: "1", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "2", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "3", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "4", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "5", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "6", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "7", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "8", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "9", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "10", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "11", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "12", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "13", examType: ExamType.THEORY },
+//   { subjectCode: 2005, regNo: "14", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "15", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "16", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "17", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "18", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "19", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "20", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "21", examType: ExamType.THEORY },
+//   { subjectCode: 2001, regNo: "22", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "23", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "24", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "25", examType: ExamType.THEORY },
+//   { subjectCode: 2002, regNo: "26", examType: ExamType.THEORY },
+// ];
 
-const seating = allocateSeats(students, examHall);
+// const seating = allocateSeats(students, examHall);
 
-// Display seating as a table with rows and seats
-const seatingTable = seating.reduce(
-  (acc, student) => {
-    acc[student.row][student.seat] = `${student.subjectCode}-${student.regNo}`;
-    return acc;
-  },
-  examHall.map((row) => row.map(() => ""))
-);
+// // Display seating as a table with rows and seats
+// const seatingTable = seating.reduce(
+//   (acc, student) => {
+//     acc[student.row][student.seat] = `${student.subjectCode}-${student.regNo}`;
+//     return acc;
+//   },
+//   examHall.map((row) => row.map(() => ""))
+// );
 
-console.log(seatingTable);
+// console.log(seatingTable);
