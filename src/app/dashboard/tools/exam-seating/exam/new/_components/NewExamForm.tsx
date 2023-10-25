@@ -195,21 +195,22 @@ function GenerateSection({
           subjectCode: number;
           examType: number;
         }[] = [];
-
+        // console.log(remainingStudents);
         subjectCodes.map((subCode) => {
           if (indexes[subCode] === undefined) indexes[subCode] = 0;
           const count = hall[parseInt(subCode)];
-          console.log(
-            `${count} students assigned from ${subCode} in Hall ${ogHall?.name}`
-          );
+          //   console.log(
+          //     `${count} students assigned from ${subCode} in Hall ${ogHall?.name}, Index start from ${indexes[subCode]}`
+          //   );
           const toAdd = remainingStudents[parseInt(subCode)]?.slice(
             indexes[subCode],
-            indexes[subCode] - 1 + count
+            indexes[subCode] + count
           );
+          //   console.log(indexes);
           indexes[subCode] += count;
+          console.log(indexes);
           if (!toAdd) return;
           students.push(...toAdd);
-          indexes[subCode] ? (indexes[subCode] += count) : 0;
         });
         if (!ogHall?.structure) return;
 
@@ -226,7 +227,7 @@ function GenerateSection({
         };
       })
     );
-    console.log(seats);
+    // console.log(seats);
     return seats;
   }, [finalBatches, finalHalls]);
 
