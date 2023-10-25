@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckIcon, Diamond, Users } from "lucide-react";
-import React, { useState } from "react";
+import { CheckIcon, Cross, Diamond, Users, X } from "lucide-react";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
@@ -57,15 +57,33 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { sum } from "radash";
+
+type tabsType = "batches-section" | "halls-section" | "generate-section";
 
 function CreateExamFrom() {
   const [finalHalls, setfinalHalls] = useState<ExamHall[]>([]);
   const [finalBatches, setfinalBatches] = useState<BatchWithSub[]>([]);
 
+  const counts = useMemo(
+    () => ({
+      drawing: sum(
+        finalBatches.filter((e) => e.type === "DRAWING"),
+        (e) => e.studentsCount
+      ),
+      theory: sum(
+        finalBatches.filter((e) => e.type === "THEORY"),
+        (e) => e.studentsCount
+      ),
+    }),
+    [finalBatches]
+  );
+
+  const [tab, settab] = useState<tabsType>("batches-section");
   return (
     <div>
       <div className="max-w-sm"></div>
-      <Tabs defaultValue="batches-section" className="w-full">
+      <Tabs value={tab} defaultValue="batches-section" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="batches-section">1. Batches</TabsTrigger>
           <TabsTrigger value="halls-section">2. Halls</TabsTrigger>
@@ -75,12 +93,15 @@ function CreateExamFrom() {
           <AddBatchesSection
             finalBatches={finalBatches}
             setfinalBatches={setfinalBatches}
+            onSuccess={() => settab("halls-section")}
           />
         </TabsContent>
         <TabsContent className="py-4" value="halls-section">
           <AddHallsSection
+            studentCount={counts}
             finalHalls={finalHalls}
             setfinalHalls={setfinalHalls}
+            onSuccess={() => settab("generate-section")}
           />
         </TabsContent>
       </Tabs>
@@ -90,6 +111,16 @@ function CreateExamFrom() {
 
 export default CreateExamFrom;
 
+function GenerateSection({
+  finalHalls,
+  finalBatches,
+}: {
+  finalHalls: ExamHall[];
+  finalBatches: BatchWithSub[];
+}) {
+  return <div></div>;
+}
+
 const schema = z.object({
   hallId: z.string().uuid(),
   searchInput: z.string().optional(),
@@ -98,9 +129,16 @@ const schema = z.object({
 function AddHallsSection({
   finalHalls,
   setfinalHalls,
+  onSuccess,
+  studentCount,
 }: {
   finalHalls: ExamHall[];
   setfinalHalls: (e: ExamHall[]) => void;
+  onSuccess: () => void;
+  studentCount: {
+    drawing: number;
+    theory: number;
+  };
 }) {
   const { data: hallList, isLoading } = usePermenantGet<ExamHall[]>(
     "/api/secure/exam-seating/all"
@@ -130,93 +168,139 @@ function AddHallsSection({
 
   const [open, setOpen] = React.useState(false);
 
+  const diff = useMemo(() => {
+    const { theoryOnlySeats, drawingOnlySeats, commonSeats } =
+      finalHalls.reduce(
+        (acc, curr) => {
+          acc.theoryOnlySeats += curr.theoryOnlySeats;
+          acc.drawingOnlySeats += curr.drawingOnlySeats;
+          acc.commonSeats += curr.commonSeats;
+          return acc;
+        },
+        { theoryOnlySeats: 0, drawingOnlySeats: 0, commonSeats: 0 }
+      );
+    const theorydiff = Math.abs(
+      theoryOnlySeats - studentCount.theory < 0
+        ? theoryOnlySeats - studentCount.theory
+        : 0
+    );
+    const drawingdiff = Math.abs(
+      drawingOnlySeats - studentCount.drawing < 0
+        ? drawingOnlySeats - studentCount.drawing
+        : 0
+    );
+    const diff = Math.abs(
+      commonSeats - (theorydiff + drawingdiff) < 0
+        ? commonSeats - (theorydiff + drawingdiff)
+        : 0
+    );
+    return diff;
+  }, [finalHalls, studentCount.drawing, studentCount.theory]);
+  const assigned = studentCount.drawing + studentCount.theory - diff;
   return (
     <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="w-full lg:w-2/5">
+          <Card className="w-full">
             <CardContent className="grid gap-4 pt-4">
-              <FormField
-                control={form.control}
-                name="hallId"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="my-1">Exam Hall</FormLabel>
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={open}
-                            className={cn(
-                              "min-w-[340px] justify-between truncate whitespace-nowrap flex-nowrap overflow-hidden",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? hallList?.find((hl) => hl.id === field.value)
-                                  ?.name
-                              : "Select Hall"}
-                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-0" align="start">
-                        <Command>
-                          <CommandInput
-                            placeholder="Search halls..."
-                            className="h-9"
-                          />
-                          <CommandList>
-                            {isLoading && (
-                              <CommandLoading>
-                                <div className="py-2 px-4">Hang on…</div>
-                              </CommandLoading>
-                            )}
+              <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 pt-4">
+                <FormField
+                  control={form.control}
+                  name="hallId"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="my-1">Exam Hall</FormLabel>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={open}
+                              className={cn(
+                                "min-w-[340px] justify-between truncate whitespace-nowrap flex-nowrap overflow-hidden",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? hallList?.find((hl) => hl.id === field.value)
+                                    ?.name
+                                : "Select Hall"}
+                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0" align="start">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search halls..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              {isLoading && (
+                                <CommandLoading>
+                                  <div className="py-2 px-4">Hang on…</div>
+                                </CommandLoading>
+                              )}
 
-                            <CommandEmpty>No hall found.</CommandEmpty>
-                            <CommandGroup>
-                              {hallList?.map((hall) => (
-                                <CommandItem
-                                  value={hall.id}
-                                  key={hall.id}
-                                  onSelect={() => {
-                                    form.setValue("hallId", hall.id);
-                                    setOpen(false);
-                                  }}
-                                >
-                                  {hall.name}
-                                  <CheckIcon
-                                    className={cn(
-                                      "ml-auto h-4 w-4",
-                                      hall.id === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormDescription>
-                      Select a class/hall to use in current exam. You can create
-                      new hall{" "}
-                      <Link
-                        href="/dashboard/tools/exam-seating/new-class"
-                        className="font-bold text-violet-500 inline-block hover:text-fuchsia-400 cursor-pointer"
-                      >
-                        from here.
-                      </Link>
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                              <CommandEmpty>No hall found.</CommandEmpty>
+                              <CommandGroup>
+                                {hallList?.map((hall) => (
+                                  <CommandItem
+                                    value={hall.id}
+                                    key={hall.id}
+                                    onSelect={() => {
+                                      form.setValue("hallId", hall.id);
+                                      setOpen(false);
+                                    }}
+                                  >
+                                    {hall.name}
+                                    <CheckIcon
+                                      className={cn(
+                                        "ml-auto h-4 w-4",
+                                        hall.id === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        Select a class/hall to use in current exam. You can
+                        create new hall{" "}
+                        <Link
+                          href="/dashboard/tools/exam-seating/new-class"
+                          className="font-bold text-violet-500 inline-block hover:text-fuchsia-400 cursor-pointer"
+                        >
+                          from here.
+                        </Link>
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {finalHalls.length > 0 && (
+                  <div className="py-4 pl-8">
+                    {
+                      <div className="flex text-green-500 mb-2">
+                        <CheckIcon className="mr-2" />
+                        {assigned} Students can be assigned
+                      </div>
+                    }
+                    {diff > 0 && (
+                      <div className="flex text-red-500">
+                        <X className="mr-2" /> {diff} Students dont have seats
+                      </div>
+                    )}
+                  </div>
                 )}
-              />
-              <Button type="submit" variant="secondary">
+              </div>
+              <Button type="submit" className="mt-4 w-64" variant="secondary">
                 Add hall
               </Button>
             </CardContent>
@@ -270,7 +354,7 @@ function AddHallsSection({
         </Table>
       </div>
       <section className="my-2">
-        <Button disabled={finalHalls.length === 0}>
+        <Button disabled={finalHalls.length === 0} onClick={onSuccess}>
           Generate seating arrangements
         </Button>
       </section>
@@ -301,9 +385,11 @@ type BatchWithSub = StudentBatchForExam & BatchIdWithSubjectType;
 function AddBatchesSection({
   finalBatches,
   setfinalBatches,
+  onSuccess,
 }: {
   finalBatches: BatchWithSub[];
   setfinalBatches: (e: BatchWithSub[]) => void;
+  onSuccess: () => void;
 }) {
   const { data: batchList, isLoading } = usePermenantGet<StudentBatchForExam[]>(
     "/api/secure/exam-seating/student-batches/all"
@@ -594,7 +680,9 @@ function AddBatchesSection({
         </Table>
       </div>
       <section className="my-2">
-        <Button disabled={finalBatches.length === 0}>Submit</Button>
+        <Button disabled={finalBatches.length === 0} onClick={onSuccess}>
+          Submit
+        </Button>
       </section>
     </div>
   );
