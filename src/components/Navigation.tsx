@@ -195,7 +195,7 @@ export function NavBar() {
                 Student directory and their batches
               </ListItem>
               <ListItem
-                href="/dashboard/result-formatter/progress"
+                href="/dashboard/tools/exam-seating/exam"
                 title="Add Exams"
               >
                 Create seating arrangements for each exams

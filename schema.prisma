@@ -55,10 +55,11 @@ model User {
 
   courses Course[]
 
-  createdBatches          Batch[]
-  ExamResultFormatHistory ExamResultFormatHistory[]
-  ExamHall                ExamHall[]
-  StudentBatchForExam     StudentBatchForExam[]
+  createdBatches             Batch[]
+  ExamResultFormatHistory    ExamResultFormatHistory[]
+  ExamHall                   ExamHall[]
+  StudentBatchForExam        StudentBatchForExam[]
+  ExamsForSeatingArrangement ExamsForSeatingArrangement[]
 
   @@index([collegeId])
 }
@@ -353,6 +354,8 @@ model ExamHall {
   createdBy   User   @relation(fields: [createdById], references: [id])
   createdById String
 
+  exams ExamsForSeatingArrangement[]
+
   @@index([createdById])
 }
 
@@ -362,6 +365,25 @@ model StudentBatchForExam {
 
   students      Json
   studentsCount Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  exams ExamsForSeatingArrangement[]
+
+  @@index([createdById])
+}
+
+model ExamsForSeatingArrangement {
+  id   String @id @default(uuid())
+  name String
+  date String
+
+  examHalls ExamHall[]
+  batches   StudentBatchForExam[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
