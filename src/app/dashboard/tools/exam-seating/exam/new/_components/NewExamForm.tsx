@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Diamond, Users } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -56,17 +56,55 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+function CreateExamFrom() {
+  const [finalHalls, setfinalHalls] = useState<ExamHall[]>([]);
+  const [finalBatches, setfinalBatches] = useState<BatchWithSub[]>([]);
+
+  return (
+    <div>
+      <div className="max-w-sm"></div>
+      <Tabs defaultValue="batches-section" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="batches-section">1. Batches</TabsTrigger>
+          <TabsTrigger value="halls-section">2. Halls</TabsTrigger>
+          <TabsTrigger value="generate-section">3. Generate</TabsTrigger>
+        </TabsList>
+        <TabsContent className="py-4" value="batches-section">
+          <AddBatchesSection
+            finalBatches={finalBatches}
+            setfinalBatches={setfinalBatches}
+          />
+        </TabsContent>
+        <TabsContent className="py-4" value="halls-section">
+          <AddHallsSection
+            finalHalls={finalHalls}
+            setfinalHalls={setfinalHalls}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+export default CreateExamFrom;
 
 const schema = z.object({
   hallId: z.string().uuid(),
   searchInput: z.string().optional(),
 });
 
-function AddHallsSection() {
+function AddHallsSection({
+  finalHalls,
+  setfinalHalls,
+}: {
+  finalHalls: ExamHall[];
+  setfinalHalls: (e: ExamHall[]) => void;
+}) {
   const { data: hallList, isLoading } = usePermenantGet<ExamHall[]>(
     "/api/secure/exam-seating/all"
   );
-  const [finalHalls, setfinalHalls] = useState<ExamHall[]>([]);
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -201,8 +239,11 @@ function AddHallsSection() {
           <TableBody>
             {finalHalls.length < 1 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6">
-                  No halls added
+                <TableCell colSpan={5}>
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <Diamond className="block mb-2" />
+                    No halls added
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -257,7 +298,13 @@ type BatchIdWithSubjectType = z.infer<typeof batchSchema>;
 
 type BatchWithSub = StudentBatchForExam & BatchIdWithSubjectType;
 
-function AddBatchesSection() {
+function AddBatchesSection({
+  finalBatches,
+  setfinalBatches,
+}: {
+  finalBatches: BatchWithSub[];
+  setfinalBatches: (e: BatchWithSub[]) => void;
+}) {
   const { data: batchList, isLoading } = usePermenantGet<StudentBatchForExam[]>(
     "/api/secure/exam-seating/student-batches/all"
   );
@@ -265,8 +312,6 @@ function AddBatchesSection() {
   const { data: subjects, isLoading: isSubsLoading } = usePermenantGet<
     Subject[]
   >("/api/secure/subjects/all");
-
-  const [finalBatches, setfinalBatches] = useState<BatchWithSub[]>([]);
 
   const form = useForm<BatchIdWithSubjectType>({
     resolver: zodResolver(batchSchema),
@@ -423,7 +468,7 @@ function AddBatchesSection() {
                               <CommandGroup>
                                 {subjects?.map((sub) => (
                                   <CommandItem
-                                    value={sub.code}
+                                    value={sub.name}
                                     key={sub.code}
                                     onSelect={() => {
                                       form.setValue("subject", sub);
@@ -516,8 +561,11 @@ function AddBatchesSection() {
           <TableBody>
             {finalBatches.length < 1 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6">
-                  No batches added
+                <TableCell colSpan={5}>
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <Users className="block mb-2" />
+                    No batches added
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -551,4 +599,3 @@ function AddBatchesSection() {
     </div>
   );
 }
-export default AddBatchesSection;
