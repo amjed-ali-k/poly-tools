@@ -6,12 +6,37 @@ import {
   Document,
   StyleSheet,
   PDFViewer,
+  Link,
+  usePDF,
 } from "@react-pdf/renderer";
 import { ArrangedResult } from "./NewExamForm";
-import React, { useEffect, useMemo, useState } from "react";
-import { boil, max } from "radash";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
+import { max } from "radash";
 import { SeatType } from "../../../new-class/_components/newClass";
 import { AllocatedSeat } from "@/lib/examTools/hallSort";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 const commonStyle = StyleSheet.create({
   page: {
@@ -33,6 +58,15 @@ const commonStyle = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#000",
     justifyContent: "space-between",
+  },
+  headingContainer: {
+    fontWeight: "bold",
+    fontSize: 13,
+    textAlign: "center",
+    marginBottom: 4,
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
   titleContainer: {
     fontWeight: "extrabold",
@@ -67,7 +101,7 @@ const commonStyle = StyleSheet.create({
     letterSpacing: 2,
   },
   frontSideTextContainer: {
-    width: 600,
+    width: "100%",
     borderTopWidth: 1,
     paddingTop: 3,
     textAlign: "center",
@@ -126,25 +160,147 @@ Font.register({
   ],
 });
 
-export function ExamHallPDF({ seats }: { seats: ArrangedResult[] }) {
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
+const seatingSchema = z.object({
+  alignment: z.string(),
+  title: z.string().min(0).optional(),
+  nameSelect: z.string(),
+});
 
-  const ref = React.useRef<HTMLDivElement>(null);
+export function GenerateSeatArrangements({
+  seats,
+}: {
+  seats: ArrangedResult[];
+}) {
+  const [options, setOptions] = useState<z.infer<typeof seatingSchema>>();
 
-  useEffect(() => {
-    function handleResize() {
-      ref.current?.offsetWidth && setWidth(ref.current.offsetWidth);
-      ref.current?.offsetHeight && setHeight(ref.current.offsetHeight);
-    }
+  const form = useForm<z.infer<typeof seatingSchema>>({
+    resolver: zodResolver(seatingSchema),
+    defaultValues: {
+      alignment: "portrait",
+      nameSelect: "regNo",
+      title: "",
+    },
+  });
 
-    window.addEventListener("resize", handleResize);
+  function onSubmit(data: z.infer<typeof seatingSchema>) {
+    setOptions(data);
+  }
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const opts = useMemo(() => options, [options]);
 
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Card className="w-full">
+          <CardContent className="p-4">
+            <div>
+              <h5 className="text-lg font-bold">Seating arrangement</h5>
+              <p className="text-sm text-gray-400 mb-2">
+                Seating arrangement sheets are made to paste in front of exam
+                halls. So that students can sit on respective positions
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <FormField
+                control={form.control}
+                name="alignment"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Page alignment</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem defaultChecked value="portrait" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Portrait
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="landscape" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Landscape
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Series Exam - 2024 Jan" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This will be the title of all pages.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nameSelect"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Student Name</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue="regNo">
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a field to display in student name" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="regNo">Normal</SelectItem>
+                        <SelectItem value="regNumber">Reg Number</SelectItem>
+                        <SelectItem value="admnNumber">Admn Number</SelectItem>
+                        <SelectItem value="rollNumber">Roll Number</SelectItem>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="primaryNumber">Primary</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose which value should be printed in student name
+                      session
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className=" w-64" variant="default">
+                Update
+              </Button>
+            </div>
+            <div className="w-full">
+              {seats && <ExamHallPDF options={opts} seats={seats as any} />}
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
+  );
+}
+
+export function ExamHallPDF({
+  seats,
+  options,
+}: {
+  seats: ArrangedResult[];
+  options?: z.infer<typeof seatingSchema>;
+}) {
   const maxSeat = useMemo(() => {
     return (
       (max(
@@ -153,17 +309,28 @@ export function ExamHallPDF({ seats }: { seats: ArrangedResult[] }) {
       ) || 0) + 1
     );
   }, [seats]);
+  const maxWidth = options?.alignment === "landscape" ? 842 : 595;
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  useEffect(() => {
+    forceUpdate();
+  }, [options]);
 
   return (
-    <PDFViewer className="w-full h-[700px]">
+    <PDFViewer style={{ height: "700px", width: "100%" }}>
       <Document>
         {seats.map((hall) => (
           <Page
-            ref={ref as any}
             key={hall.hall}
             size="A4"
+            orientation={(options?.alignment as any) || "portrait"}
             style={commonStyle.page}
           >
+            {options?.title && options.title.length > 0 && (
+              <View style={commonStyle.headingContainer}>
+                <Text>{options?.title}</Text>
+              </View>
+            )}
             <View style={commonStyle.titleContainer}>
               <Text>{hall.hallName}</Text>
             </View>
@@ -199,13 +366,21 @@ export function ExamHallPDF({ seats }: { seats: ArrangedResult[] }) {
                             <View
                               style={{
                                 ...commonStyle.seat,
-                                width: 550 / maxSeat,
+                                width: maxWidth / maxSeat,
                               }}
                               key={di}
                             >
-                              <Text style={commonStyle.seatText}>
-                                {getSeatData(ri, col, hall.seats)}
-                              </Text>
+                              <Text
+                                style={commonStyle.seatText}
+                                render={() => {
+                                  return getSeatData(
+                                    ri,
+                                    col,
+                                    hall.seats,
+                                    options?.nameSelect
+                                  );
+                                }}
+                              />
                             </View>
                           );
                         })}
@@ -225,7 +400,23 @@ export function ExamHallPDF({ seats }: { seats: ArrangedResult[] }) {
   );
 }
 
-function getSeatData(row: number, col: number, allocated: AllocatedSeat[]) {
+function getSeatData(
+  row: number,
+  col: number,
+  allocated: AllocatedSeat[],
+  type?: string
+) {
   const seat = allocated.find((e) => e.row === row && e.seat === col);
+  if (type && seat && seat[type as keyof typeof seat]) {
+    return seat[type as keyof typeof seat];
+  }
   return seat?.regNo || " ";
+}
+
+export function GeneratePDF({ seats }: { seats: ArrangedResult[] }) {
+  return (
+    <Document>
+      <Page></Page>
+    </Document>
+  );
 }

@@ -11,6 +11,11 @@ interface Student {
   regNo: string;
   subjectCode: number;
   examType: ExamType; // Add examType to student
+  name?: string | undefined;
+  rollNumber?: string | undefined;
+  regNumber?: string | undefined;
+  admnNumber?: string | undefined;
+  primaryNumber?: string | undefined;
 }
 
 export type AllocatedSeat = Student & {

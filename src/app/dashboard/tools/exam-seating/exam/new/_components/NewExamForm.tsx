@@ -2,19 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CheckCircle,
   CheckCircle2,
   CheckIcon,
-  Circle,
-  CircleDashed,
-  CircleSlash,
-  Cross,
   Diamond,
   PlayCircle,
-  StopCircle,
   Users,
   X,
-  XCircle,
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -74,11 +67,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { sum, flat, group, sift } from "radash";
 import { assignHallsCustom } from "@/lib/examTools/customHallAsiign";
 import { AllocatedSeat, allocateSeats } from "@/lib/examTools/hallSort";
-import {
-  SeatObjectType,
-  SeatType,
-} from "../../../new-class/_components/newClass";
-import { ExamHallPDF } from "./PDFgen";
+import { SeatObjectType } from "../../../new-class/_components/newClass";
+import { ExamHallPDF, GenerateSeatArrangements } from "./PDFgen";
 
 type tabsType = "batches-section" | "halls-section" | "generate-section";
 
@@ -183,6 +173,7 @@ function GenerateSection({
             regNo: (k.name || k.primaryNumber)!,
             subjectCode: parseInt(e.subject.code),
             examType: e.type === "THEORY" ? 0 : 1,
+            ...k,
           }));
           return students;
         })
@@ -197,11 +188,11 @@ function GenerateSection({
         const ogHall = finalHalls.find((k) => k.id === e);
         const subjectCodes = Object.keys(assignedHalls[e]);
 
-        const students: {
+        const students: ({
           regNo: string;
           subjectCode: number;
           examType: number;
-        }[] = [];
+        } & IncomeStudent)[] = [];
         // console.log(remainingStudents);
         subjectCodes.map((subCode) => {
           if (indexes[subCode] === undefined) indexes[subCode] = 0;
@@ -239,29 +230,9 @@ function GenerateSection({
   }, [finalBatches, finalHalls]);
 
   return (
-    <Card className="w-full">
-      <CardContent className="p-4">
-        <div className="flex flex-col space-y-2">
-          <div className="flex items-center">
-            <CheckCircle2 className="mr-2 text-green-500" /> Validating inputs
-          </div>
-          <div className="flex items-center">
-            <CheckCircle2 className="mr-2 text-green-500" /> Processing data
-          </div>
-          <div className="flex items-center">
-            <CheckCircle2 className="mr-2 text-green-500" /> Alloting halls for
-            students
-          </div>
-          <div className="flex items-center">
-            <PlayCircle className="mr-2 animate-spin" /> Assigning students in
-            each halls
-          </div>
-        </div>
-      </CardContent>
-      <div className="w-full">
-        {seats && <ExamHallPDF seats={seats as any} />}
-      </div>
-    </Card>
+    <div>
+      <GenerateSeatArrangements seats={seats as any} />
+    </div>
   );
 }
 
