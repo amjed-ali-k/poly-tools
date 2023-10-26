@@ -13,7 +13,7 @@ interface Student {
   examType: ExamType; // Add examType to student
 }
 
-type AllocatedSeat = Student & {
+export type AllocatedSeat = Student & {
   row: number;
   seat: number;
 };

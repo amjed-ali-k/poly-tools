@@ -73,11 +73,12 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { sum, flat, group, sift } from "radash";
 import { assignHallsCustom } from "@/lib/examTools/customHallAsiign";
-import { allocateSeats } from "@/lib/examTools/hallSort";
+import { AllocatedSeat, allocateSeats } from "@/lib/examTools/hallSort";
 import {
   SeatObjectType,
   SeatType,
 } from "../../../new-class/_components/newClass";
+import { ExamHallPDF } from "./PDFgen";
 
 type tabsType = "batches-section" | "halls-section" | "generate-section";
 
@@ -145,6 +146,13 @@ type IncomeStudent = {
   primaryNumber?: string | undefined;
 };
 
+export type ArrangedResult = {
+  hall: string;
+  hallName: string;
+  hallStructure: SeatObjectType[][];
+  seats: AllocatedSeat[];
+};
+
 function GenerateSection({
   finalHalls,
   finalBatches,
@@ -183,7 +191,6 @@ function GenerateSection({
     );
 
     const indexes: { [key: string]: number } = {};
-
     const seats = sift(
       Object.keys(assignedHalls).map((e) => {
         const hall = assignedHalls[e];
@@ -251,6 +258,9 @@ function GenerateSection({
           </div>
         </div>
       </CardContent>
+      <div className="w-full">
+        {seats && <ExamHallPDF seats={seats as any} />}
+      </div>
     </Card>
   );
 }
