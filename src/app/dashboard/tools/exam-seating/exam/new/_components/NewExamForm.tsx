@@ -230,7 +230,7 @@ function GenerateSection({
   }, [finalBatches, finalHalls]);
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <GenerateSeatArrangements seats={seats as any} />
     </div>
   );

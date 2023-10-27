@@ -171,7 +171,13 @@ export function GenerateSeatArrangements({
 }: {
   seats: ArrangedResult[];
 }) {
-  const [options, setOptions] = useState<z.infer<typeof seatingSchema>>();
+  const [examPdf, setExamPdf] = useState<JSX.Element>(() => (
+    <ExamHallPDF seats={seats as any} />
+  ));
+
+  const [instance, updateInstance] = usePDF({
+    document: <ExamHallPDF seats={seats} />,
+  });
 
   const form = useForm<z.infer<typeof seatingSchema>>({
     resolver: zodResolver(seatingSchema),
@@ -183,10 +189,8 @@ export function GenerateSeatArrangements({
   });
 
   function onSubmit(data: z.infer<typeof seatingSchema>) {
-    setOptions(data);
+    updateInstance(<ExamHallPDF seats={seats} options={data} />);
   }
-
-  const opts = useMemo(() => options, [options]);
 
   return (
     <Form {...form}>
@@ -285,7 +289,9 @@ export function GenerateSeatArrangements({
               </Button>
             </div>
             <div className="w-full">
-              {seats && <ExamHallPDF options={opts} seats={seats as any} />}
+              {seats && instance.url && (
+                <iframe height="700px" width="100%" src={instance.url}></iframe>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -310,93 +316,85 @@ export function ExamHallPDF({
     );
   }, [seats]);
   const maxWidth = options?.alignment === "landscape" ? 842 : 595;
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
-
-  useEffect(() => {
-    forceUpdate();
-  }, [options]);
 
   return (
-    <PDFViewer style={{ height: "700px", width: "100%" }}>
-      <Document>
-        {seats.map((hall) => (
-          <Page
-            key={hall.hall}
-            size="A4"
-            orientation={(options?.alignment as any) || "portrait"}
-            style={commonStyle.page}
-          >
-            {options?.title && options.title.length > 0 && (
-              <View style={commonStyle.headingContainer}>
-                <Text>{options?.title}</Text>
-              </View>
-            )}
-            <View style={commonStyle.titleContainer}>
-              <Text>{hall.hallName}</Text>
+    <Document>
+      {seats.map((hall) => (
+        <Page
+          key={hall.hall}
+          size="A4"
+          orientation={(options?.alignment as any) || "portrait"}
+          style={commonStyle.page}
+        >
+          {options?.title && options.title !== "" && (
+            <View style={commonStyle.headingContainer}>
+              <Text>{options?.title}</Text>
             </View>
-            <View style={commonStyle.subTitleContainer}>
-              <Text>Seating arrangement</Text>
-            </View>
-            <View style={commonStyle.frontSideTextContainer}>
-              <Text style={commonStyle.frontSide}>FRONT SIDE</Text>
-            </View>
-            <View style={commonStyle.deskViewContainer}>
-              {hall.hallStructure.map((row, ri) => (
-                <View style={commonStyle.row} key={ri}>
-                  {row.map((desks, i) => {
-                    const isBlank = desks.structure.every(
-                      (x) => x === SeatType.BLANK
-                    );
-                    return (
-                      <View
-                        style={{
-                          ...commonStyle.desk,
-                          borderColor: isBlank ? "#eee" : "#000",
-                          color: isBlank ? "#fff" : "#000",
-                        }}
-                        key={i}
-                      >
-                        {desks.structure.map((seat, di) => {
-                          const col =
-                            row
-                              .slice(0, i)
-                              .reduce((a, b) => a + b.seatCount, 0) + di;
+          )}
+          <View style={commonStyle.titleContainer}>
+            <Text>{hall.hallName}</Text>
+          </View>
+          <View style={commonStyle.subTitleContainer}>
+            <Text>Seating arrangement</Text>
+          </View>
+          <View style={commonStyle.frontSideTextContainer}>
+            <Text style={commonStyle.frontSide}>FRONT SIDE</Text>
+          </View>
+          <View style={commonStyle.deskViewContainer}>
+            {hall.hallStructure.map((row, ri) => (
+              <View style={commonStyle.row} key={ri}>
+                {row.map((desks, i) => {
+                  const isBlank = desks.structure.every(
+                    (x) => x === SeatType.BLANK
+                  );
+                  return (
+                    <View
+                      style={{
+                        ...commonStyle.desk,
+                        borderColor: isBlank ? "#eee" : "#000",
+                        color: isBlank ? "#fff" : "#000",
+                      }}
+                      key={i}
+                    >
+                      {desks.structure.map((seat, di) => {
+                        const col =
+                          row.slice(0, i).reduce((a, b) => a + b.seatCount, 0) +
+                          di;
 
-                          return (
-                            <View
-                              style={{
-                                ...commonStyle.seat,
-                                width: maxWidth / maxSeat,
+                        return (
+                          <View
+                            style={{
+                              ...commonStyle.seat,
+                              width: maxWidth / maxSeat,
+                            }}
+                            key={di}
+                          >
+                            <Text
+                              style={commonStyle.seatText}
+                              render={() => {
+                                return getSeatData(
+                                  ri,
+                                  col,
+                                  hall.seats,
+                                  options?.nameSelect
+                                );
                               }}
-                              key={di}
-                            >
-                              <Text
-                                style={commonStyle.seatText}
-                                render={() => {
-                                  return getSeatData(
-                                    ri,
-                                    col,
-                                    hall.seats,
-                                    options?.nameSelect
-                                  );
-                                }}
-                              />
-                            </View>
-                          );
-                        })}
-                      </View>
-                    );
-                  })}
-                </View>
-              ))}
-            </View>
-            <View style={commonStyle.signContainer}>
-              <Text>Sign and designation of Invigilator</Text>
-            </View>
-          </Page>
-        ))}
-      </Document>
-    </PDFViewer>
+                            />
+                          </View>
+                        );
+                      })}
+                    </View>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
+          <View style={commonStyle.signContainer}>
+            <Text>Sign and designation of Invigilator</Text>
+          </View>
+        </Page>
+      ))}
+    </Document>
   );
 }
 
@@ -407,16 +405,10 @@ function getSeatData(
   type?: string
 ) {
   const seat = allocated.find((e) => e.row === row && e.seat === col);
+  console.log("Option", type);
+  console.log(seat);
   if (type && seat && seat[type as keyof typeof seat]) {
     return seat[type as keyof typeof seat];
   }
   return seat?.regNo || " ";
-}
-
-export function GeneratePDF({ seats }: { seats: ArrangedResult[] }) {
-  return (
-    <Document>
-      <Page></Page>
-    </Document>
-  );
 }
