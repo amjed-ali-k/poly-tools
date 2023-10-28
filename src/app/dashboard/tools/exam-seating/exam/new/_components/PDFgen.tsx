@@ -35,6 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { usePermenantGet } from "@/lib/swr";
+import { Subject } from "@prisma/client";
 
 const commonStyle = StyleSheet.create({
   page: {
@@ -432,6 +434,10 @@ export function GenerateHallsAssignment({
     },
   });
 
+  const { data: subjects, isLoading: isSubsLoading } = usePermenantGet<
+    Subject[]
+  >("/api/secure/subjects/all");
+
   function onSubmit(data: z.infer<typeof hallschema>) {
     const hl = seats.map((hall) => {
       return {
@@ -441,7 +447,9 @@ export function GenerateHallsAssignment({
         count: hall.seats.length,
       };
     });
-    updateInstance(<HallArrangementPDF seats={hl} options={data} />);
+    updateInstance(
+      <HallArrangementPDF seats={hl} options={data} subjects={subjects} />
+    );
   }
 
   return (
@@ -611,8 +619,6 @@ const hallStyle = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 10,
     flexWrap: "wrap",
   },
   contentItem: {
@@ -621,11 +627,20 @@ const hallStyle = StyleSheet.create({
     fontWeight: "normal",
     flex: 1,
   },
+  contentSubTitle: {
+    fontSize: 10,
+    fontWeight: "semibold",
+    marginBottom: 5,
+  },
+  contentSubContainer: {
+    padding: 10,
+  },
 });
 
 function HallArrangementPDF({
   seats,
   options,
+  subjects,
 }: {
   seats: {
     id: string;
@@ -634,6 +649,7 @@ function HallArrangementPDF({
     count: number;
   }[];
   options?: z.infer<typeof seatingSchema>;
+  subjects?: Subject[];
 }) {
   return (
     <Document>
@@ -666,23 +682,32 @@ function HallArrangementPDF({
                     <View key={subCode} style={{ width: "100%" }}>
                       <View style={hallStyle.contentTitleContainer}>
                         {/* Subject Name  */}
-                        <Text style={hallStyle.contentTitle}>{subCode}</Text>
+                        <Text style={hallStyle.contentTitle}>
+                          {subCode}
+                          {" - " +
+                            subjects?.find((e) => e.code === subCode)?.name}
+                        </Text>
                       </View>
-                      <Text style={hallStyle.contentDetails}>
-                        {/* Details */}
-                        {details?.map((seat) => (
-                          <Text
-                            key={seat.name}
-                            style={hallStyle.contentItem}
-                            wrap
-                          >
-                            {seat[options?.nameSelect as keyof typeof seat] ||
-                              seat.name ||
-                              " "}
-                            ,{" "}
-                          </Text>
-                        ))}
-                      </Text>
+                      <View style={hallStyle.contentSubContainer}>
+                        <Text style={hallStyle.contentSubTitle}>
+                          Electronics
+                        </Text>
+                        <Text style={hallStyle.contentDetails}>
+                          {/* Details */}
+                          {details?.map((seat) => (
+                            <Text
+                              key={seat.name}
+                              style={hallStyle.contentItem}
+                              wrap
+                            >
+                              {seat[options?.nameSelect as keyof typeof seat] ||
+                                seat.name ||
+                                " "}
+                              ,{" "}
+                            </Text>
+                          ))}
+                        </Text>
+                      </View>
                     </View>
                   ))}
                 </View>
