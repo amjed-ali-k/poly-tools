@@ -810,10 +810,10 @@ export function GenerateAttendanceSheet({
         <Card className="w-full">
           <CardContent className="p-4">
             <div>
-              <h5 className="text-lg font-bold">Hall arrangement</h5>
+              <h5 className="text-lg font-bold">Attendance Sheet</h5>
               <p className="text-sm text-gray-400 mb-2">
-                Hall arrangement sheets are made to paste in notice board. So
-                that students can find respective halls
+                Attendance sheets are made to record attendance and sign of each
+                student.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-4 mb-4">
