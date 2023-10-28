@@ -36,6 +36,7 @@ import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExamHall } from "@prisma/client";
+import Link from "next/link";
 
 export const columns: ColumnDef<ExamHall>[] = [
   {
@@ -94,12 +95,16 @@ export const columns: ColumnDef<ExamHall>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <Link
+              href={`/dashboard/tools/exam-seating/hall/${row.original.id}`}
+            >
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem
               className="text-red-500"
               onClick={() =>
                 axios
-                  .delete("/api/secure/exam-seating", {
+                  .delete("/api/secure/exam-seating/", {
                     data: {
                       id: row.original.id,
                     },

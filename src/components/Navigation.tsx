@@ -183,7 +183,7 @@ export function NavBar() {
                 </NavigationMenuLink>
               </li>
               <ListItem
-                href="/dashboard/tools/exam-seating/class-list"
+                href="/dashboard/tools/exam-seating/hall"
                 title="Class layouts"
               >
                 Structure of desks and tables in each class

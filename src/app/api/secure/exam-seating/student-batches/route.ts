@@ -145,5 +145,16 @@ export async function GET(request: NextRequest) {
     },
   });
 
+  if (!result) {
+    return NextResponse.json({ message: "Batch not found" }, { status: 404 });
+  }
+
+  if (result?.createdById !== userId) {
+    return NextResponse.json(
+      { message: "You are not authorized to view this batch" },
+      { status: 401 }
+    );
+  }
+
   return NextResponse.json(result);
 }

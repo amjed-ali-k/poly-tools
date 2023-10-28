@@ -1,10 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuShortcut,
   ContextMenuSeparator,
   ContextMenuSub,
   ContextMenuSubContent,
@@ -17,10 +16,8 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -69,9 +66,16 @@ function EditHallForm({ id }: { id?: string }) {
 
   const { toast } = useToast();
   const router = useRouter();
-  const { data: existingData } = usePermenantGet<ExamHall>(
+
+  const { data: existingData, mutate } = usePermenantGet<ExamHall>(
     `/api/secure/exam-seating?id=${id}`
   );
+
+  useEffect(() => {
+    if (!existingData) return;
+    setHallName(existingData.name);
+    setStructure(existingData.structure as SeatObjectType[][]);
+  }, [existingData]);
 
   const onSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -82,12 +86,17 @@ function EditHallForm({ id }: { id?: string }) {
         variant: "destructive",
       });
     axios
-      .post<ExamHall>("/api/secure/exam-seating", { name: hallName, structure })
+      .put<ExamHall>("/api/secure/exam-seating/hall", {
+        name: hallName,
+        structure,
+        id,
+      })
       .then((res) => {
         toast({
           title: "Well done!",
           description: `Class ${res.data.name} added successfully`,
         });
+        mutate();
         router.push("/dashboard/tools/exam-seating/");
       });
   };
