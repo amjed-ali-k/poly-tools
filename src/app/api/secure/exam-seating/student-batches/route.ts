@@ -18,7 +18,7 @@ const schema = z.object({
     .min(1),
 });
 
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const userId = await getUserId(request);
   if (!userId)
     return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
@@ -37,6 +37,50 @@ export async function PUT(request: NextRequest) {
       name: body.data.name,
       students: body.data.students,
       createdById: userId,
+      studentsCount: body.data.students.length,
+    },
+  });
+
+  return NextResponse.json(results);
+}
+
+const updateSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(3, "Minimum 3 characters required"),
+  students: z
+    .array(
+      z.object({
+        name: z.string().optional(),
+        primaryNumber: z.string(),
+        rollNumber: z.string().optional(),
+        regNumber: z.string().optional(),
+        admnNumber: z.string().optional(),
+      })
+    )
+    .min(1),
+});
+
+export async function PUT(request: NextRequest) {
+  const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+
+  const body = updateSchema.safeParse(await request.json());
+  if (!body.success) {
+    const { errors } = body.error;
+    return NextResponse.json(
+      { message: "Invalid request", errors },
+      { status: 400 }
+    );
+  }
+
+  const results = await prisma.studentBatchForExam.update({
+    where: {
+      id: body.data.id,
+    },
+    data: {
+      name: body.data.name,
+      students: body.data.students,
       studentsCount: body.data.students.length,
     },
   });

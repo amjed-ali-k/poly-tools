@@ -27,7 +27,7 @@ const schema = z.object({
     .min(1),
 });
 
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const userId = await getUserId(request);
   if (!userId)
     return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
@@ -46,6 +46,53 @@ export async function PUT(request: NextRequest) {
       name: body.data.name,
       structure: body.data.structure,
       createdById: userId,
+      theoryOnlySeats: getCount(body.data.structure, SeatType.THEORY),
+      drawingOnlySeats: getCount(body.data.structure, SeatType.DRAWING),
+      commonSeats: getCount(body.data.structure, SeatType.COMMON),
+    },
+  });
+
+  return NextResponse.json(results);
+}
+
+const updateSchema = z.object({
+  name: z.string(),
+  id: z.string().uuid(),
+  structure: z
+    .array(
+      z
+        .array(
+          z.object({
+            name: z.string(),
+            seatCount: z.number().positive(),
+            structure: z.array(z.number().nonnegative()),
+          })
+        )
+        .min(1)
+    )
+    .min(1),
+});
+export async function PUT(request: NextRequest) {
+  const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+
+  const body = updateSchema.safeParse(await request.json());
+  if (!body.success) {
+    const { errors } = body.error;
+    return NextResponse.json(
+      { message: "Invalid request", errors },
+      { status: 400 }
+    );
+  }
+
+  const results = await prisma.examHall.update({
+    where: {
+      id: body.data.id,
+    },
+    data: {
+      name: body.data.name,
+      structure: body.data.structure,
       theoryOnlySeats: getCount(body.data.structure, SeatType.THEORY),
       drawingOnlySeats: getCount(body.data.structure, SeatType.DRAWING),
       commonSeats: getCount(body.data.structure, SeatType.COMMON),

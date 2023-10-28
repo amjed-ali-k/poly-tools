@@ -82,7 +82,7 @@ function NewStudentBatchComponent() {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     axios
-      .put<StudentBatchForExam>(
+      .post<StudentBatchForExam>(
         "/api/secure/exam-seating/student-batches",
         data
       )

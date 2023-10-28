@@ -3,16 +3,10 @@
 import * as React from "react";
 import dayjs from "dayjs";
 
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
+import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -23,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -43,17 +36,6 @@ import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExamHall } from "@prisma/client";
-import { useToast } from "@/components/ui/use-toast";
-
-type ClassLayoutApiType = {
-  id: string;
-  createdAt: string;
-  commonSeats: number;
-  theoryOnlySeats: number;
-  drawingOnlySeats: number;
-  name: string;
-  createdBy: string;
-};
 
 export const columns: ColumnDef<ExamHall>[] = [
   {
@@ -148,7 +130,6 @@ export function ClassListTable() {
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  console.log(data);
   const table = useReactTable({
     data,
     columns,

@@ -79,7 +79,7 @@ function NewClassComponent() {
       });
     console.log(structure);
     axios
-      .put<ExamHall>("/api/secure/exam-seating", { name: hallName, structure })
+      .post<ExamHall>("/api/secure/exam-seating", { name: hallName, structure })
       .then((res) => {
         toast({
           title: "Well done!",
