@@ -326,71 +326,74 @@ export function ExamHallPDF({
           orientation={(options?.alignment as any) || "portrait"}
           style={commonStyle.page}
         >
-          {options?.title && options.title !== "" && (
-            <View style={commonStyle.headingContainer}>
-              <Text>{options?.title}</Text>
-            </View>
-          )}
-          <View style={commonStyle.titleContainer}>
-            <Text>{hall.hallName}</Text>
-          </View>
-          <View style={commonStyle.subTitleContainer}>
-            <Text>Seating arrangement</Text>
-          </View>
-          <View style={commonStyle.frontSideTextContainer}>
-            <Text style={commonStyle.frontSide}>FRONT SIDE</Text>
-          </View>
-          <View style={commonStyle.deskViewContainer}>
-            {hall.hallStructure.map((row, ri) => (
-              <View style={commonStyle.row} key={ri}>
-                {row.map((desks, i) => {
-                  const isBlank = desks.structure.every(
-                    (x) => x === SeatType.BLANK
-                  );
-                  return (
-                    <View
-                      style={{
-                        ...commonStyle.desk,
-                        borderColor: isBlank ? "#eee" : "#000",
-                        color: isBlank ? "#fff" : "#000",
-                      }}
-                      key={i}
-                    >
-                      {desks.structure.map((seat, di) => {
-                        const col =
-                          row.slice(0, i).reduce((a, b) => a + b.seatCount, 0) +
-                          di;
-
-                        return (
-                          <View
-                            style={{
-                              ...commonStyle.seat,
-                              width: maxWidth / maxSeat,
-                            }}
-                            key={di}
-                          >
-                            <Text
-                              style={commonStyle.seatText}
-                              render={() => {
-                                return getSeatData(
-                                  ri,
-                                  col,
-                                  hall.seats,
-                                  options?.nameSelect
-                                );
-                              }}
-                            />
-                          </View>
-                        );
-                      })}
-                    </View>
-                  );
-                })}
+          <View>
+            {options?.title && options.title !== "" && (
+              <View style={commonStyle.headingContainer}>
+                <Text>{options?.title}</Text>
               </View>
-            ))}
-          </View>
-          <View style={commonStyle.signContainer}>
-            <Text>Sign and designation of Invigilator</Text>
+            )}
+            <View style={commonStyle.titleContainer}>
+              <Text>{hall.hallName}</Text>
+            </View>
+            <View style={commonStyle.subTitleContainer}>
+              <Text>Seating arrangement</Text>
+            </View>
+            <View style={commonStyle.frontSideTextContainer}>
+              <Text style={commonStyle.frontSide}>FRONT SIDE</Text>
+            </View>
+            <View style={commonStyle.deskViewContainer}>
+              {hall.hallStructure.map((row, ri) => (
+                <View style={commonStyle.row} key={ri}>
+                  {row.map((desks, i) => {
+                    const isBlank = desks.structure.every(
+                      (x) => x === SeatType.BLANK
+                    );
+                    return (
+                      <View
+                        style={{
+                          ...commonStyle.desk,
+                          borderColor: isBlank ? "#eee" : "#000",
+                          color: isBlank ? "#fff" : "#000",
+                        }}
+                        key={i}
+                      >
+                        {desks.structure.map((seat, di) => {
+                          const col =
+                            row
+                              .slice(0, i)
+                              .reduce((a, b) => a + b.seatCount, 0) + di;
+
+                          return (
+                            <View
+                              style={{
+                                ...commonStyle.seat,
+                                width: maxWidth / maxSeat,
+                              }}
+                              key={di}
+                            >
+                              <Text
+                                style={commonStyle.seatText}
+                                render={() => {
+                                  return getSeatData(
+                                    ri,
+                                    col,
+                                    hall.seats,
+                                    options?.nameSelect
+                                  );
+                                }}
+                              />
+                            </View>
+                          );
+                        })}
+                      </View>
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+            <View style={commonStyle.signContainer}>
+              <Text>Sign and designation of Invigilator</Text>
+            </View>
           </View>
         </Page>
       ))}
@@ -405,8 +408,6 @@ function getSeatData(
   type?: string
 ) {
   const seat = allocated.find((e) => e.row === row && e.seat === col);
-  console.log("Option", type);
-  console.log(seat);
   if (type && seat && seat[type as keyof typeof seat]) {
     return seat[type as keyof typeof seat];
   }
