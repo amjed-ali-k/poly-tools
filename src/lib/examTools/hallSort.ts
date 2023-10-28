@@ -16,6 +16,8 @@ interface Student {
   regNumber?: string | undefined;
   admnNumber?: string | undefined;
   primaryNumber?: string | undefined;
+  batchId: string;
+  batchName: string;
 }
 
 export type AllocatedSeat = Student & {

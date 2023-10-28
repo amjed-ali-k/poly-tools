@@ -1,4 +1,3 @@
-"use server";
 import { hankoApiUrl } from "./vars";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { NextRequest } from "next/server";

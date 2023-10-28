@@ -170,6 +170,8 @@ function GenerateSection({
         finalBatches.map((e) => {
           const st = e.students as IncomeStudent[];
           const students = st.map((k) => ({
+            batchId: e.batchId,
+            batchName: e.name,
             regNo: (k.name || k.primaryNumber)!,
             subjectCode: parseInt(e.subject.code),
             examType: e.type === "THEORY" ? 0 : 1,
@@ -192,6 +194,8 @@ function GenerateSection({
           regNo: string;
           subjectCode: number;
           examType: number;
+          batchId: string;
+          batchName: string;
         } & IncomeStudent)[] = [];
         // console.log(remainingStudents);
         subjectCodes.map((subCode) => {

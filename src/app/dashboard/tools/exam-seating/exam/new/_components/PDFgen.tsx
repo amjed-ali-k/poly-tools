@@ -8,8 +8,8 @@ import {
   usePDF,
 } from "@react-pdf/renderer";
 import { ArrangedResult } from "./NewExamForm";
-import React, { useEffect, useMemo, useReducer, useState } from "react";
-import { group, mapValues, max } from "radash";
+import React, { useMemo } from "react";
+import { group, max } from "radash";
 import { SeatType } from "../../../new-class/_components/newClass";
 import { AllocatedSeat } from "@/lib/examTools/hallSort";
 import { useForm } from "react-hook-form";
@@ -34,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { usePermenantGet } from "@/lib/swr";
 import { Subject } from "@prisma/client";
@@ -414,6 +415,7 @@ const hallschema = z.object({
   alignment: z.string(),
   title: z.string().min(0).optional(),
   nameSelect: z.string(),
+  showBatchName: z.boolean(),
 });
 
 export function GenerateHallsAssignment({
@@ -421,8 +423,21 @@ export function GenerateHallsAssignment({
 }: {
   seats: ArrangedResult[];
 }) {
+  const { data: subjects } = usePermenantGet<Subject[]>(
+    "/api/secure/subjects/all"
+  );
+  const seatData = useMemo(
+    () =>
+      seats.map((hall) => ({
+        id: hall.hall,
+        name: hall.hallName,
+        subs: group(hall.seats, (e) => e.subjectCode),
+        count: hall.seats.length,
+      })),
+    [seats]
+  );
   const [instance, updateInstance] = usePDF({
-    document: <ExamHallPDF seats={seats} />,
+    document: <HallArrangementPDF seats={seatData} subjects={subjects} />,
   });
 
   const form = useForm<z.infer<typeof hallschema>>({
@@ -431,24 +446,13 @@ export function GenerateHallsAssignment({
       alignment: "portrait",
       nameSelect: "regNo",
       title: "",
+      showBatchName: true,
     },
   });
 
-  const { data: subjects, isLoading: isSubsLoading } = usePermenantGet<
-    Subject[]
-  >("/api/secure/subjects/all");
-
   function onSubmit(data: z.infer<typeof hallschema>) {
-    const hl = seats.map((hall) => {
-      return {
-        id: hall.hall,
-        name: hall.hallName,
-        subs: group(hall.seats, (e) => e.subjectCode),
-        count: hall.seats.length,
-      };
-    });
     updateInstance(
-      <HallArrangementPDF seats={hl} options={data} subjects={subjects} />
+      <HallArrangementPDF seats={seatData} options={data} subjects={subjects} />
     );
   }
 
@@ -544,10 +548,31 @@ export function GenerateHallsAssignment({
                   </FormItem>
                 )}
               />
-              <Button type="submit" className=" w-64" variant="default">
-                Update
-              </Button>
+              <FormField
+                control={form.control}
+                name="showBatchName"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel>Show batch name</FormLabel>
+                      <FormDescription>
+                        Display batch name on top of each student list
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-readonly
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
+            <Button type="submit" className="my-4 w-64" variant="default">
+              Update
+            </Button>
             <div className="w-full">
               {seats && instance.url && (
                 <iframe height="700px" width="100%" src={instance.url}></iframe>
@@ -648,7 +673,7 @@ function HallArrangementPDF({
     subs: Partial<Record<number, AllocatedSeat[]>>;
     count: number;
   }[];
-  options?: z.infer<typeof seatingSchema>;
+  options?: z.infer<typeof hallschema>;
   subjects?: Subject[];
 }) {
   return (
@@ -678,38 +703,58 @@ function HallArrangementPDF({
                   </Text>
                 </View>
                 <View style={hallStyle.contentCol}>
-                  {Object.entries(hall.subs).map(([subCode, details]) => (
-                    <View key={subCode} style={{ width: "100%" }}>
-                      <View style={hallStyle.contentTitleContainer}>
-                        {/* Subject Name  */}
-                        <Text style={hallStyle.contentTitle}>
-                          {subCode}
-                          {" - " +
-                            subjects?.find((e) => e.code === subCode)?.name}
-                        </Text>
+                  {Object.entries(hall.subs).map(([subCode, details]) => {
+                    if (!details) return;
+                    const batchGroup = group(details, (e) => e.batchId);
+
+                    return (
+                      <View key={subCode} style={{ width: "100%" }}>
+                        <View style={hallStyle.contentTitleContainer}>
+                          {/* Subject Name  */}
+                          <Text style={hallStyle.contentTitle}>
+                            {subCode}
+                            {" - " +
+                              subjects?.find((e) => e.code === subCode)?.name}
+                          </Text>
+                        </View>
+                        {Object.entries(batchGroup).map(
+                          ([batchId, details]) => {
+                            if (!details) return;
+                            return (
+                              <View
+                                key={batchId}
+                                style={hallStyle.contentSubContainer}
+                              >
+                                {options?.showBatchName && (
+                                  <Text style={hallStyle.contentSubTitle}>
+                                    {/* Batch Name */}
+                                    {details[0].batchName}
+                                  </Text>
+                                )}
+                                <Text style={hallStyle.contentDetails}>
+                                  {/* Details */}
+                                  {details?.map((seat) => (
+                                    <Text
+                                      key={seat.name}
+                                      style={hallStyle.contentItem}
+                                      wrap
+                                    >
+                                      {seat[
+                                        options?.nameSelect as keyof typeof seat
+                                      ] ||
+                                        seat.name ||
+                                        " "}
+                                      ,{" "}
+                                    </Text>
+                                  ))}
+                                </Text>
+                              </View>
+                            );
+                          }
+                        )}
                       </View>
-                      <View style={hallStyle.contentSubContainer}>
-                        <Text style={hallStyle.contentSubTitle}>
-                          Electronics
-                        </Text>
-                        <Text style={hallStyle.contentDetails}>
-                          {/* Details */}
-                          {details?.map((seat) => (
-                            <Text
-                              key={seat.name}
-                              style={hallStyle.contentItem}
-                              wrap
-                            >
-                              {seat[options?.nameSelect as keyof typeof seat] ||
-                                seat.name ||
-                                " "}
-                              ,{" "}
-                            </Text>
-                          ))}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
               </View>
             </View>
@@ -719,3 +764,5 @@ function HallArrangementPDF({
     </Document>
   );
 }
+
+export function GenerateAttendanceSheet({}) {}
