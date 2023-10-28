@@ -114,3 +114,21 @@ export async function DELETE(request: NextRequest) {
 
   return NextResponse.json(results);
 }
+
+export async function GET(request: NextRequest) {
+  const userId = await getUserId(request);
+  if (!userId)
+    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+
+  const id = request.nextUrl.searchParams.get("id");
+  if (!id)
+    return NextResponse.json({ message: "Invalid request" }, { status: 400 });
+
+  const result = await prisma.studentBatchForExam.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  return NextResponse.json(result);
+}

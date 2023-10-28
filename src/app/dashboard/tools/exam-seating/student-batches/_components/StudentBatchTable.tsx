@@ -35,6 +35,7 @@ import axios from "axios";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StudentBatchForExam } from "@prisma/client";
+import Link from "next/link";
 
 export const columns: ColumnDef<StudentBatchForExam>[] = [
   {
@@ -78,7 +79,11 @@ export const columns: ColumnDef<StudentBatchForExam>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <Link
+              href={`/dashboard/tools/exam-seating/student-batches/${row.original.id}`}
+            >
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem
               className="text-red-500"
               onClick={() =>

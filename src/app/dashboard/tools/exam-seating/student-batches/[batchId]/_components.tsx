@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import {
@@ -47,6 +47,8 @@ import axios from "axios";
 import { StudentBatchForExam } from "@prisma/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { usePermenantGet } from "@/lib/swr";
+import { mutate } from "swr";
 
 const formSchema: z.ZodType<{
   name: string;
@@ -72,7 +74,7 @@ const formSchema: z.ZodType<{
     .min(1),
 });
 
-function NewStudentBatchComponent() {
+function EditStudentBatchComponent({ id }: { id?: string }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
@@ -80,16 +82,28 @@ function NewStudentBatchComponent() {
   const { toast } = useToast();
   const router = useRouter();
 
+  const { data: existingData, mutate } = usePermenantGet<StudentBatchForExam>(
+    `/api/secure/exam-seating/student-batches?id=${id}`
+  );
+
+  useEffect(() => {
+    form.reset({
+      name: existingData?.name,
+      students: existingData?.students as any,
+    });
+  }, [form, existingData]);
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     axios
-      .post<StudentBatchForExam>(
-        "/api/secure/exam-seating/student-batches",
-        data
-      )
+      .put<StudentBatchForExam>("/api/secure/exam-seating/student-batches", {
+        ...data,
+        id,
+      })
       .then((res) => {
+        mutate();
         toast({
           title: "Well done!",
-          description: `Class ${res.data.name} added successfully`,
+          description: `Class ${res.data.name} updated successfully`,
         });
         router.push("/dashboard/tools/exam-seating/student-batches");
       })
@@ -220,7 +234,7 @@ function NewStudentBatchComponent() {
             disabled={form.formState.isSubmitting}
             type="submit"
           >
-            Add batch
+            Update batch
           </Button>
         </form>
       </Form>
@@ -254,7 +268,7 @@ function NewStudentBatchComponent() {
   );
 }
 
-export default NewStudentBatchComponent;
+export default EditStudentBatchComponent;
 
 const studentFormSchema = z
   .object({
