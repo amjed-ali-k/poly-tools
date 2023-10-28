@@ -265,7 +265,7 @@ export function GenerateSeatArrangements({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="regNo">Normal</SelectItem>
+                        <SelectItem value="regNo">Default</SelectItem>
                         <SelectItem value="regNumber">Reg Number</SelectItem>
                         <SelectItem value="admnNumber">Admn Number</SelectItem>
                         <SelectItem value="rollNumber">Roll Number</SelectItem>
@@ -418,6 +418,12 @@ const hallschema = z.object({
   showBatchName: z.boolean(),
 });
 
+const defaultHallValues = {
+  alignment: "portrait",
+  nameSelect: "regNo",
+  title: "",
+  showBatchName: true,
+};
 export function GenerateHallsAssignment({
   seats,
 }: {
@@ -437,17 +443,18 @@ export function GenerateHallsAssignment({
     [seats]
   );
   const [instance, updateInstance] = usePDF({
-    document: <HallArrangementPDF seats={seatData} subjects={subjects} />,
+    document: (
+      <HallArrangementPDF
+        seats={seatData}
+        subjects={subjects}
+        options={defaultHallValues}
+      />
+    ),
   });
 
   const form = useForm<z.infer<typeof hallschema>>({
     resolver: zodResolver(hallschema),
-    defaultValues: {
-      alignment: "portrait",
-      nameSelect: "regNo",
-      title: "",
-      showBatchName: true,
-    },
+    defaultValues: defaultHallValues,
   });
 
   function onSubmit(data: z.infer<typeof hallschema>) {
@@ -532,7 +539,7 @@ export function GenerateHallsAssignment({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="regNo">Normal</SelectItem>
+                        <SelectItem value="regNo">Default</SelectItem>
                         <SelectItem value="regNumber">Reg Number</SelectItem>
                         <SelectItem value="admnNumber">Admn Number</SelectItem>
                         <SelectItem value="rollNumber">Roll Number</SelectItem>
@@ -764,6 +771,20 @@ function HallArrangementPDF({
     </Document>
   );
 }
+const defaultAtValues = {
+  alignment: "portrait",
+  nameSelect: "regNo",
+  title: "",
+  showAddSheetCount: true,
+  showAlphaCode: true,
+};
+const atschema = z.object({
+  alignment: z.string(),
+  title: z.string().min(0).optional(),
+  nameSelect: z.string(),
+  showAddSheetCount: z.boolean(),
+  showAlphaCode: z.boolean(),
+});
 
 export function GenerateAttendanceSheet({
   seats,
@@ -771,20 +792,15 @@ export function GenerateAttendanceSheet({
   seats: ArrangedResult[];
 }) {
   const [instance, updateInstance] = usePDF({
-    document: <AttendanceSheetPDF seats={seats} />,
+    document: <AttendanceSheetPDF seats={seats} options={defaultAtValues} />,
   });
 
-  const form = useForm<z.infer<typeof hallschema>>({
-    resolver: zodResolver(hallschema),
-    defaultValues: {
-      alignment: "portrait",
-      nameSelect: "regNo",
-      title: "",
-      showBatchName: true,
-    },
+  const form = useForm<z.infer<typeof atschema>>({
+    resolver: zodResolver(atschema),
+    defaultValues: defaultAtValues,
   });
 
-  function onSubmit(data: z.infer<typeof hallschema>) {
+  function onSubmit(data: z.infer<typeof atschema>) {
     updateInstance(<AttendanceSheetPDF seats={seats} options={data} />);
   }
 
@@ -864,7 +880,7 @@ export function GenerateAttendanceSheet({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="regNo">Normal</SelectItem>
+                        <SelectItem value="regNo">Default</SelectItem>
                         <SelectItem value="regNumber">Reg Number</SelectItem>
                         <SelectItem value="admnNumber">Admn Number</SelectItem>
                         <SelectItem value="rollNumber">Roll Number</SelectItem>
@@ -882,13 +898,35 @@ export function GenerateAttendanceSheet({
               />
               <FormField
                 control={form.control}
-                name="showBatchName"
+                name="showAddSheetCount"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between">
                     <div className="space-y-0.5">
-                      <FormLabel>Show batch name</FormLabel>
+                      <FormLabel>Show Additional Sheets</FormLabel>
                       <FormDescription>
-                        Display batch name on top of each student list
+                        Display a column for Additional sheets count
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-readonly
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="showAlphaCode"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel>Show Alpha Code</FormLabel>
+                      <FormDescription>
+                        Display a column for writing alpha code, (Used for
+                        public examinations)
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -949,11 +987,18 @@ const atsheetStyle = StyleSheet.create({
   tableCol: {
     borderRightWidth: 1,
     paddingVertical: 5,
-    fontSize: 12,
+    fontSize: 11,
     flexShrink: 0,
     borderRightColor: "#000",
   },
-  tableblankCol: {},
+  signContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    fontSize: 10,
+    paddingHorizontal: 30,
+    paddingTop: 50,
+  },
 });
 
 function AttendanceSheetPDF({
@@ -961,7 +1006,7 @@ function AttendanceSheetPDF({
   options,
 }: {
   seats: ArrangedResult[];
-  options?: z.infer<typeof hallschema>;
+  options?: z.infer<typeof atschema>;
 }) {
   return (
     <Document>
@@ -978,6 +1023,10 @@ function AttendanceSheetPDF({
                 <Text>{options?.title}</Text>
               </View>
             )}
+            <View style={commonStyle.titleContainer}>
+              {/* Hall Details */}
+              <Text style={hallStyle.hallTitle}>{hall.hallName}</Text>
+            </View>
             <View style={commonStyle.subTitleContainer}>
               <Text>Attendance Sheet</Text>
             </View>
@@ -990,6 +1039,8 @@ function AttendanceSheetPDF({
                       width: "30px",
                       textAlign: "center",
                       fontSize: 10,
+                      fontWeight: "bold",
+                      height: "100%",
                     }}
                   >
                     No.
@@ -1002,28 +1053,46 @@ function AttendanceSheetPDF({
                       flexGrow: 1,
                       height: "100%",
                       fontSize: 10,
+                      fontWeight: "bold",
                     }}
                   >
                     Name
                   </Text>
-                  <Text
-                    style={{
-                      ...atsheetStyle.tableCol,
-                      width: "15%",
-                      paddingHorizontal: 5,
-
-                      fontSize: 10,
-                      height: "100%",
-                    }}
-                  >
-                    Alpha Code
-                  </Text>
+                  {options?.showAlphaCode && (
+                    <Text
+                      style={{
+                        ...atsheetStyle.tableCol,
+                        width: "15%",
+                        paddingHorizontal: 5,
+                        fontWeight: "bold",
+                        fontSize: 10,
+                        height: "100%",
+                      }}
+                    >
+                      Alpha Code
+                    </Text>
+                  )}
+                  {options?.showAddSheetCount && (
+                    <Text
+                      style={{
+                        ...atsheetStyle.tableCol,
+                        width: "10%",
+                        paddingHorizontal: 2,
+                        fontWeight: "bold",
+                        fontSize: 10,
+                        height: "100%",
+                      }}
+                    >
+                      Ad. Sheet
+                    </Text>
+                  )}
                   <Text
                     style={{
                       ...atsheetStyle.tableCol,
                       width: "10%",
                       paddingHorizontal: 5,
                       fontSize: 10,
+                      fontWeight: "bold",
                       height: "100%",
                     }}
                   >
@@ -1032,10 +1101,11 @@ function AttendanceSheetPDF({
                   <Text
                     style={{
                       ...atsheetStyle.tableCol,
-                      width: "20%",
+                      width: "15%",
                       borderRightWidth: 0,
                       paddingHorizontal: 5,
                       fontSize: 10,
+                      fontWeight: "bold",
                       height: "100%",
                     }}
                   >
@@ -1064,14 +1134,26 @@ function AttendanceSheetPDF({
                       >
                         {e[options?.nameSelect as keyof typeof e] || e.name}
                       </Text>
-                      <Text
-                        style={{
-                          ...atsheetStyle.tableCol,
-                          width: "15%",
-                        }}
-                      >
-                        {" "}
-                      </Text>
+                      {options?.showAlphaCode && (
+                        <Text
+                          style={{
+                            ...atsheetStyle.tableCol,
+                            width: "15%",
+                          }}
+                        >
+                          {" "}
+                        </Text>
+                      )}
+                      {options?.showAddSheetCount && (
+                        <Text
+                          style={{
+                            ...atsheetStyle.tableCol,
+                            width: "10%",
+                          }}
+                        >
+                          {" "}
+                        </Text>
+                      )}
                       <Text
                         style={{
                           ...atsheetStyle.tableCol,
@@ -1083,7 +1165,7 @@ function AttendanceSheetPDF({
                       <Text
                         style={{
                           ...atsheetStyle.tableCol,
-                          width: "20%",
+                          width: "15%",
                           borderRightWidth: 0,
                         }}
                       >
@@ -1092,6 +1174,9 @@ function AttendanceSheetPDF({
                     </View>
                   );
                 })}
+              </View>
+              <View style={atsheetStyle.signContainer}>
+                <Text>Sign and designation of Invigilator</Text>
               </View>
             </View>
           </View>
