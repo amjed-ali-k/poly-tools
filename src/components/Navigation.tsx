@@ -190,15 +190,15 @@ export function NavBar() {
               </ListItem>
               <ListItem
                 href="/dashboard/tools/exam-seating/student-batches"
-                title="Student Batches"
+                title="Student batches"
               >
                 Student directory and their batches
               </ListItem>
               <ListItem
                 href="/dashboard/tools/exam-seating/exam"
-                title="Add Exams"
+                title="Generate seating plan"
               >
-                Create seating arrangements for each exams
+                Generate printable seating arrangements and files for exam
               </ListItem>
             </ul>
           </NavigationMenuContent>

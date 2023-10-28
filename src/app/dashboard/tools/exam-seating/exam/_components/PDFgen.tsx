@@ -10,7 +10,7 @@ import {
 import { ArrangedResult } from "./NewExamForm";
 import React, { useMemo } from "react";
 import { group, max } from "radash";
-import { SeatType } from "../../../new-class/_components/newClass";
+import { SeatType } from "../../new-class/_components/newClass";
 import { AllocatedSeat } from "@/lib/examTools/hallSort";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
