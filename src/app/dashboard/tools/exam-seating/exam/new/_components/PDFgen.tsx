@@ -765,4 +765,338 @@ function HallArrangementPDF({
   );
 }
 
-export function GenerateAttendanceSheet({}) {}
+export function GenerateAttendanceSheet({
+  seats,
+}: {
+  seats: ArrangedResult[];
+}) {
+  const [instance, updateInstance] = usePDF({
+    document: <AttendanceSheetPDF seats={seats} />,
+  });
+
+  const form = useForm<z.infer<typeof hallschema>>({
+    resolver: zodResolver(hallschema),
+    defaultValues: {
+      alignment: "portrait",
+      nameSelect: "regNo",
+      title: "",
+      showBatchName: true,
+    },
+  });
+
+  function onSubmit(data: z.infer<typeof hallschema>) {
+    updateInstance(<AttendanceSheetPDF seats={seats} options={data} />);
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Card className="w-full">
+          <CardContent className="p-4">
+            <div>
+              <h5 className="text-lg font-bold">Hall arrangement</h5>
+              <p className="text-sm text-gray-400 mb-2">
+                Hall arrangement sheets are made to paste in notice board. So
+                that students can find respective halls
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <FormField
+                control={form.control}
+                name="alignment"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Page alignment</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem defaultChecked value="portrait" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Portrait
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="landscape" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Landscape
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Series Exam - 2024 Jan" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This will be the title of all pages.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nameSelect"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Student Name</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue="regNo">
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a field to display in student name" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="regNo">Normal</SelectItem>
+                        <SelectItem value="regNumber">Reg Number</SelectItem>
+                        <SelectItem value="admnNumber">Admn Number</SelectItem>
+                        <SelectItem value="rollNumber">Roll Number</SelectItem>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="primaryNumber">Primary</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose which value should be printed in student name
+                      session
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="showBatchName"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel>Show batch name</FormLabel>
+                      <FormDescription>
+                        Display batch name on top of each student list
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-readonly
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Button type="submit" className="my-4 w-64" variant="default">
+              Update
+            </Button>
+            <div className="w-full">
+              {seats && instance.url && (
+                <iframe height="700px" width="100%" src={instance.url}></iframe>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
+  );
+}
+
+const atsheetStyle = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#fff",
+    justifyContent: "flex-start",
+    fontFamily: "Inter",
+    padding: 10,
+    width: "100%",
+  },
+  tableContainer: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    marginVertical: 10,
+    border: 1,
+    borderColor: "#000",
+    fontFamily: "Inter",
+  },
+  tableRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+
+    fontSize: 12,
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+  },
+  tableCol: {
+    borderRightWidth: 1,
+    paddingVertical: 5,
+    fontSize: 12,
+    flexShrink: 0,
+    borderRightColor: "#000",
+  },
+  tableblankCol: {},
+});
+
+function AttendanceSheetPDF({
+  seats,
+  options,
+}: {
+  seats: ArrangedResult[];
+  options?: z.infer<typeof hallschema>;
+}) {
+  return (
+    <Document>
+      {seats.map((hall) => (
+        <Page
+          size="A4"
+          orientation={(options?.alignment as any) || "portrait"}
+          style={atsheetStyle.page}
+          key={hall.hall}
+        >
+          <View>
+            {options?.title && options.title !== "" && (
+              <View style={commonStyle.titleContainer}>
+                <Text>{options?.title}</Text>
+              </View>
+            )}
+            <View style={commonStyle.subTitleContainer}>
+              <Text>Attendance Sheet</Text>
+            </View>
+            <View>
+              <View style={atsheetStyle.tableContainer}>
+                <View style={atsheetStyle.tableRow}>
+                  <Text
+                    style={{
+                      ...atsheetStyle.tableCol,
+                      width: "30px",
+                      textAlign: "center",
+                      fontSize: 10,
+                    }}
+                  >
+                    No.
+                  </Text>
+                  <Text
+                    style={{
+                      ...atsheetStyle.tableCol,
+                      flex: 1,
+                      paddingHorizontal: 5,
+                      flexGrow: 1,
+                      height: "100%",
+                      fontSize: 10,
+                    }}
+                  >
+                    Name
+                  </Text>
+                  <Text
+                    style={{
+                      ...atsheetStyle.tableCol,
+                      width: "15%",
+                      paddingHorizontal: 5,
+
+                      fontSize: 10,
+                      height: "100%",
+                    }}
+                  >
+                    Alpha Code
+                  </Text>
+                  <Text
+                    style={{
+                      ...atsheetStyle.tableCol,
+                      width: "10%",
+                      paddingHorizontal: 5,
+                      fontSize: 10,
+                      height: "100%",
+                    }}
+                  >
+                    Sign
+                  </Text>
+                  <Text
+                    style={{
+                      ...atsheetStyle.tableCol,
+                      width: "20%",
+                      borderRightWidth: 0,
+                      paddingHorizontal: 5,
+                      fontSize: 10,
+                      height: "100%",
+                    }}
+                  >
+                    Remarks
+                  </Text>
+                </View>
+                {hall.seats.map((e, i) => {
+                  return (
+                    <View key={i} style={atsheetStyle.tableRow}>
+                      <Text
+                        style={{
+                          ...atsheetStyle.tableCol,
+                          width: "30px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {i + 1}
+                      </Text>
+                      <Text
+                        style={{
+                          ...atsheetStyle.tableCol,
+                          flex: 1,
+                          paddingHorizontal: 5,
+                          flexGrow: 1,
+                        }}
+                      >
+                        {e[options?.nameSelect as keyof typeof e] || e.name}
+                      </Text>
+                      <Text
+                        style={{
+                          ...atsheetStyle.tableCol,
+                          width: "15%",
+                        }}
+                      >
+                        {" "}
+                      </Text>
+                      <Text
+                        style={{
+                          ...atsheetStyle.tableCol,
+                          width: "10%",
+                        }}
+                      >
+                        {" "}
+                      </Text>
+                      <Text
+                        style={{
+                          ...atsheetStyle.tableCol,
+                          width: "20%",
+                          borderRightWidth: 0,
+                        }}
+                      >
+                        {" "}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+        </Page>
+      ))}
+    </Document>
+  );
+}
