@@ -68,7 +68,7 @@ import { sum, flat, group, sift } from "radash";
 import { assignHallsCustom } from "@/lib/examTools/customHallAsiign";
 import { AllocatedSeat, allocateSeats } from "@/lib/examTools/hallSort";
 import { SeatObjectType } from "../../../new-class/_components/newClass";
-import { ExamHallPDF, GenerateSeatArrangements } from "./PDFgen";
+import { GenerateHallsAssignment, GenerateSeatArrangements } from "./PDFgen";
 
 type tabsType = "batches-section" | "halls-section" | "generate-section";
 
@@ -232,6 +232,7 @@ function GenerateSection({
   return (
     <div className="flex flex-col gap-4">
       <GenerateSeatArrangements seats={seats as any} />
+      <GenerateHallsAssignment seats={seats as any} />
     </div>
   );
 }

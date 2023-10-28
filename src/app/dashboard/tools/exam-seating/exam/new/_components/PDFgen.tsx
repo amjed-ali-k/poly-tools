@@ -5,13 +5,11 @@ import {
   Font,
   Document,
   StyleSheet,
-  PDFViewer,
-  Link,
   usePDF,
 } from "@react-pdf/renderer";
 import { ArrangedResult } from "./NewExamForm";
 import React, { useEffect, useMemo, useReducer, useState } from "react";
-import { max } from "radash";
+import { group, mapValues, max } from "radash";
 import { SeatType } from "../../../new-class/_components/newClass";
 import { AllocatedSeat } from "@/lib/examTools/hallSort";
 import { useForm } from "react-hook-form";
@@ -171,10 +169,6 @@ export function GenerateSeatArrangements({
 }: {
   seats: ArrangedResult[];
 }) {
-  const [examPdf, setExamPdf] = useState<JSX.Element>(() => (
-    <ExamHallPDF seats={seats as any} />
-  ));
-
   const [instance, updateInstance] = usePDF({
     document: <ExamHallPDF seats={seats} />,
   });
@@ -300,7 +294,7 @@ export function GenerateSeatArrangements({
   );
 }
 
-export function ExamHallPDF({
+function ExamHallPDF({
   seats,
   options,
 }: {
@@ -412,4 +406,291 @@ function getSeatData(
     return seat[type as keyof typeof seat];
   }
   return seat?.regNo || " ";
+}
+
+const hallschema = z.object({
+  alignment: z.string(),
+  title: z.string().min(0).optional(),
+  nameSelect: z.string(),
+});
+
+export function GenerateHallsAssignment({
+  seats,
+}: {
+  seats: ArrangedResult[];
+}) {
+  const [instance, updateInstance] = usePDF({
+    document: <ExamHallPDF seats={seats} />,
+  });
+
+  const form = useForm<z.infer<typeof hallschema>>({
+    resolver: zodResolver(hallschema),
+    defaultValues: {
+      alignment: "portrait",
+      nameSelect: "regNo",
+      title: "",
+    },
+  });
+
+  function onSubmit(data: z.infer<typeof hallschema>) {
+    const hl = seats.map((hall) => {
+      return {
+        id: hall.hall,
+        name: hall.hallName,
+        subs: group(hall.seats, (e) => e.subjectCode),
+        count: hall.seats.length,
+      };
+    });
+    updateInstance(<HallArrangementPDF seats={hl} options={data} />);
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Card className="w-full">
+          <CardContent className="p-4">
+            <div>
+              <h5 className="text-lg font-bold">Hall arrangement</h5>
+              <p className="text-sm text-gray-400 mb-2">
+                Hall arrangement sheets are made to paste in notice board. So
+                that students can find respective halls
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <FormField
+                control={form.control}
+                name="alignment"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Page alignment</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem defaultChecked value="portrait" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Portrait
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="landscape" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Landscape
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Series Exam - 2024 Jan" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This will be the title of all pages.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nameSelect"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Student Name</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue="regNo">
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a field to display in student name" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="regNo">Normal</SelectItem>
+                        <SelectItem value="regNumber">Reg Number</SelectItem>
+                        <SelectItem value="admnNumber">Admn Number</SelectItem>
+                        <SelectItem value="rollNumber">Roll Number</SelectItem>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="primaryNumber">Primary</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose which value should be printed in student name
+                      session
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className=" w-64" variant="default">
+                Update
+              </Button>
+            </div>
+            <div className="w-full">
+              {seats && instance.url && (
+                <iframe height="700px" width="100%" src={instance.url}></iframe>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
+  );
+}
+
+const hallStyle = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#fff",
+    justifyContent: "flex-start",
+    fontFamily: "Inter",
+    padding: 10,
+    width: "100%",
+  },
+  tableContainer: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    marginVertical: 10,
+    border: 1,
+    fontFamily: "Inter",
+  },
+  hallCol: {
+    display: "flex",
+    flexDirection: "column",
+    width: "30%",
+    padding: 10,
+    borderRightWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  hallTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  hallSubTitle: {
+    fontSize: 10,
+    fontWeight: "normal",
+  },
+  contentCol: {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+  },
+  contentTitleContainer: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    backgroundColor: "#eee",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  contentTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  contentDetails: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    flexWrap: "wrap",
+  },
+  contentItem: {
+    fontSize: 12,
+    lineHeight: 1.5,
+    fontWeight: "normal",
+    flex: 1,
+  },
+});
+
+function HallArrangementPDF({
+  seats,
+  options,
+}: {
+  seats: {
+    id: string;
+    name: string;
+    subs: Partial<Record<number, AllocatedSeat[]>>;
+    count: number;
+  }[];
+  options?: z.infer<typeof seatingSchema>;
+}) {
+  return (
+    <Document>
+      <Page
+        size="A4"
+        orientation={(options?.alignment as any) || "portrait"}
+        style={hallStyle.page}
+      >
+        <View>
+          {options?.title && options.title !== "" && (
+            <View style={commonStyle.titleContainer}>
+              <Text>{options?.title}</Text>
+            </View>
+          )}
+          <View style={commonStyle.subTitleContainer}>
+            <Text>Hall arrangement</Text>
+          </View>
+          {seats.map((hall) => (
+            <View key={hall.id}>
+              <View style={hallStyle.tableContainer}>
+                <View style={hallStyle.hallCol}>
+                  {/* Hall Details */}
+                  <Text style={hallStyle.hallTitle}>{hall.name}</Text>
+                  <Text style={hallStyle.hallSubTitle}>
+                    {hall.count} students
+                  </Text>
+                </View>
+                <View style={hallStyle.contentCol}>
+                  {Object.entries(hall.subs).map(([subCode, details]) => (
+                    <View key={subCode} style={{ width: "100%" }}>
+                      <View style={hallStyle.contentTitleContainer}>
+                        {/* Subject Name  */}
+                        <Text style={hallStyle.contentTitle}>{subCode}</Text>
+                      </View>
+                      <Text style={hallStyle.contentDetails}>
+                        {/* Details */}
+                        {details?.map((seat) => (
+                          <Text
+                            key={seat.name}
+                            style={hallStyle.contentItem}
+                            wrap
+                          >
+                            {seat[options?.nameSelect as keyof typeof seat] ||
+                              seat.name ||
+                              " "}
+                            ,{" "}
+                          </Text>
+                        ))}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      </Page>
+    </Document>
+  );
 }
