@@ -370,26 +370,31 @@ function AddHallsSection({
 
                               <CommandEmpty>No hall found.</CommandEmpty>
                               <CommandGroup>
-                                {hallList?.map((hall) => (
-                                  <CommandItem
-                                    value={hall.id}
-                                    key={hall.id}
-                                    onSelect={() => {
-                                      form.setValue("hallId", hall.id);
-                                      setOpen(false);
-                                    }}
-                                  >
-                                    {hall.name}
-                                    <CheckIcon
-                                      className={cn(
-                                        "ml-auto h-4 w-4",
-                                        hall.id === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
+                                {hallList
+                                  ?.filter(
+                                    (e) =>
+                                      !finalHalls.find((k) => k.id === e.id)
+                                  )
+                                  .map((hall) => (
+                                    <CommandItem
+                                      value={hall.id}
+                                      key={hall.id}
+                                      onSelect={() => {
+                                        form.setValue("hallId", hall.id);
+                                        setOpen(false);
+                                      }}
+                                    >
+                                      {hall.name}
+                                      <CheckIcon
+                                        className={cn(
+                                          "ml-auto h-4 w-4",
+                                          hall.id === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
@@ -596,26 +601,31 @@ function AddBatchesSection({
 
                               <CommandEmpty>No batch found.</CommandEmpty>
                               <CommandGroup>
-                                {batchList?.map((batch) => (
-                                  <CommandItem
-                                    value={batch.id}
-                                    key={batch.id}
-                                    onSelect={() => {
-                                      form.setValue("batchId", batch.id);
-                                      setOpen(false);
-                                    }}
-                                  >
-                                    {batch.name}
-                                    <CheckIcon
-                                      className={cn(
-                                        "ml-auto h-4 w-4",
-                                        batch.id === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
+                                {batchList
+                                  ?.filter(
+                                    (e) =>
+                                      !finalBatches.find((k) => k.id === e.id)
+                                  )
+                                  .map((batch) => (
+                                    <CommandItem
+                                      value={batch.id}
+                                      key={batch.id}
+                                      onSelect={() => {
+                                        form.setValue("batchId", batch.id);
+                                        setOpen(false);
+                                      }}
+                                    >
+                                      {batch.name}
+                                      <CheckIcon
+                                        className={cn(
+                                          "ml-auto h-4 w-4",
+                                          batch.id === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
