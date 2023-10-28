@@ -67,7 +67,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { sum, flat, group, sift } from "radash";
 import { assignHallsCustom } from "@/lib/examTools/customHallAsiign";
 import { AllocatedSeat, allocateSeats } from "@/lib/examTools/hallSort";
-import { SeatObjectType } from "../../new-class/_components/newClass";
+import { SeatObjectType } from "../../hall/new/_components/newClass";
 import {
   GenerateAttendanceSheet,
   GenerateHallsAssignment,

@@ -74,6 +74,21 @@ export async function PUT(request: NextRequest) {
     );
   }
 
+  const batch = await prisma.studentBatchForExam.findUnique({
+    where: {
+      id: body.data.id,
+    },
+  });
+
+  if (!batch)
+    return NextResponse.json({ message: "Invalid request" }, { status: 400 });
+
+  if (batch.createdById !== userId)
+    return NextResponse.json(
+      { message: "You are not authorized to update this batch" },
+      { status: 401 }
+    );
+
   const results = await prisma.studentBatchForExam.update({
     where: {
       id: body.data.id,

@@ -86,6 +86,23 @@ export async function PUT(request: NextRequest) {
     );
   }
 
+  const hall = await prisma.examHall.findUnique({
+    where: {
+      id: body.data.id,
+    },
+  });
+
+  if (!hall) {
+    return NextResponse.json({ message: "Hall not found" }, { status: 404 });
+  }
+
+  if (hall.createdById !== userId) {
+    return NextResponse.json(
+      { message: "You are not authorized to update this hall" },
+      { status: 401 }
+    );
+  }
+
   const results = await prisma.examHall.update({
     where: {
       id: body.data.id,

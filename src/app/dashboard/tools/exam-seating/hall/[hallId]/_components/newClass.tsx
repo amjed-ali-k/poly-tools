@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -61,13 +61,17 @@ import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { ExamHall } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { usePermenantGet } from "@/lib/swr";
 
-function NewClassComponent() {
+function EditHallForm({ id }: { id?: string }) {
   const [hallName, setHallName] = useState("");
   const [structure, setStructure] = useState([[]] as SeatObjectType[][]);
-  const { toast } = useToast();
 
+  const { toast } = useToast();
   const router = useRouter();
+  const { data: existingData } = usePermenantGet<ExamHall>(
+    `/api/secure/exam-seating?id=${id}`
+  );
 
   const onSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -77,7 +81,6 @@ function NewClassComponent() {
         description: "Please enter a name for the hall",
         variant: "destructive",
       });
-    console.log(structure);
     axios
       .post<ExamHall>("/api/secure/exam-seating", { name: hallName, structure })
       .then((res) => {
@@ -85,7 +88,7 @@ function NewClassComponent() {
           title: "Well done!",
           description: `Class ${res.data.name} added successfully`,
         });
-        router.push("/dashboard/tools/exam-seating/class-list");
+        router.push("/dashboard/tools/exam-seating/");
       });
   };
   return (
@@ -114,7 +117,7 @@ function NewClassComponent() {
   );
 }
 
-export default NewClassComponent;
+export default EditHallForm;
 
 function ClassLayout({
   structure,
