@@ -16,7 +16,7 @@ async function page() {
           and use.
         </p>
       </div>
-      <div className="container">
+      <div className="container grid grid-cols-3 gap-4">
         {tools.map((e) => (
           <ToolCard
             key={e.slug}
@@ -27,7 +27,7 @@ async function page() {
             diff={e.type}
             likes={e.likes}
             views={e.views}
-            link={`/dashboard/${e.slug}`}
+            link={`/dashboard/tools/${e.slug}`}
           />
         ))}
       </div>

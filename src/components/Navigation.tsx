@@ -195,7 +195,7 @@ export function NavBar() {
                 Student directory and their batches
               </ListItem>
               <ListItem
-                href="/dashboard/tools/exam-seating/exam"
+                href="/dashboard/tools/exam-seating"
                 title="Generate seating plan"
               >
                 Generate printable seating arrangements and files for exam
