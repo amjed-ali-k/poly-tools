@@ -122,7 +122,7 @@ export function NavBar() {
                 <NavigationMenuLink asChild>
                   <a
                     className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/dashboard/result-formatter"
+                    href="/dashboard/tools/result-formatter"
                   >
                     <SBTEToolsLogo className="h-6 w-6" />
                     <div className="mb-2 mt-4 text-lg font-medium">
@@ -135,19 +135,19 @@ export function NavBar() {
                 </NavigationMenuLink>
               </li>
               <ListItem
-                href="/dashboard/result-formatter"
+                href="/dashboard/tools/result-formatter"
                 title="Upload and generate"
               >
                 Upload your result and get started.
               </ListItem>
               <ListItem
-                href="/dashboard/result-formatter/history"
+                href="/dashboard/tools/result-formatter/history"
                 title="Analysis History"
               >
                 View your previous analysis results.
               </ListItem>
               <ListItem
-                href="/dashboard/result-formatter/progress"
+                href="/dashboard/tools/result-formatter/progress"
                 title="Student Progress"
               >
                 View aggregated analysis of each student in your class.
@@ -168,7 +168,7 @@ export function NavBar() {
                 <NavigationMenuLink asChild>
                   <a
                     className="flex h-full w-full select-none  flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    // href="/dashboard/result-formatter"
+                    // href="/dashboard/tools/result-formatter"
                   >
                     <div className="relative">
                       <div className="bg-gray-950/30 blur-md inset-0 absolute" />
