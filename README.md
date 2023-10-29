@@ -8,6 +8,8 @@ But that's not all! Poly Tools is continuously evolving to cater to the needs of
 
 Simplify your result evaluation process with Poly Tools and reclaim valuable time to focus on what truly matters – providing quality education to your students. Experience the convenience, efficiency, and accuracy of Poly Tools today!
 
+![Alt](https://repobeats.axiom.co/api/embed/ca107e7fe4e1c952ea7c3fa2ecab2f4c037657ec.svg "Repobeats analytics image")
+
 ## Getting Started
 
 First, run the development server:
